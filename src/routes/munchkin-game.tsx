@@ -11,6 +11,9 @@ import { CombatTab } from "@/games/munchkin/tabs/combat-tab";
 import { PlayersTab } from "@/games/munchkin/tabs/players-tab";
 import { SettingsTab } from "@/games/munchkin/tabs/settings-tab";
 
+const TAB_TRIGGER_CLS =
+  "relative flex flex-col gap-1.5 h-full rounded-none data-[state=active]:text-primary data-[state=active]:bg-accent/30 before:absolute before:top-0 before:left-1/2 before:-translate-x-1/2 before:h-1 before:w-12 before:rounded-b-full before:bg-primary before:opacity-0 data-[state=active]:before:opacity-100 before:transition-opacity";
+
 export function MunchkinGame() {
   return (
     <div className="flex flex-col h-dvh bg-background text-foreground">
@@ -38,16 +41,16 @@ export function MunchkinGame() {
         >
           <SettingsTab />
         </TabsContent>
-        <TabsList className="grid grid-cols-3 w-full rounded-none border-t border-border h-20">
-          <TabsTrigger value="players" className="flex flex-col gap-1.5 h-full">
+        <TabsList className="grid grid-cols-3 w-full rounded-none border-t border-border h-20 p-0">
+          <TabsTrigger value="players" className={TAB_TRIGGER_CLS}>
             <Users className="size-6" />
             <span className="text-sm">Players</span>
           </TabsTrigger>
-          <TabsTrigger value="combat" className="flex flex-col gap-1.5 h-full">
+          <TabsTrigger value="combat" className={TAB_TRIGGER_CLS}>
             <Swords className="size-6" />
             <span className="text-sm">Combate</span>
           </TabsTrigger>
-          <TabsTrigger value="settings" className="flex flex-col gap-1.5 h-full">
+          <TabsTrigger value="settings" className={TAB_TRIGGER_CLS}>
             <SettingsIcon className="size-6" />
             <span className="text-sm">Config</span>
           </TabsTrigger>

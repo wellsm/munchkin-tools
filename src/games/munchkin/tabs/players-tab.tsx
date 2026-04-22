@@ -71,11 +71,11 @@ export function PlayersTab() {
       {canAdd && (
         <Button
           size="icon"
-          className="absolute top-3 right-3 rounded-full shadow-md"
+          className="absolute bottom-4 right-4 size-14 rounded-full shadow-lg"
           onClick={() => setAddOpen(true)}
           aria-label="Adicionar jogador"
         >
-          <Plus className="size-6" />
+          <Plus className="size-7" />
         </Button>
       )}
 
