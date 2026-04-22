@@ -51,9 +51,9 @@ export function SettingsTab() {
             disabled={decreaseMaxPlayersDisabled}
             aria-label="Diminuir jogadores máximo"
           >
-            <Minus className="size-4" />
+            <Minus className="size-5" />
           </Button>
-          <span className="w-10 text-center tabular-nums">{settings.maxPlayers}</span>
+          <span className="w-10 text-center tabular-nums text-lg">{settings.maxPlayers}</span>
           <Button
             type="button"
             size="icon"
@@ -62,7 +62,7 @@ export function SettingsTab() {
             disabled={increaseMaxPlayersDisabled}
             aria-label="Aumentar jogadores máximo"
           >
-            <Plus className="size-4" />
+            <Plus className="size-5" />
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
@@ -86,7 +86,7 @@ export function SettingsTab() {
       <section className="flex flex-col gap-2">
         <Label>Tema</Label>
         <Button variant="outline" onClick={toggleTheme} className="justify-start">
-          {theme === 'dark' ? <Moon className="size-4" /> : <Sun className="size-4" />}
+          {theme === 'dark' ? <Moon className="size-5" /> : <Sun className="size-5" />}
           <span className="ml-2">{theme === 'dark' ? 'Escuro' : 'Claro'}</span>
         </Button>
       </section>
@@ -96,7 +96,7 @@ export function SettingsTab() {
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" className="justify-start">
-              <Trash2 className="size-4" />
+              <Trash2 className="size-5" />
               <span className="ml-2">Apagar todos os jogadores</span>
             </Button>
           </AlertDialogTrigger>

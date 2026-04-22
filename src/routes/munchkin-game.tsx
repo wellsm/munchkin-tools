@@ -17,10 +17,10 @@ export function MunchkinGame() {
       <header className="flex items-center gap-3 border-b border-border p-3">
         <Button asChild variant="ghost" size="icon" aria-label="Voltar">
           <Link to="/">
-            <ArrowLeft className="size-5" />
+            <ArrowLeft className="size-6" />
           </Link>
         </Button>
-        <h1 className="text-lg font-semibold">Munchkin</h1>
+        <h1 className="text-xl font-semibold">Munchkin</h1>
       </header>
       <Tabs
         defaultValue="players"
@@ -38,18 +38,18 @@ export function MunchkinGame() {
         >
           <SettingsTab />
         </TabsContent>
-        <TabsList className="grid grid-cols-3 w-full rounded-none border-t border-border h-16">
-          <TabsTrigger value="players" className="flex flex-col gap-1 h-full">
-            <Users className="size-5" />
-            <span className="text-xs">Players</span>
+        <TabsList className="grid grid-cols-3 w-full rounded-none border-t border-border h-20">
+          <TabsTrigger value="players" className="flex flex-col gap-1.5 h-full">
+            <Users className="size-6" />
+            <span className="text-sm">Players</span>
           </TabsTrigger>
-          <TabsTrigger value="combat" className="flex flex-col gap-1 h-full">
-            <Swords className="size-5" />
-            <span className="text-xs">Combate</span>
+          <TabsTrigger value="combat" className="flex flex-col gap-1.5 h-full">
+            <Swords className="size-6" />
+            <span className="text-sm">Combate</span>
           </TabsTrigger>
-          <TabsTrigger value="settings" className="flex flex-col gap-1 h-full">
-            <SettingsIcon className="size-5" />
-            <span className="text-xs">Config</span>
+          <TabsTrigger value="settings" className="flex flex-col gap-1.5 h-full">
+            <SettingsIcon className="size-6" />
+            <span className="text-sm">Config</span>
           </TabsTrigger>
         </TabsList>
       </Tabs>

@@ -125,11 +125,11 @@ export function PlayerForm({ initialValues, maxLevel, submitLabel, onSubmit, onC
                 type="button"
                 onClick={() => toggleClass(c.id)}
                 className={cn(
-                  'inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-sm',
+                  'inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-base',
                   active ? 'bg-primary text-primary-foreground border-primary' : 'bg-background text-foreground',
                 )}
               >
-                <Icon className="size-4" aria-hidden />
+                <Icon className="size-5" aria-hidden />
                 {c.label}
               </button>
             )
@@ -150,11 +150,11 @@ export function PlayerForm({ initialValues, maxLevel, submitLabel, onSubmit, onC
                 type="button"
                 onClick={() => toggleRace(r.id)}
                 className={cn(
-                  'inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm',
+                  'inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-base',
                   active ? 'bg-accent text-accent-foreground border-accent-foreground' : 'bg-background text-foreground',
                 )}
               >
-                <Icon className="size-4" aria-hidden />
+                <Icon className="size-5" aria-hidden />
                 {r.label}
               </button>
             )

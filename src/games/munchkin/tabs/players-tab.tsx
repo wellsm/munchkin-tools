@@ -34,7 +34,7 @@ export function PlayersTab() {
       <div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center">
         <p className="text-muted-foreground">Nenhum jogador ainda.</p>
         <Button onClick={() => setAddOpen(true)}>
-          <Plus className="size-4" /> Adicionar jogador
+          <Plus className="size-5" /> Adicionar jogador
         </Button>
         <AddPlayerDialog
           open={addOpen}
@@ -52,7 +52,7 @@ export function PlayersTab() {
   return (
     <div className="relative h-full w-full">
       <div
-        className="grid gap-3 h-full w-full p-3"
+        className="grid gap-4 h-full w-full p-3"
         style={{
           gridTemplateColumns: `repeat(${layout.cols}, minmax(0, 1fr))`,
           gridTemplateRows: `repeat(${layout.rows}, minmax(0, 1fr))`,
@@ -75,7 +75,7 @@ export function PlayersTab() {
           onClick={() => setAddOpen(true)}
           aria-label="Adicionar jogador"
         >
-          <Plus className="size-5" />
+          <Plus className="size-6" />
         </Button>
       )}
 
