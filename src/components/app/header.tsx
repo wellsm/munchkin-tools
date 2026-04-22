@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useT } from "@/lib/i18n/store"
 
 type Props = {
   title: string
@@ -7,13 +8,15 @@ type Props = {
 }
 
 export function Header({ title, onBack }: Props) {
+  const t = useT()
+
   return (
     <div className="flex border-b p-4 items-center justify-between">
       {onBack ? (
         <Button
           variant="ghost"
           size="icon"
-          aria-label="Back"
+          aria-label={t.common.back}
           onClick={onBack}
         >
           <ArrowLeft className="size-6" />

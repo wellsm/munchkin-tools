@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils'
 import { MIN_LEVEL } from '@/lib/constants'
 import { avatarInitial, playerAvatarColor } from '@/lib/avatar-color'
+import { useT } from '@/lib/i18n/store'
 import { useMunchkinStore } from '@/lib/store'
 import type { Player } from '@/lib/types'
 
@@ -28,6 +29,7 @@ type ParticipantAction = {
 const INITIAL_ACTION: ParticipantAction = { increment: 0, reset: false }
 
 export function FinishSheet({ open, onOpenChange }: Props) {
+  const t = useT()
   const navigate = useNavigate()
   const players = useMunchkinStore((s) => s.players)
   const combat = useMunchkinStore((s) => s.combat)
@@ -142,16 +144,16 @@ export function FinishSheet({ open, onOpenChange }: Props) {
         <SheetHeader>
           <div className="flex items-center gap-2">
             <Flag className="size-6 text-primary" aria-hidden />
-            <SheetTitle className="font-munchkin text-3xl">Finish</SheetTitle>
+            <SheetTitle className="font-munchkin text-3xl">{t.finish.title}</SheetTitle>
           </div>
           <SheetDescription>
-            Level up winners, reset fallen heroes.
+            {t.finish.description}
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 overflow-auto mt-4 px-4">
           {participants.length === 0 && (
-            <p className="text-center text-muted-foreground p-4">No participants.</p>
+            <p className="text-center text-muted-foreground p-4">{t.finish.noParticipants}</p>
           )}
           <ul className="flex flex-col gap-3">
             {participants.map((p) => {
@@ -179,11 +181,12 @@ export function FinishSheet({ open, onOpenChange }: Props) {
                   <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                     <span className="text-lg font-munchkin truncate">{p.name}</span>
                     <span className="text-sm text-muted-foreground">
-                      Level {p.level}
-                      {changed && (
+                      {changed ? (
                         <span className={action.reset ? 'text-destructive' : 'text-primary'}>
-                          {' '}→ {projected}
+                          {t.finish.levelTransition(p.level, projected)}
                         </span>
+                      ) : (
+                        t.combat.levelFormat(p.level)
                       )}
                     </span>
                   </div>
@@ -196,7 +199,7 @@ export function FinishSheet({ open, onOpenChange }: Props) {
                     >
                       <button
                         type="button"
-                        aria-label={`Decrease ${p.name} level gain`}
+                        aria-label={t.finish.decreaseLevelGain(p.name)}
                         onClick={() => adjust(p.id, -1)}
                         disabled={action.reset || action.increment <= 0}
                         className="px-3 py-2 text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -208,7 +211,7 @@ export function FinishSheet({ open, onOpenChange }: Props) {
                       </span>
                       <button
                         type="button"
-                        aria-label={`Increase ${p.name} level gain`}
+                        aria-label={t.finish.increaseLevelGain(p.name)}
                         onClick={() => adjust(p.id, 1)}
                         disabled={action.reset || action.increment >= cap}
                         className="px-3 py-2 text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
@@ -218,7 +221,7 @@ export function FinishSheet({ open, onOpenChange }: Props) {
                     </div>
                     <button
                       type="button"
-                      aria-label={`Reset ${p.name} level to ${MIN_LEVEL}`}
+                      aria-label={t.finish.resetLevelTo(p.name, MIN_LEVEL)}
                       aria-pressed={action.reset}
                       onClick={() => toggleReset(p.id)}
                       className={cn(
@@ -239,10 +242,10 @@ export function FinishSheet({ open, onOpenChange }: Props) {
 
         <div className="p-4 pt-2 grid grid-cols-2 gap-3">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button onClick={handleSave}>
-            <Check className="size-4" /> Save
+            <Check className="size-4" /> {t.common.save}
           </Button>
         </div>
       </SheetContent>

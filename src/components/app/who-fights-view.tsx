@@ -1,34 +1,36 @@
-import { useNavigate } from 'react-router-dom'
-import { useMunchkinStore } from '@/lib/store'
-import { Header } from './header'
-import { HeroRow } from './hero-row'
+import { useNavigate } from "react-router-dom";
+import { Header } from "@/components/app/header";
+import { HeroRow } from "@/components/app/hero-row";
+import { useT } from "@/lib/i18n/store";
+import { useMunchkinStore } from "@/lib/store";
 
 export function WhoFightsView() {
-  const { players, setMainCombatant } = useMunchkinStore()
-  const navigate = useNavigate()
+  const t = useT();
+  const { players, setMainCombatant } = useMunchkinStore();
+  const navigate = useNavigate();
 
   const setHero = (id: string) => {
-    setMainCombatant(id)
-    navigate(`?tab=combat`)
-  }
+    setMainCombatant(id);
+    navigate(`?tab=combat`);
+  };
 
   if (players.length === 0) {
     return (
       <div className="h-full flex items-center justify-center p-6 text-center">
-        <p className="text-muted-foreground">Add heroes in the Heroes tab before combat.</p>
+        <p className="text-muted-foreground">
+          {t.combat.addHeroesFirst}
+        </p>
       </div>
-    )
+    );
   }
 
   return (
     <div>
-      <Header title="Combat" />
+      <Header title={t.combat.title} />
       <div className="h-full overflow-auto p-4 max-w-md mx-auto w-full">
-
-
         <div className="flex items-center gap-3 mb-3">
           <span className="text-base tracking-wider uppercase text-muted-foreground shrink-0">
-            Who Fights?
+            {t.combat.whoFights}
           </span>
           <div className="flex-1 h-px bg-border" />
         </div>
@@ -40,5 +42,5 @@ export function WhoFightsView() {
         </ul>
       </div>
     </div>
-  )
+  );
 }

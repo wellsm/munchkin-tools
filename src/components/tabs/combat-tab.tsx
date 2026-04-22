@@ -1,5 +1,5 @@
-import { FightingView } from "@/components/fighting-view";
-import { WhoFightsView } from "@/components/who-fights-view";
+import { FightingView } from "@/components/app/fighting-view";
+import { WhoFightsView } from "@/components/app/who-fights-view";
 import { useMunchkinStore } from "@/lib/store";
 
 export function CombatTab() {

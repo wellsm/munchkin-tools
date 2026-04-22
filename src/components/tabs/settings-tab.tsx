@@ -1,5 +1,8 @@
 import { Moon, Sun, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Header } from "@/components/app/header";
+import { SectionLabel } from "@/components/app/section-label";
+import { StepperCard } from "@/components/app/stepper-card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,19 +14,32 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { applyTheme, getStoredTheme, type Theme } from "@/lib/theme";
-import { Header } from "@/components/header";
-import { SectionLabel } from "@/components/section-label";
-import { StepperCard } from "@/components/stepper-card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { MIN_MAX_PLAYERS, PRODUCT_MAX_PLAYERS } from "@/lib/constants";
+import { useI18nStore, useT, type Locale } from "@/lib/i18n/store";
 import { useMunchkinStore } from "@/lib/store";
+import { applyTheme, getStoredTheme, type Theme } from "@/lib/theme";
+import { isWakeLockSupported, useWakeLockStore } from "@/lib/wake-lock";
 
 export function SettingsTab() {
+  const t = useT();
   const players = useMunchkinStore((s) => s.players);
   const settings = useMunchkinStore((s) => s.settings);
   const setMaxPlayers = useMunchkinStore((s) => s.setMaxPlayers);
   const setMaxLevel = useMunchkinStore((s) => s.setMaxLevel);
   const resetAllPlayers = useMunchkinStore((s) => s.resetAllPlayers);
+  const locale = useI18nStore((s) => s.locale);
+  const setLocale = useI18nStore((s) => s.setLocale);
+  const wakeLockEnabled = useWakeLockStore((s) => s.enabled);
+  const setWakeLockEnabled = useWakeLockStore((s) => s.setEnabled);
+  const wakeLockSupported = isWakeLockSupported();
   const [theme, setTheme] = useState<Theme>(() => getStoredTheme());
 
   const decreaseMaxPlayersDisabled =
@@ -38,40 +54,64 @@ export function SettingsTab() {
 
   return (
     <div>
-      <Header title="Settings" />
+      <Header title={t.settings.title} />
       <div className="h-full overflow-auto p-4 pb-8 max-w-md mx-auto w-full flex flex-col gap-4">
         <div>
-          <SectionLabel>Party</SectionLabel>
+          <SectionLabel>{t.settings.party}</SectionLabel>
           <div className="flex flex-col gap-3 mb-6">
             <StepperCard
-              label="Max Heroes"
+              label={t.settings.maxHeroes}
               value={settings.maxPlayers}
               onChange={setMaxPlayers}
               decreaseDisabled={decreaseMaxPlayersDisabled}
               increaseDisabled={increaseMaxPlayersDisabled}
-              hint={`Cannot be lower than current hero count (${players.length}).`}
+              hint={t.settings.maxHeroesHint(players.length)}
             />
             <StepperCard
-              label="Max Level"
+              label={t.settings.maxLevel}
               value={settings.maxLevel}
               onChange={setMaxLevel}
               decreaseDisabled={settings.maxLevel <= 1}
               increaseDisabled={settings.maxLevel >= 99}
-              hint="Heroes above this level will be demoted."
+              hint={t.settings.maxLevelHint}
             />
           </div>
         </div>
 
         <div>
-          <SectionLabel>Appearance</SectionLabel>
-          <div className="mb-6">
+          <SectionLabel>{t.settings.preferences}</SectionLabel>
+          <div className="mb-6 flex flex-col gap-3">
+            <section className="rounded-xl border border-border/60 bg-card/50 p-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-base tracking-widest uppercase text-muted-foreground font-munchkin">
+                  {t.settings.language}
+                </span>
+                <Select
+                  value={locale}
+                  onValueChange={(v) => setLocale(v as Locale)}
+                >
+                  <SelectTrigger className="w-36">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">
+                      {t.settings.languageEnglish}
+                    </SelectItem>
+                    <SelectItem value="pt">
+                      {t.settings.languagePortuguese}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </section>
+
             <button
               type="button"
               onClick={toggleTheme}
               className="w-full flex items-center justify-between rounded-xl border border-border/60 bg-card/50 p-4 hover:bg-accent transition-colors"
             >
               <span className="text-base tracking-widest uppercase text-muted-foreground font-munchkin">
-                Theme
+                {t.settings.theme}
               </span>
               <span className="flex items-center gap-2 text-foreground">
                 {theme === "dark" ? (
@@ -80,15 +120,36 @@ export function SettingsTab() {
                   <Sun className="size-5" />
                 )}
                 <span className="font-munchkin text-xl">
-                  {theme === "dark" ? "Dark" : "Light"}
+                  {theme === "dark"
+                    ? t.settings.themeDark
+                    : t.settings.themeLight}
                 </span>
               </span>
             </button>
+
+            <section className="rounded-xl border border-border/60 bg-card/50 p-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-base tracking-widest uppercase text-muted-foreground font-munchkin">
+                  {t.settings.keepAwake}
+                </span>
+                <Switch
+                  checked={wakeLockEnabled && wakeLockSupported}
+                  onCheckedChange={setWakeLockEnabled}
+                  disabled={!wakeLockSupported}
+                  aria-label={t.settings.keepAwake}
+                />
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {wakeLockSupported
+                  ? t.settings.keepAwakeHint
+                  : t.settings.keepAwakeUnsupported}
+              </span>
+            </section>
           </div>
         </div>
 
         <div>
-          <SectionLabel variant="danger">Danger Zone</SectionLabel>
+          <SectionLabel variant="danger">{t.settings.dangerZone}</SectionLabel>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <button
@@ -96,22 +157,24 @@ export function SettingsTab() {
                 className="w-full flex items-center gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4 hover:bg-destructive/10 transition-colors text-destructive"
               >
                 <Trash2 className="size-5" />
-                <span className="font-munchkin text-lg">Remove all heroes</span>
+                <span className="font-munchkin text-lg">
+                  {t.settings.removeAllHeroes}
+                </span>
               </button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle className="font-munchkin text-2xl">
-                  Remove all heroes?
+                  {t.settings.confirmRemoveAllTitle}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  This removes all heroes and resets combat. It cannot be undone.
+                  {t.settings.confirmRemoveAllDescription}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
                 <AlertDialogAction onClick={resetAllPlayers}>
-                  Remove all
+                  {t.settings.removeAll}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

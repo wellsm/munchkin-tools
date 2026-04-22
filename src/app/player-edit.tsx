@@ -6,10 +6,13 @@ import {
   Swords,
   Trash2,
   Venus,
-  X,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Chip } from "@/components/app/chip";
+import { GenderButton } from "@/components/app/gender-button";
+import { NameEditor } from "@/components/app/name-editor";
+import { StatCard } from "@/components/app/stat-card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,11 +25,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Chip } from "@/components/chip";
-import { GenderButton } from "@/components/gender-button";
-import { NameEditor } from "@/components/name-editor";
-import { StatCard } from "@/components/stat-card";
+import { AVATAR_COLORS, avatarInitial } from "@/lib/avatar-color";
 import {
   CLASSES,
   MAX_CLASSES_PER_PLAYER,
@@ -34,37 +33,31 @@ import {
   MIN_LEVEL,
   RACES,
 } from "@/lib/constants";
-import {
-  AVATAR_COLORS,
-  avatarColor,
-  avatarInitial,
-} from "@/lib/avatar-color";
+import { useT } from "@/lib/i18n/store";
 import { useMunchkinStore } from "@/lib/store";
-import type {
-  Gender,
-  MunchkinClass,
-  MunchkinRace,
-  Player,
-} from "@/lib/types";
+import type { Gender, MunchkinClass, MunchkinRace, Player } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 type Draft = Omit<Player, "id">;
 
 const EMPTY_DRAFT: Draft = {
-  name: "New Hero",
+  name: "",
   level: 1,
   gear: 0,
-  gender: null,
-  color: undefined,
+  gender: "male",
+  color: AVATAR_COLORS[0],
   classes: [],
   races: [],
 };
 
 export function PlayerEdit() {
+  const t = useT();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isNew = id === "new";
 
-  const maxLevel = useMunchkinStore((s) => s.settings.maxLevel);
+  const { settings, updatePlayer, removePlayer, addPlayer, setMainCombatant } = useMunchkinStore();
+
   const existingPlayer = useMunchkinStore((s) => {
     if (isNew) {
       return null;
@@ -72,25 +65,21 @@ export function PlayerEdit() {
 
     return s.players.find((p) => p.id === id) ?? null;
   });
-  const updatePlayer = useMunchkinStore((s) => s.updatePlayer);
-  const removePlayer = useMunchkinStore((s) => s.removePlayer);
-  const addPlayer = useMunchkinStore((s) => s.addPlayer);
-  const setMainCombatant = useMunchkinStore((s) => s.setMainCombatant);
 
-  const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
+  const [draft, setDraft] = useState<Draft>(() => ({
+    ...EMPTY_DRAFT,
+    name: t.heroEdit.newHero,
+  }));
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const source: Draft | null = isNew ? draft : existingPlayer;
-  const avatarSeed = isNew
-    ? draft.name.trim() || "new-hero"
-    : (existingPlayer?.id ?? "new-hero");
 
   if (!source) {
     return (
       <div className="min-h-dvh flex items-center justify-center p-6 text-center bg-background text-foreground">
         <div className="flex flex-col gap-4 items-center">
-          <p className="text-muted-foreground">Hero not found.</p>
-          <Button onClick={() => navigate("/")}>Back to party</Button>
+          <p className="text-muted-foreground">{t.heroEdit.heroNotFound}</p>
+          <Button onClick={() => navigate("/")}>{t.heroEdit.backToParty}</Button>
         </div>
       </div>
     );
@@ -145,7 +134,7 @@ export function PlayerEdit() {
   }
 
   function handleLevelChange(delta: number) {
-    const next = Math.max(MIN_LEVEL, Math.min(maxLevel, source!.level + delta));
+    const next = Math.max(MIN_LEVEL, Math.min(settings.maxLevel, source!.level + delta));
     commitField("level", next);
   }
 
@@ -201,7 +190,7 @@ export function PlayerEdit() {
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Back"
+            aria-label={t.heroEdit.backAria}
             onClick={() => navigate("/")}
           >
             <ArrowLeft className="size-6" />
@@ -211,23 +200,27 @@ export function PlayerEdit() {
           ) : (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Remove hero">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={t.heroEdit.removeHeroAria}
+                >
                   <Trash2 className="size-6" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    Remove {existingPlayer?.name}?
+                    {t.heroEdit.confirmRemoveTitle(existingPlayer?.name ?? "")}
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    This cannot be undone.
+                    {t.heroEdit.confirmRemoveDescription}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
                   <AlertDialogAction onClick={handleRemove}>
-                    Remove
+                    {t.common.remove}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -239,7 +232,9 @@ export function PlayerEdit() {
           <div className="relative">
             <div
               className="size-28 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: source.color ?? avatarColor(avatarSeed) }}
+              style={{
+                backgroundColor: source.color,
+              }}
               aria-hidden
             >
               <span className="font-munchkin text-6xl text-background leading-none">
@@ -248,7 +243,7 @@ export function PlayerEdit() {
             </div>
             <button
               type="button"
-              aria-label="Choose avatar color"
+              aria-label={t.heroEdit.chooseAvatarColor}
               aria-expanded={pickerOpen}
               onClick={() => setPickerOpen((v) => !v)}
               className="absolute -bottom-1 -right-1 size-10 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-foreground hover:bg-accent transition-colors"
@@ -258,15 +253,15 @@ export function PlayerEdit() {
           </div>
 
           {pickerOpen && (
-            <div className="mt-4 p-3 rounded-xl border border-border bg-card/70 flex items-center gap-2 flex-wrap justify-center">
+            <div className="mt-4 px-2 py-4 rounded-xl border border-border bg-card/70 flex items-center gap-2 flex-wrap justify-center">
               {AVATAR_COLORS.map((c) => {
-                const selected = source.color === c;
+                const selected = source.color === c
 
                 return (
                   <button
                     key={c}
                     type="button"
-                    aria-label="Pick color"
+                    aria-label={t.heroEdit.pickColor}
                     aria-pressed={selected}
                     onClick={() => {
                       commitField("color", c);
@@ -275,28 +270,12 @@ export function PlayerEdit() {
                     className={cn(
                       "size-10 rounded-full transition-all",
                       selected &&
-                        "ring-2 ring-primary ring-offset-2 ring-offset-background",
+                      "ring-2 ring-primary ring-offset-2 ring-offset-background",
                     )}
                     style={{ backgroundColor: c }}
                   />
                 );
               })}
-              <button
-                type="button"
-                aria-label="Reset to default color"
-                aria-pressed={source.color === undefined}
-                onClick={() => {
-                  commitField("color", undefined);
-                  setPickerOpen(false);
-                }}
-                className={cn(
-                  "size-10 rounded-full border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors",
-                  source.color === undefined &&
-                    "ring-2 ring-primary ring-offset-2 ring-offset-background",
-                )}
-              >
-                <X className="size-4" />
-              </button>
             </div>
           )}
 
@@ -309,41 +288,55 @@ export function PlayerEdit() {
             <GenderButton
               active={source.gender === "male"}
               gender={source.gender}
-              label="Male"
+              label={t.heroEdit.male}
               onClick={() => handleGender("male")}
             >
-              <Mars className={cn("size-8", source.gender === "male" ? "text-background" : "text-foreground")} />
+              <Mars
+                className={cn(
+                  "size-8",
+                  source.gender === "male"
+                    ? "text-background"
+                    : "text-foreground",
+                )}
+              />
             </GenderButton>
             <GenderButton
               active={source.gender === "female"}
               gender={source.gender}
-              label="Female"
+              label={t.heroEdit.female}
               onClick={() => handleGender("female")}
             >
-              <Venus className={cn("size-8", source.gender === "female" ? "text-background" : "text-foreground")} />
+              <Venus
+                className={cn(
+                  "size-8",
+                  source.gender === "female"
+                    ? "text-background"
+                    : "text-foreground",
+                )}
+              />
             </GenderButton>
           </div>
         </div>
 
         <div className="grid grid-cols-3 items-center gap-3 mt-8">
           <StatCard
-            label="LEVEL"
+            label={t.heroEdit.level}
             value={source.level}
             onDown={() => handleLevelChange(-1)}
             onUp={() => handleLevelChange(1)}
             downDisabled={source.level <= MIN_LEVEL}
-            upDisabled={source.level >= maxLevel}
+            upDisabled={source.level >= settings.maxLevel}
           />
           <div className="flex flex-col items-center justify-center">
             <span className="text-xs tracking-widest uppercase text-muted-foreground mt-4">
-              Strength
+              {t.heroEdit.strength}
             </span>
             <span className="font-munchkin text-8xl text-primary tabular-nums leading-none mt-3">
               {strength}
             </span>
           </div>
           <StatCard
-            label="GEAR"
+            label={t.heroEdit.gear}
             value={source.gear}
             onDown={() => handleGearChange(-1)}
             onUp={() => handleGearChange(1)}
@@ -352,7 +345,7 @@ export function PlayerEdit() {
 
         <div className="mt-6 flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">
-            Race {source.races.length}/{MAX_RACES_PER_PLAYER}
+            {t.heroEdit.raceSlots(source.races.length, MAX_RACES_PER_PLAYER)}
           </span>
           <div className="flex flex-wrap gap-2">
             {RACES.map((r) => {
@@ -366,7 +359,7 @@ export function PlayerEdit() {
                   onClick={() => toggleRace(r.id)}
                 >
                   <Icon className="size-4" aria-hidden />
-                  {r.label}
+                  {t.heroEdit.races[r.id]}
                 </Chip>
               );
             })}
@@ -375,7 +368,7 @@ export function PlayerEdit() {
 
         <div className="mt-4 flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">
-            Class {source.classes.length}/{MAX_CLASSES_PER_PLAYER}
+            {t.heroEdit.classSlots(source.classes.length, MAX_CLASSES_PER_PLAYER)}
           </span>
           <div className="flex flex-wrap gap-2">
             {CLASSES.map((c) => {
@@ -389,7 +382,7 @@ export function PlayerEdit() {
                   onClick={() => toggleClass(c.id)}
                 >
                   <Icon className="size-4" aria-hidden />
-                  {c.label}
+                  {t.heroEdit.classes[c.id]}
                 </Chip>
               );
             })}
@@ -403,11 +396,11 @@ export function PlayerEdit() {
             onClick={handleSave}
             disabled={!canSave}
           >
-            <Check className="size-5" /> Save
+            <Check className="size-5" /> {t.heroEdit.save}
           </Button>
         ) : (
           <Button size="lg" className="w-full mt-8" onClick={handleEnterCombat}>
-            <Swords className="size-5" /> Enter combat
+            <Swords className="size-5" /> {t.heroEdit.enterCombat}
           </Button>
         )}
       </div>

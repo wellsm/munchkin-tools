@@ -9,27 +9,27 @@ export const PRODUCT_MAX_PLAYERS = 8
 export const DEFAULT_MAX_LEVEL = 10
 export const MIN_LEVEL = 1
 
-export type ClassEntry = { id: MunchkinClass; label: string; icon: LucideIcon }
-export type RaceEntry = { id: MunchkinRace; label: string; icon: LucideIcon }
-export type GenderEntry = { id: Gender; label: string; icon: LucideIcon }
+export type ClassEntry = { id: MunchkinClass; icon: LucideIcon }
+export type RaceEntry = { id: MunchkinRace; icon: LucideIcon }
+export type GenderEntry = { id: Gender; icon: LucideIcon }
 
 export const CLASSES: ClassEntry[] = [
-  { id: 'warrior', label: 'Warrior', icon: Sword },
-  { id: 'wizard', label: 'Wizard', icon: Sparkles },
-  { id: 'cleric', label: 'Cleric', icon: Cross },
-  { id: 'thief', label: 'Thief', icon: VenetianMask },
+  { id: 'warrior', icon: Sword },
+  { id: 'wizard', icon: Sparkles },
+  { id: 'cleric', icon: Cross },
+  { id: 'thief', icon: VenetianMask },
 ]
 
 export const RACES: RaceEntry[] = [
-  { id: 'human', label: 'Human', icon: User },
-  { id: 'elf', label: 'Elf', icon: TreePine },
-  { id: 'dwarf', label: 'Dwarf', icon: Hammer },
-  { id: 'halfling', label: 'Halfling', icon: Rabbit },
+  { id: 'human', icon: User },
+  { id: 'elf', icon: TreePine },
+  { id: 'dwarf', icon: Hammer },
+  { id: 'halfling', icon: Rabbit },
 ]
 
 export const GENDERS: GenderEntry[] = [
-  { id: 'male', label: 'Male', icon: Mars },
-  { id: 'female', label: 'Female', icon: Venus },
+  { id: 'male', icon: Mars },
+  { id: 'female', icon: Venus },
 ]
 
 export function classById(id: MunchkinClass): ClassEntry {

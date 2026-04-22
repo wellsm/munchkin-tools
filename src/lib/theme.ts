@@ -14,5 +14,6 @@ export function getStoredTheme(): Theme {
 
 export function applyTheme(theme: Theme) {
   localStorage.setItem(THEME_KEY, theme)
+
   document.documentElement.classList.toggle('dark', theme === 'dark')
 }

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CombatTab } from "@/components/tabs/combat-tab";
 import { PlayersTab } from "@/components/tabs/players-tab";
 import { SettingsTab } from "@/components/tabs/settings-tab";
+import { useT } from "@/lib/i18n/store";
 import { useMunchkinStore } from "@/lib/store";
 
 const TAB_TRIGGER_CLS =
@@ -15,6 +16,7 @@ const MIN_HEROES_FOR_COMBAT = 3;
 type TabValue = (typeof VALID_TABS)[number];
 
 export function MunchkinGame() {
+  const t = useT();
   const [searchParams, setSearchParams] = useSearchParams();
   const playerCount = useMunchkinStore((s) => s.players.length);
   const canFight = playerCount >= MIN_HEROES_FOR_COMBAT;
@@ -60,7 +62,7 @@ export function MunchkinGame() {
         <TabsList className="grid grid-cols-3 w-full rounded-none border-t border-border h-20 p-0">
           <TabsTrigger value="players" className={TAB_TRIGGER_CLS}>
             <Users className="size-6" />
-            <span className="text-sm">Heroes</span>
+            <span className="text-sm">{t.tabs.heroes}</span>
           </TabsTrigger>
           <TabsTrigger
             value="combat"
@@ -68,16 +70,16 @@ export function MunchkinGame() {
             disabled={!canFight}
             aria-label={
               canFight
-                ? "Combat"
-                : `Combat (needs ${MIN_HEROES_FOR_COMBAT} heroes)`
+                ? t.tabs.combat
+                : t.combat.combatNeeds(MIN_HEROES_FOR_COMBAT)
             }
           >
             <Swords className="size-6" />
-            <span className="text-sm">Combat</span>
+            <span className="text-sm">{t.tabs.combat}</span>
           </TabsTrigger>
           <TabsTrigger value="settings" className={TAB_TRIGGER_CLS}>
             <SettingsIcon className="size-6" />
-            <span className="text-sm">Settings</span>
+            <span className="text-sm">{t.tabs.settings}</span>
           </TabsTrigger>
         </TabsList>
       </Tabs>

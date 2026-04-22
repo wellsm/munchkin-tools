@@ -4,41 +4,49 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from '@/components/ui/sheet'
-import { avatarInitial, playerAvatarColor } from '@/lib/avatar-color'
-import { combatBreed } from '@/lib/combat-breed'
-import { calculateStrength } from '@/lib/strength'
-import { useMunchkinStore } from '@/lib/store'
+} from "@/components/ui/sheet";
+import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
+import { combatBreed } from "@/lib/combat-breed";
+import { useT } from "@/lib/i18n/store";
+import { useMunchkinStore } from "@/lib/store";
+import { calculateStrength } from "@/lib/strength";
 
 type Props = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
 
 export function HelperPickerSheet({ open, onOpenChange }: Props) {
-  const players = useMunchkinStore((s) => s.players)
-  const combat = useMunchkinStore((s) => s.combat)
-  const addHelper = useMunchkinStore((s) => s.addHelper)
+  const t = useT();
+  const players = useMunchkinStore((s) => s.players);
+  const combat = useMunchkinStore((s) => s.combat);
+  const addHelper = useMunchkinStore((s) => s.addHelper);
 
   const available = players.filter(
     (p) => p.id !== combat.mainCombatantId && !combat.helperIds.includes(p.id),
-  )
+  );
 
   function pick(id: string) {
-    addHelper(id)
-    onOpenChange(false)
+    addHelper(id);
+    onOpenChange(false);
   }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="max-h-[80dvh] flex flex-col">
         <SheetHeader>
-          <SheetTitle className="font-munchkin text-2xl">Choose a helper</SheetTitle>
-          <SheetDescription>Pick another hero to join the fight.</SheetDescription>
+          <SheetTitle className="font-munchkin text-2xl">
+            {t.combat.chooseHelper}
+          </SheetTitle>
+          <SheetDescription>
+            {t.combat.pickHelperDescription}
+          </SheetDescription>
         </SheetHeader>
         <div className="flex-1 overflow-auto mt-4 px-4 pb-4">
           {available.length === 0 && (
-            <p className="text-center text-muted-foreground p-4">No other heroes available.</p>
+            <p className="text-center text-muted-foreground p-4">
+              {t.combat.noOtherHeroes}
+            </p>
           )}
           <ul className="flex flex-col gap-2">
             {available.map((p) => (
@@ -58,9 +66,11 @@ export function HelperPickerSheet({ open, onOpenChange }: Props) {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                    <span className="text-lg font-munchkin truncate">{p.name}</span>
+                    <span className="text-lg font-munchkin truncate">
+                      {p.name}
+                    </span>
                     <span className="text-sm tracking-wide text-muted-foreground truncate">
-                      {combatBreed(p)}
+                      {combatBreed(p, t)}
                     </span>
                   </div>
                   <span className="font-munchkin text-xl text-primary tabular-nums">
@@ -73,5 +83,5 @@ export function HelperPickerSheet({ open, onOpenChange }: Props) {
         </div>
       </SheetContent>
     </Sheet>
-  )
+  );
 }

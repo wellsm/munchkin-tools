@@ -1,11 +1,11 @@
 import { Mars, Venus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { StatBox } from "@/components/app/stat-box";
 import { Button } from "@/components/ui/button";
-import { classById, raceById } from "@/lib/constants";
 import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
+import { useT } from "@/lib/i18n/store";
 import { calculateStrength } from "@/lib/strength";
 import type { Player } from "@/lib/types";
-import { StatBox } from "./stat-box";
 
 type Props = {
   player: Player;
@@ -13,13 +13,14 @@ type Props = {
 };
 
 export function HeroRow({ player, onClick }: Props) {
+  const t = useT();
   const navigate = useNavigate();
   const strength = calculateStrength(player);
   const races = player.races
-    .map((id) => raceById(id).label.toUpperCase())
+    .map((id) => t.heroEdit.races[id].toUpperCase())
     .join(" | ");
   const classes = player.classes
-    .map((id) => classById(id).label.toUpperCase())
+    .map((id) => t.heroEdit.classes[id].toUpperCase())
     .join(" | ");
 
   return (
@@ -45,13 +46,13 @@ export function HeroRow({ player, onClick }: Props) {
           {player.gender === "male" && (
             <Mars
               className="size-4 text-muted-foreground shrink-0"
-              aria-label="Male"
+              aria-label={t.heroEdit.male}
             />
           )}
           {player.gender === "female" && (
             <Venus
               className="size-4 text-muted-foreground shrink-0"
-              aria-label="Female"
+              aria-label={t.heroEdit.female}
             />
           )}
         </div>
@@ -66,9 +67,9 @@ export function HeroRow({ player, onClick }: Props) {
       </div>
 
       <div className="flex items-center gap-1.5 shrink-0">
-        <StatBox value={player.level} label="LVL" />
-        <StatBox value={player.gear} label="GEAR" />
-        <StatBox value={strength} label="STR" highlighted />
+        <StatBox value={player.level} label={t.heroes.lvlShort} />
+        <StatBox value={player.gear} label={t.heroes.gearShort} />
+        <StatBox value={strength} label={t.heroes.strShort} highlighted />
       </div>
     </Button>
   );

@@ -4,15 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
 import { combatTotals } from "@/lib/combat";
+import { useT } from "@/lib/i18n/store";
 import { useMunchkinStore } from "@/lib/store";
 import type { Player } from "@/lib/types";
-import { Header } from "./header";
+import { FinishSheet } from "@/components/app/finish-sheet";
+import { Header } from "@/components/app/header";
 import { HelperPickerSheet } from "./helper-picker-sheet";
 import { StepperCard } from "./stepper-card";
 import { VersusBadge } from "./versus-badge";
-import { FinishSheet } from "./finish-sheet";
 
 export function FightingView() {
+  const t = useT();
   const navigate = useNavigate();
   const players = useMunchkinStore((s) => s.players);
   const combat = useMunchkinStore((s) => s.combat);
@@ -48,13 +50,13 @@ export function FightingView() {
 
   return (
     <div>
-      <Header title="Combat" onBack={() => setMainCombatant(null)} />
+      <Header title={t.combat.title} onBack={() => setMainCombatant(null)} />
       <div className="h-full overflow-auto p-4 max-w-md mx-auto w-full flex flex-col gap-4">
         <section className="rounded-xl border border-border/60 bg-card/50 p-5">
           <div className="grid grid-cols-3 gap-2 items-start">
             <div className="flex flex-col items-center text-center">
               <span className="text-xs tracking-widest uppercase text-muted-foreground">
-                Party
+                {t.combat.party}
               </span>
               <span className="font-munchkin text-6xl text-primary tabular-nums leading-none mt-2">
                 {result.partyTotal}
@@ -88,7 +90,7 @@ export function FightingView() {
                   <button
                     type="button"
                     onClick={() => setPickerOpen(true)}
-                    aria-label="Add helper"
+                    aria-label={t.combat.addHelper}
                     className="size-10 rounded-full border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
                   >
                     <Plus className="size-5" />
@@ -99,7 +101,7 @@ export function FightingView() {
 
             <div className="flex flex-col items-center text-center gap-1 pt-6">
               <span className="text-xs tracking-widest text-muted-foreground">
-                VS
+                {t.combat.vs}
               </span>
               <VersusBadge
                 partyTotal={result.partyTotal}
@@ -109,13 +111,13 @@ export function FightingView() {
 
             <div className="flex flex-col items-center text-center">
               <span className="text-xs tracking-widest uppercase text-muted-foreground">
-                Monster
+                {t.combat.monster}
               </span>
               <span className="font-munchkin text-6xl text-foreground tabular-nums leading-none mt-2">
                 {combat.monsterLevel + combat.monsterModifier}
               </span>
               <span className="text-sm text-muted-foreground mt-2">
-                Level {combat.monsterLevel}
+                {t.combat.levelFormat(combat.monsterLevel)}
               </span>
               <div className="size-10 rounded-full bg-destructive/20 border border-destructive/40 flex items-center justify-center mt-3 mx-auto">
                 <Skull className="size-5 text-destructive" />
@@ -125,18 +127,18 @@ export function FightingView() {
         </section>
 
         <StepperCard
-          label="Monster Level"
+          label={t.combat.monsterLevel}
           value={combat.monsterLevel}
           onChange={setMonsterLevel}
           decreaseDisabled={combat.monsterLevel <= 0}
         />
         <StepperCard
-          label="Party modifiers"
+          label={t.combat.partyModifiers}
           value={combat.partyModifier}
           onChange={setPartyModifier}
         />
         <StepperCard
-          label="Monster modifiers"
+          label={t.combat.monsterModifiers}
           value={combat.monsterModifier}
           onChange={setMonsterModifier}
         />
@@ -146,7 +148,7 @@ export function FightingView() {
             variant="outline"
             onClick={() => helpers.forEach((h) => removeHelper(h.id))}
           >
-            <UserMinus className="size-4" /> Remove Helper
+            <UserMinus className="size-4" /> {t.combat.removeHelper}
           </Button>
         )}
 
@@ -156,10 +158,10 @@ export function FightingView() {
             onClick={handleFled}
             className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
-            <X className="size-5" /> Fled
+            <X className="size-5" /> {t.combat.fled}
           </Button>
           <Button onClick={() => setFinishOpen(true)}>
-            <Flag className="size-5" /> Finish
+            <Flag className="size-5" /> {t.combat.finish}
           </Button>
         </div>
 

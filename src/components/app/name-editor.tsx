@@ -1,6 +1,7 @@
 import { Pencil } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
+import { useT } from '@/lib/i18n/store'
 
 type Props = {
   name: string
@@ -8,6 +9,7 @@ type Props = {
 }
 
 export function NameEditor({ name, onRename }: Props) {
+  const t = useT()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(name)
 
@@ -48,7 +50,7 @@ export function NameEditor({ name, onRename }: Props) {
           }
         }}
         className="mt-4 w-auto min-w-40 max-w-full text-center text-3xl font-munchkin h-auto py-1"
-        aria-label="Hero name"
+        aria-label={t.heroEdit.heroNameAria}
       />
     )
   }
@@ -58,7 +60,7 @@ export function NameEditor({ name, onRename }: Props) {
       type="button"
       onClick={() => setEditing(true)}
       className="mt-4 flex items-center gap-2 cursor-pointer"
-      aria-label="Edit hero name"
+      aria-label={t.heroEdit.editName}
     >
       <span className="text-3xl font-munchkin">{name}</span>
       <Pencil className="size-4 text-muted-foreground" aria-hidden />
