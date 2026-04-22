@@ -1,30 +1,37 @@
+import { Settings as SettingsIcon, Swords, Users } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
-import {
-  Settings as SettingsIcon,
-  Swords,
-  Users,
-} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CombatTab } from "@/munchkin/tabs/combat-tab";
 import { PlayersTab } from "@/munchkin/tabs/players-tab";
 import { SettingsTab } from "@/munchkin/tabs/settings-tab";
+import { useMunchkinStore } from "@/munchkin/store";
 
 const TAB_TRIGGER_CLS =
-  "relative flex flex-col gap-1.5 h-full rounded-none data-[state=active]:text-primary data-[state=active]:bg-accent/30 before:absolute before:top-0 before:left-1/2 before:-translate-x-1/2 before:h-1 before:w-12 before:rounded-b-full before:bg-primary before:opacity-0 data-[state=active]:before:opacity-100 before:transition-opacity";
+  "relative flex flex-col gap-1.5 h-full rounded-none data-[state=active]:text-primary data-[state=active]:bg-accent/30 before:absolute before:top-0 before:left-1/2 before:-translate-x-1/2 before:h-1 before:w-full  before:bg-primary before:opacity-0 data-[state=active]:before:opacity-100 before:transition-opacity";
 
 const VALID_TABS = ["players", "combat", "settings"] as const;
+const MIN_HEROES_FOR_COMBAT = 3;
+
 type TabValue = (typeof VALID_TABS)[number];
 
 export function MunchkinGame() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const playerCount = useMunchkinStore((s) => s.players.length);
+  const canFight = playerCount >= MIN_HEROES_FOR_COMBAT;
+
   const rawTab = searchParams.get("tab");
-  const tab: TabValue = (VALID_TABS as readonly string[]).includes(rawTab ?? "")
+  const requestedTab: TabValue = (
+    VALID_TABS as readonly string[]
+  ).includes(rawTab ?? "")
     ? (rawTab as TabValue)
     : "players";
+  const tab: TabValue =
+    requestedTab === "combat" && !canFight ? "players" : requestedTab;
 
   function setTab(next: string) {
     setSearchParams((params) => {
       const copy = new URLSearchParams(params);
+
       copy.set("tab", next);
 
       return copy;
@@ -33,9 +40,6 @@ export function MunchkinGame() {
 
   return (
     <div className="flex flex-col h-dvh bg-background text-foreground">
-      <header className="flex items-center border-b border-border p-4">
-        <h1 className="text-2xl font-munchkin">Munchkin Tools</h1>
-      </header>
       <Tabs
         value={tab}
         onValueChange={setTab}
@@ -58,7 +62,16 @@ export function MunchkinGame() {
             <Users className="size-6" />
             <span className="text-sm">Heroes</span>
           </TabsTrigger>
-          <TabsTrigger value="combat" className={TAB_TRIGGER_CLS}>
+          <TabsTrigger
+            value="combat"
+            className={TAB_TRIGGER_CLS}
+            disabled={!canFight}
+            aria-label={
+              canFight
+                ? "Combat"
+                : `Combat (needs ${MIN_HEROES_FOR_COMBAT} heroes)`
+            }
+          >
             <Swords className="size-6" />
             <span className="text-sm">Combat</span>
           </TabsTrigger>
