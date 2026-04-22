@@ -2,7 +2,7 @@ import { ArrowLeft, Crown, Plus, Skull, UserMinus, X } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { avatarColor, avatarInitial } from '../lib/avatar-color'
+import { avatarInitial, playerAvatarColor } from '../lib/avatar-color'
 import { combatTotals } from '../lib/combat'
 import { useMunchkinStore } from '../store'
 import type { Player } from '../types'
@@ -73,7 +73,7 @@ export function FightingView() {
             <div className="flex gap-2 mt-3 justify-center flex-wrap">
               <div
                 className="size-10 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: avatarColor(main.id) }}
+                style={{ backgroundColor: playerAvatarColor(main) }}
                 aria-hidden
               >
                 <span className="font-munchkin text-lg text-background leading-none">
@@ -84,7 +84,7 @@ export function FightingView() {
                 <div
                   key={h.id}
                   className="size-10 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: avatarColor(h.id) }}
+                  style={{ backgroundColor: playerAvatarColor(h) }}
                   aria-hidden
                 >
                   <span className="font-munchkin text-lg text-background leading-none">

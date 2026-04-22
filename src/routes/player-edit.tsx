@@ -2,9 +2,11 @@ import {
   ArrowLeft,
   Check,
   Mars,
+  Palette,
   Swords,
   Trash2,
   Venus,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,6 +22,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Chip } from "@/munchkin/components/chip";
+import { GenderButton } from "@/munchkin/components/gender-button";
+import { NameEditor } from "@/munchkin/components/name-editor";
+import { StatCard } from "@/munchkin/components/stat-card";
 import {
   CLASSES,
   MAX_CLASSES_PER_PLAYER,
@@ -27,11 +34,11 @@ import {
   MIN_LEVEL,
   RACES,
 } from "@/munchkin/constants";
-import { Chip } from "@/munchkin/components/chip";
-import { GenderButton } from "@/munchkin/components/gender-button";
-import { NameEditor } from "@/munchkin/components/name-editor";
-import { StatCard } from "@/munchkin/components/stat-card";
-import { avatarColor, avatarInitial } from "@/munchkin/lib/avatar-color";
+import {
+  AVATAR_COLORS,
+  avatarColor,
+  avatarInitial,
+} from "@/munchkin/lib/avatar-color";
 import { useMunchkinStore } from "@/munchkin/store";
 import type {
   Gender,
@@ -47,6 +54,7 @@ const EMPTY_DRAFT: Draft = {
   level: 1,
   gear: 0,
   gender: null,
+  color: undefined,
   classes: [],
   races: [],
 };
@@ -70,6 +78,7 @@ export function PlayerEdit() {
   const setMainCombatant = useMunchkinStore((s) => s.setMainCombatant);
 
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const source: Draft | null = isNew ? draft : existingPlayer;
   const avatarSeed = isNew
@@ -227,52 +236,96 @@ export function PlayerEdit() {
         </header>
 
         <div className="flex flex-col items-center mt-6">
-          <div
-            className="size-28 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: avatarColor(avatarSeed) }}
-            aria-hidden
-          >
-            <span className="font-munchkin text-6xl text-background leading-none">
-              {avatarInitial(source.name)}
-            </span>
+          <div className="relative">
+            <div
+              className="size-28 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: source.color ?? avatarColor(avatarSeed) }}
+              aria-hidden
+            >
+              <span className="font-munchkin text-6xl text-background leading-none">
+                {avatarInitial(source.name)}
+              </span>
+            </div>
+            <button
+              type="button"
+              aria-label="Choose avatar color"
+              aria-expanded={pickerOpen}
+              onClick={() => setPickerOpen((v) => !v)}
+              className="absolute -bottom-1 -right-1 size-10 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-foreground hover:bg-accent transition-colors"
+            >
+              <Palette className="size-4" />
+            </button>
           </div>
+
+          {pickerOpen && (
+            <div className="mt-4 p-3 rounded-xl border border-border bg-card/70 flex items-center gap-2 flex-wrap justify-center">
+              {AVATAR_COLORS.map((c) => {
+                const selected = source.color === c;
+
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    aria-label="Pick color"
+                    aria-pressed={selected}
+                    onClick={() => {
+                      commitField("color", c);
+                      setPickerOpen(false);
+                    }}
+                    className={cn(
+                      "size-10 rounded-full transition-all",
+                      selected &&
+                        "ring-2 ring-primary ring-offset-2 ring-offset-background",
+                    )}
+                    style={{ backgroundColor: c }}
+                  />
+                );
+              })}
+              <button
+                type="button"
+                aria-label="Reset to default color"
+                aria-pressed={source.color === undefined}
+                onClick={() => {
+                  commitField("color", undefined);
+                  setPickerOpen(false);
+                }}
+                className={cn(
+                  "size-10 rounded-full border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors",
+                  source.color === undefined &&
+                    "ring-2 ring-primary ring-offset-2 ring-offset-background",
+                )}
+              >
+                <X className="size-4" />
+              </button>
+            </div>
+          )}
 
           <NameEditor
             name={source.name}
             onRename={(name) => commitField("name", name)}
           />
 
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-3 mt-6">
             <GenderButton
               active={source.gender === "male"}
+              gender={source.gender}
               label="Male"
               onClick={() => handleGender("male")}
             >
-              <Mars className="size-5" />
+              <Mars className={cn("size-8", source.gender === "male" ? "text-background" : "text-foreground")} />
             </GenderButton>
             <GenderButton
               active={source.gender === "female"}
+              gender={source.gender}
               label="Female"
               onClick={() => handleGender("female")}
             >
-              <Venus className="size-5" />
+              <Venus className={cn("size-8", source.gender === "female" ? "text-background" : "text-foreground")} />
             </GenderButton>
           </div>
         </div>
 
-        <div className="flex flex-col items-center mt-8">
-          <span className="text-xs tracking-widest uppercase text-muted-foreground">
-            Strength
-          </span>
-          <span className="font-munchkin text-9xl text-primary tabular-nums leading-none mt-3">
-            {strength}
-          </span>
-          <span className="text-sm text-muted-foreground mt-3">
-            Level {source.level} + Gear {source.gear}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 mt-8">
+        <div className="grid grid-cols-3 items-center gap-3 mt-8">
           <StatCard
             label="LEVEL"
             value={source.level}
@@ -281,6 +334,14 @@ export function PlayerEdit() {
             downDisabled={source.level <= MIN_LEVEL}
             upDisabled={source.level >= maxLevel}
           />
+          <div className="flex flex-col items-center justify-center">
+            <span className="text-xs tracking-widest uppercase text-muted-foreground mt-4">
+              Strength
+            </span>
+            <span className="font-munchkin text-8xl text-primary tabular-nums leading-none mt-3">
+              {strength}
+            </span>
+          </div>
           <StatCard
             label="GEAR"
             value={source.gear}

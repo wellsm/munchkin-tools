@@ -8,6 +8,7 @@ export type Player = {
   level: number
   gear: number
   gender: Gender | null
+  color?: string
   classes: MunchkinClass[]
   races: MunchkinRace[]
 }

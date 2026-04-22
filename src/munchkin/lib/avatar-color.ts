@@ -1,4 +1,4 @@
-const AVATAR_COLORS = [
+export const AVATAR_COLORS = [
   'oklch(0.85 0.03 240)',
   'oklch(0.88 0.12 90)',
   'oklch(0.78 0.09 330)',
@@ -17,6 +17,14 @@ export function avatarColor(id: string): string {
   }
 
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
+}
+
+export function playerAvatarColor(player: { id: string; color?: string | undefined }): string {
+  if (player.color) {
+    return player.color
+  }
+
+  return avatarColor(player.id)
 }
 
 export function avatarInitial(name: string): string {

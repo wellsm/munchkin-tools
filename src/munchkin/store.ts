@@ -71,6 +71,7 @@ function sanitizeInput(input: NewPlayerInput, maxLevel: number): NewPlayerInput 
     level: clampInt(input.level, 1, maxLevel),
     gear: Math.round(input.gear) || 0,
     gender: input.gender ?? null,
+    color: input.color,
     classes: clampList<MunchkinClass>(input.classes, MAX_CLASSES_PER_PLAYER),
     races: clampList<MunchkinRace>(input.races, MAX_RACES_PER_PLAYER),
   }

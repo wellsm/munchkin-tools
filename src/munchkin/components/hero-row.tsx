@@ -1,20 +1,19 @@
-import { Link } from 'react-router-dom'
-import { ChevronRight, Mars, Venus } from 'lucide-react'
-import type { Player } from '../types'
-import { calculateStrength } from '../lib/strength'
-import { avatarColor, avatarInitial } from '../lib/avatar-color'
-import { classById, raceById } from '../constants'
-import { StatBox } from './stat-box'
+import { Mars, Venus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { classById, raceById } from "../constants";
+import { avatarInitial, playerAvatarColor } from "../lib/avatar-color";
+import { calculateStrength } from "../lib/strength";
+import type { Player } from "../types";
+import { StatBox } from "./stat-box";
 
 type Props = {
-  player: Player
-}
+  player: Player;
+};
 
 export function HeroRow({ player }: Props) {
-  const strength = calculateStrength(player)
-  const racesText = player.races.map((id) => raceById(id).label).join('')
-  const classesText = player.classes.map((id) => classById(id).label).join('')
-  const breed = `${racesText}${classesText}` || 'Unknown'
+  const strength = calculateStrength(player);
+  const races = player.races.map((id) => raceById(id).label.toUpperCase()).join(" | ");
+  const classes = player.classes.map((id) => classById(id).label.toUpperCase()).join(" | ");
 
   return (
     <Link
@@ -23,7 +22,7 @@ export function HeroRow({ player }: Props) {
     >
       <div
         className="size-12 shrink-0 rounded-full flex items-center justify-center"
-        style={{ backgroundColor: avatarColor(player.id) }}
+        style={{ backgroundColor: playerAvatarColor(player) }}
         aria-hidden
       >
         <span className="font-munchkin text-2xl text-background leading-none">
@@ -34,10 +33,23 @@ export function HeroRow({ player }: Props) {
       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
         <div className="flex items-center gap-2">
           <span className="text-lg font-munchkin truncate">{player.name}</span>
-          {player.gender === 'male' && <Mars className="size-4 text-muted-foreground shrink-0" aria-label="Male" />}
-          {player.gender === 'female' && <Venus className="size-4 text-muted-foreground shrink-0" aria-label="Female" />}
+          {player.gender === "male" && (
+            <Mars
+              className="size-4 text-muted-foreground shrink-0"
+              aria-label="Male"
+            />
+          )}
+          {player.gender === "female" && (
+            <Venus
+              className="size-4 text-muted-foreground shrink-0"
+              aria-label="Female"
+            />
+          )}
         </div>
-        <span className="text-sm text-muted-foreground truncate">{breed}</span>
+        <div className="flex flex-col">
+          <span className="text-sm text-muted-foreground truncate">{races}</span>
+          <span className="text-sm text-muted-foreground truncate">{classes}</span>
+        </div>
       </div>
 
       <div className="flex items-center gap-1.5 shrink-0">
@@ -45,8 +57,6 @@ export function HeroRow({ player }: Props) {
         <StatBox value={player.gear} label="GEAR" />
         <StatBox value={strength} label="STR" highlighted />
       </div>
-
-      <ChevronRight className="size-5 text-muted-foreground shrink-0" aria-hidden />
     </Link>
-  )
+  );
 }

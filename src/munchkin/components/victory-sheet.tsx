@@ -9,7 +9,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { avatarColor, avatarInitial } from '../lib/avatar-color'
+import { avatarInitial, playerAvatarColor } from '../lib/avatar-color'
 import { useMunchkinStore } from '../store'
 import type { Player } from '../types'
 
@@ -127,7 +127,7 @@ export function VictorySheet({ open, onOpenChange }: Props) {
                 >
                   <div
                     className="size-12 shrink-0 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: avatarColor(p.id) }}
+                    style={{ backgroundColor: playerAvatarColor(p) }}
                     aria-hidden
                   >
                     <span className="font-munchkin text-2xl text-background leading-none">
