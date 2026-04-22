@@ -1,8 +1,16 @@
+import { useNavigate } from 'react-router-dom'
 import { useMunchkinStore } from '../store'
+import { Header } from './header'
 import { HeroRow } from './hero-row'
 
 export function WhoFightsView() {
-  const players = useMunchkinStore((s) => s.players)
+  const { players, setMainCombatant } = useMunchkinStore()
+  const navigate = useNavigate()
+
+  const setHero = (id: string) => {
+    setMainCombatant(id)
+    navigate(`?tab=combat`)
+  }
 
   if (players.length === 0) {
     return (
@@ -13,21 +21,24 @@ export function WhoFightsView() {
   }
 
   return (
-    <div className="h-full overflow-auto p-4 max-w-md mx-auto w-full">
-      <h2 className="text-4xl font-munchkin mb-4">Combat</h2>
+    <div>
+      <Header title="Combat" />
+      <div className="h-full overflow-auto p-4 max-w-md mx-auto w-full">
 
-      <div className="flex items-center gap-3 mb-3">
-        <span className="text-base tracking-wider uppercase text-muted-foreground shrink-0">
-          Who Fights?
-        </span>
-        <div className="flex-1 h-px bg-border" />
+
+        <div className="flex items-center gap-3 mb-3">
+          <span className="text-base tracking-wider uppercase text-muted-foreground shrink-0">
+            Who Fights?
+          </span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
+        <ul className="flex flex-col gap-3">
+          {players.map((p) => (
+            <HeroRow key={p.id} player={p} onClick={() => setHero(p.id)} />
+          ))}
+        </ul>
       </div>
-
-      <ul className="flex flex-col gap-3">
-        {players.map((p) => (
-          <HeroRow key={p.id} player={p} />
-        ))}
-      </ul>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { Mars, Venus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { classById, raceById } from "../constants";
 import { avatarInitial, playerAvatarColor } from "../lib/avatar-color";
 import { calculateStrength } from "../lib/strength";
@@ -8,17 +9,25 @@ import { StatBox } from "./stat-box";
 
 type Props = {
   player: Player;
+  onClick?: () => void;
 };
 
-export function HeroRow({ player }: Props) {
+export function HeroRow({ player, onClick }: Props) {
+  const navigate = useNavigate();
   const strength = calculateStrength(player);
-  const races = player.races.map((id) => raceById(id).label.toUpperCase()).join(" | ");
-  const classes = player.classes.map((id) => classById(id).label.toUpperCase()).join(" | ");
+  const races = player.races
+    .map((id) => raceById(id).label.toUpperCase())
+    .join(" | ");
+  const classes = player.classes
+    .map((id) => classById(id).label.toUpperCase())
+    .join(" | ");
 
   return (
-    <Link
-      to={`/player/${player.id}`}
-      className="flex items-center gap-3 rounded-lg bg-card/50 border border-border/60 p-3 hover:bg-accent transition-colors"
+    <Button
+      variant="ghost"
+      onClick={onClick ?? (() => navigate(`/player/${player.id}`))}
+      size="lg"
+      className="w-full flex items-center gap-3 h-auto py-3 rounded-lg bg-card/50 border border-border/60 hover:bg-accent transition-colors"
     >
       <div
         className="size-12 shrink-0 rounded-full flex items-center justify-center"
@@ -47,8 +56,12 @@ export function HeroRow({ player }: Props) {
           )}
         </div>
         <div className="flex flex-col">
-          <span className="text-sm text-muted-foreground truncate">{races}</span>
-          <span className="text-sm text-muted-foreground truncate">{classes}</span>
+          <span className="text-sm text-muted-foreground truncate">
+            {races}
+          </span>
+          <span className="text-sm text-muted-foreground truncate">
+            {classes}
+          </span>
         </div>
       </div>
 
@@ -57,6 +70,6 @@ export function HeroRow({ player }: Props) {
         <StatBox value={player.gear} label="GEAR" />
         <StatBox value={strength} label="STR" highlighted />
       </div>
-    </Link>
+    </Button>
   );
 }

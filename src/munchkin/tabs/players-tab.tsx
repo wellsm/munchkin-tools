@@ -1,19 +1,19 @@
-import { Plus } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { useMunchkinStore } from '../store'
-import { HeroRow } from '../components/hero-row'
-import { Button } from '@/components/ui/button'
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Header } from "../components/header";
+import { HeroRow } from "../components/hero-row";
+import { useMunchkinStore } from "../store";
 
 export function PlayersTab() {
-  const navigate = useNavigate()
-  const players = useMunchkinStore((s) => s.players)
-  const maxPlayers = useMunchkinStore((s) => s.settings.maxPlayers)
+  const navigate = useNavigate();
+  const players = useMunchkinStore((s) => s.players);
+  const maxPlayers = useMunchkinStore((s) => s.settings.maxPlayers);
 
-  const canAdd = players.length < maxPlayers
-  const heroCount = players.length
+  const canAdd = players.length < maxPlayers;
 
   function goToAdd() {
-    navigate('/player/new')
+    navigate("/player/new");
   }
 
   if (players.length === 0) {
@@ -24,25 +24,13 @@ export function PlayersTab() {
           <Plus className="size-5" /> Add hero
         </Button>
       </div>
-    )
+    );
   }
 
   return (
     <div className="relative h-full w-full">
-      <div className="h-full overflow-auto p-4 pb-24">
-        <div className="flex items-end justify-between mb-4">
-          <h2 className="text-4xl font-munchkin leading-none">Munchkins</h2>
-          <span className="text-sm tracking-wider uppercase text-muted-foreground">
-            {heroCount} {heroCount === 1 ? 'Hero' : 'Heroes'}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3 mb-3">
-          <span className="text-base tracking-wider uppercase text-muted-foreground shrink-0">
-            The Party
-          </span>
-          <div className="flex-1 h-px bg-border" />
-        </div>
+      <Header title="Munchkins" />
+      <div className="overflow-auto p-4 pb-24">
 
         <ul className="flex flex-col gap-3">
           {players.map((p) => (
@@ -64,5 +52,5 @@ export function PlayersTab() {
         </Button>
       )}
     </div>
-  )
+  );
 }

@@ -1,0 +1,251 @@
+import { Check, Flag, Minus, Plus, RotateCcw } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
+import { cn } from '@/lib/utils'
+import { MIN_LEVEL } from '../constants'
+import { avatarInitial, playerAvatarColor } from '../lib/avatar-color'
+import { useMunchkinStore } from '../store'
+import type { Player } from '../types'
+
+type Props = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+type ParticipantAction = {
+  increment: number
+  reset: boolean
+}
+
+const INITIAL_ACTION: ParticipantAction = { increment: 0, reset: false }
+
+export function FinishSheet({ open, onOpenChange }: Props) {
+  const navigate = useNavigate()
+  const players = useMunchkinStore((s) => s.players)
+  const combat = useMunchkinStore((s) => s.combat)
+  const updatePlayer = useMunchkinStore((s) => s.updatePlayer)
+  const resetCombat = useMunchkinStore((s) => s.resetCombat)
+  const maxLevel = useMunchkinStore((s) => s.settings.maxLevel)
+
+  const participants: Player[] = [
+    ...(combat.mainCombatantId
+      ? (() => {
+          const m = players.find((p) => p.id === combat.mainCombatantId)
+
+          if (!m) {
+            return []
+          }
+
+          return [m]
+        })()
+      : []),
+    ...combat.helperIds
+      .map((id) => players.find((p) => p.id === id))
+      .filter((p): p is Player => p !== undefined),
+  ]
+
+  const [actions, setActions] = useState<Record<string, ParticipantAction>>({})
+
+  useEffect(() => {
+    if (open) {
+      const seed: Record<string, ParticipantAction> = {}
+
+      for (const p of participants) {
+        seed[p.id] = { ...INITIAL_ACTION }
+      }
+
+      setActions(seed)
+    }
+  }, [open, combat.mainCombatantId, combat.helperIds.join(',')])
+
+  function capFor(player: Player): number {
+    return Math.max(0, maxLevel - player.level)
+  }
+
+  function actionFor(id: string): ParticipantAction {
+    return actions[id] ?? INITIAL_ACTION
+  }
+
+  function adjust(id: string, delta: number) {
+    setActions((prev) => {
+      const player = participants.find((p) => p.id === id)
+
+      if (!player) {
+        return prev
+      }
+
+      const current = prev[id] ?? INITIAL_ACTION
+
+      if (current.reset) {
+        return prev
+      }
+
+      const next = Math.max(0, Math.min(capFor(player), current.increment + delta))
+
+      return { ...prev, [id]: { ...current, increment: next } }
+    })
+  }
+
+  function toggleReset(id: string) {
+    setActions((prev) => {
+      const current = prev[id] ?? INITIAL_ACTION
+      const nextReset = !current.reset
+
+      return {
+        ...prev,
+        [id]: { increment: nextReset ? 0 : current.increment, reset: nextReset },
+      }
+    })
+  }
+
+  function handleSave() {
+    const mainId = combat.mainCombatantId
+
+    for (const p of participants) {
+      const action = actionFor(p.id)
+
+      if (action.reset) {
+        if (p.level !== MIN_LEVEL) {
+          updatePlayer(p.id, { level: MIN_LEVEL })
+        }
+
+        continue
+      }
+
+      if (action.increment <= 0) {
+        continue
+      }
+
+      const nextLevel = Math.min(maxLevel, p.level + action.increment)
+      updatePlayer(p.id, { level: nextLevel })
+    }
+
+    resetCombat()
+    onOpenChange(false)
+
+    if (mainId) {
+      navigate(`/player/${mainId}`)
+    }
+  }
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="max-h-[90dvh] flex flex-col">
+        <SheetHeader>
+          <div className="flex items-center gap-2">
+            <Flag className="size-6 text-primary" aria-hidden />
+            <SheetTitle className="font-munchkin text-3xl">Finish</SheetTitle>
+          </div>
+          <SheetDescription>
+            Level up winners, reset fallen heroes.
+          </SheetDescription>
+        </SheetHeader>
+
+        <div className="flex-1 overflow-auto mt-4 px-4">
+          {participants.length === 0 && (
+            <p className="text-center text-muted-foreground p-4">No participants.</p>
+          )}
+          <ul className="flex flex-col gap-3">
+            {participants.map((p) => {
+              const action = actionFor(p.id)
+              const projected = action.reset
+                ? MIN_LEVEL
+                : Math.min(maxLevel, p.level + action.increment)
+              const cap = capFor(p)
+              const changed = action.reset || action.increment > 0
+
+              return (
+                <li
+                  key={p.id}
+                  className="flex items-center gap-3 rounded-lg bg-card/50 border border-border/60 p-3"
+                >
+                  <div
+                    className="size-12 shrink-0 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: playerAvatarColor(p) }}
+                    aria-hidden
+                  >
+                    <span className="font-munchkin text-2xl text-background leading-none">
+                      {avatarInitial(p.name)}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                    <span className="text-lg font-munchkin truncate">{p.name}</span>
+                    <span className="text-sm text-muted-foreground">
+                      Level {p.level}
+                      {changed && (
+                        <span className={action.reset ? 'text-destructive' : 'text-primary'}>
+                          {' '}→ {projected}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div
+                      className={cn(
+                        'flex items-center rounded-md border border-border/60 overflow-hidden transition-opacity',
+                        action.reset && 'opacity-40',
+                      )}
+                    >
+                      <button
+                        type="button"
+                        aria-label={`Decrease ${p.name} level gain`}
+                        onClick={() => adjust(p.id, -1)}
+                        disabled={action.reset || action.increment <= 0}
+                        className="px-3 py-2 text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Minus className="size-4" />
+                      </button>
+                      <span className="px-3 py-2 font-munchkin text-primary text-lg tabular-nums min-w-10 text-center">
+                        +{action.increment}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label={`Increase ${p.name} level gain`}
+                        onClick={() => adjust(p.id, 1)}
+                        disabled={action.reset || action.increment >= cap}
+                        className="px-3 py-2 text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Plus className="size-4" />
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label={`Reset ${p.name} level to ${MIN_LEVEL}`}
+                      aria-pressed={action.reset}
+                      onClick={() => toggleReset(p.id)}
+                      className={cn(
+                        'inline-flex items-center justify-center size-10 rounded-md border transition-colors',
+                        action.reset
+                          ? 'border-destructive/60 bg-destructive/10 text-destructive'
+                          : 'border-border/60 text-muted-foreground hover:bg-accent hover:text-foreground',
+                      )}
+                    >
+                      <RotateCcw className="size-4" />
+                    </button>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+
+        <div className="p-4 pt-2 grid grid-cols-2 gap-3">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave}>
+            <Check className="size-4" /> Save
+          </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
+  )
+}
