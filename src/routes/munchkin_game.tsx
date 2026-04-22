@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, Swords, Users, Settings as SettingsIcon } from 'lucide-react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
+import { PlayersTab } from '@/games/munchkin/tabs/players_tab'
 
 export function MunchkinGame() {
   return (
@@ -16,7 +17,7 @@ export function MunchkinGame() {
       </header>
       <Tabs defaultValue="players" className="flex flex-col flex-1 overflow-hidden">
         <TabsContent value="players" className="flex-1 overflow-hidden p-0 m-0">
-          <div className="p-4 text-muted-foreground">Players tab (em breve)</div>
+          <PlayersTab />
         </TabsContent>
         <TabsContent value="combat" className="flex-1 overflow-hidden p-0 m-0">
           <div className="p-4 text-muted-foreground">Combat tab (em breve)</div>
