@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { gridLayoutFor } from './grid_layout'
+import { gridLayoutFor } from './grid-layout'
 
 describe('gridLayoutFor', () => {
   it('n=1 → 1 col x 1 row, loose', () => {

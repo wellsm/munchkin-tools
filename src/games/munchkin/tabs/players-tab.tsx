@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import type { Player } from '../types'
 import { useMunchkinStore } from '../store'
-import { gridLayoutFor } from '../lib/grid_layout'
-import { PlayerCard } from '../components/player_card'
-import { PlayerForm } from '../components/player_form'
-import { PlayerDetailDialog } from '../components/player_detail_dialog'
+import { gridLayoutFor } from '../lib/grid-layout'
+import { PlayerCard } from '../components/player-card'
+import { PlayerForm } from '../components/player-form'
+import { PlayerEditDialog } from '../components/player-edit-dialog'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -23,8 +23,8 @@ export function PlayersTab() {
   const addPlayer = useMunchkinStore((s) => s.addPlayer)
 
   const [addOpen, setAddOpen] = useState(false)
-  const [detailId, setDetailId] = useState<string | null>(null)
-  const detailPlayer = players.find((p) => p.id === detailId) ?? null
+  const [editId, setEditId] = useState<string | null>(null)
+  const editPlayer = players.find((p) => p.id === editId) ?? null
 
   const layout = gridLayoutFor(players.length)
   const canAdd = players.length < maxPlayers
@@ -63,7 +63,7 @@ export function PlayersTab() {
             key={p.id}
             player={p}
             density={layout.density}
-            onClick={() => setDetailId(p.id)}
+            onClick={() => setEditId(p.id)}
           />
         ))}
       </div>
@@ -89,12 +89,12 @@ export function PlayersTab() {
         }}
       />
 
-      <PlayerDetailDialog
-        player={detailPlayer}
-        open={detailId !== null}
+      <PlayerEditDialog
+        player={editPlayer}
+        open={editId !== null}
         onOpenChange={(next) => {
           if (!next) {
-            setDetailId(null)
+            setEditId(null)
           }
         }}
       />

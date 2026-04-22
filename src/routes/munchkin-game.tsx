@@ -1,10 +1,15 @@
-import { Link } from 'react-router-dom'
-import { ArrowLeft, Swords, Users, Settings as SettingsIcon } from 'lucide-react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { PlayersTab } from '@/games/munchkin/tabs/players_tab'
-import { CombatTab } from '@/games/munchkin/tabs/combat_tab'
-import { SettingsTab } from '@/games/munchkin/tabs/settings_tab'
+import {
+  ArrowLeft,
+  Settings as SettingsIcon,
+  Swords,
+  Users,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CombatTab } from "@/games/munchkin/tabs/combat-tab";
+import { PlayersTab } from "@/games/munchkin/tabs/players-tab";
+import { SettingsTab } from "@/games/munchkin/tabs/settings-tab";
 
 export function MunchkinGame() {
   return (
@@ -17,14 +22,20 @@ export function MunchkinGame() {
         </Button>
         <h1 className="text-lg font-semibold">Munchkin</h1>
       </header>
-      <Tabs defaultValue="players" className="flex flex-col flex-1 overflow-hidden">
+      <Tabs
+        defaultValue="players"
+        className="flex flex-col flex-1 overflow-hidden"
+      >
         <TabsContent value="players" className="flex-1 overflow-hidden p-0 m-0">
           <PlayersTab />
         </TabsContent>
         <TabsContent value="combat" className="flex-1 overflow-hidden p-0 m-0">
           <CombatTab />
         </TabsContent>
-        <TabsContent value="settings" className="flex-1 overflow-hidden p-0 m-0">
+        <TabsContent
+          value="settings"
+          className="flex-1 overflow-hidden p-0 m-0"
+        >
           <SettingsTab />
         </TabsContent>
         <TabsList className="grid grid-cols-3 w-full rounded-none border-t border-border h-16">
@@ -43,5 +54,5 @@ export function MunchkinGame() {
         </TabsList>
       </Tabs>
     </div>
-  )
+  );
 }
