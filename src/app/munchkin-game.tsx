@@ -1,10 +1,10 @@
 import { Settings as SettingsIcon, Swords, Users } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CombatTab } from "@/munchkin/tabs/combat-tab";
-import { PlayersTab } from "@/munchkin/tabs/players-tab";
-import { SettingsTab } from "@/munchkin/tabs/settings-tab";
-import { useMunchkinStore } from "@/munchkin/store";
+import { CombatTab } from "@/components/tabs/combat-tab";
+import { PlayersTab } from "@/components/tabs/players-tab";
+import { SettingsTab } from "@/components/tabs/settings-tab";
+import { useMunchkinStore } from "@/lib/store";
 
 const TAB_TRIGGER_CLS =
   "relative flex flex-col gap-1.5 h-full rounded-none data-[state=active]:text-primary data-[state=active]:bg-accent/30 before:absolute before:top-0 before:left-1/2 before:-translate-x-1/2 before:h-1 before:w-full  before:bg-primary before:opacity-0 data-[state=active]:before:opacity-100 before:transition-opacity";

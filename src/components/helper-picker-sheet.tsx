@@ -5,10 +5,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { avatarInitial, playerAvatarColor } from '../lib/avatar-color'
-import { combatBreed } from '../lib/combat-breed'
-import { calculateStrength } from '../lib/strength'
-import { useMunchkinStore } from '../store'
+import { avatarInitial, playerAvatarColor } from '@/lib/avatar-color'
+import { combatBreed } from '@/lib/combat-breed'
+import { calculateStrength } from '@/lib/strength'
+import { useMunchkinStore } from '@/lib/store'
 
 type Props = {
   open: boolean

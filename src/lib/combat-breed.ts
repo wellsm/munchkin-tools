@@ -1,5 +1,5 @@
-import type { Player } from '../types'
-import { classById, raceById } from '../constants'
+import type { Player } from './types'
+import { classById, raceById } from './constants'
 
 export function combatBreed(player: Player): string {
   const races = player.races.map((id) => raceById(id).label.toUpperCase()).join(' / ')

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useMunchkinStore } from '../store'
+import { useMunchkinStore } from '@/lib/store'
 import { Header } from './header'
 import { HeroRow } from './hero-row'
 

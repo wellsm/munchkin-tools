@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { calculateStrength } from './strength'
-import type { Player } from '../types'
+import type { Player } from './types'
 
 function makePlayer(overrides: Partial<Player> = {}): Player {
   return {

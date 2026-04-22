@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import type { Gender } from '../types'
+import type { Gender } from '@/lib/types'
 
 type Props = {
   active: boolean

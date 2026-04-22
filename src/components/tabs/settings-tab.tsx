@@ -12,11 +12,11 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { applyTheme, getStoredTheme, type Theme } from "@/lib/theme";
-import { Header } from "../components/header";
-import { SectionLabel } from "../components/section-label";
-import { StepperCard } from "../components/stepper-card";
-import { MIN_MAX_PLAYERS, PRODUCT_MAX_PLAYERS } from "../constants";
-import { useMunchkinStore } from "../store";
+import { Header } from "@/components/header";
+import { SectionLabel } from "@/components/section-label";
+import { StepperCard } from "@/components/stepper-card";
+import { MIN_MAX_PLAYERS, PRODUCT_MAX_PLAYERS } from "@/lib/constants";
+import { useMunchkinStore } from "@/lib/store";
 
 export function SettingsTab() {
   const players = useMunchkinStore((s) => s.players);

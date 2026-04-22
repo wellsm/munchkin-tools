@@ -1,9 +1,9 @@
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Header } from "../components/header";
-import { HeroRow } from "../components/hero-row";
-import { useMunchkinStore } from "../store";
+import { Header } from "@/components/header";
+import { HeroRow } from "@/components/hero-row";
+import { useMunchkinStore } from "@/lib/store";
 
 export function PlayersTab() {
   const navigate = useNavigate();

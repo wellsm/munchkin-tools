@@ -23,29 +23,29 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Chip } from "@/munchkin/components/chip";
-import { GenderButton } from "@/munchkin/components/gender-button";
-import { NameEditor } from "@/munchkin/components/name-editor";
-import { StatCard } from "@/munchkin/components/stat-card";
+import { Chip } from "@/components/chip";
+import { GenderButton } from "@/components/gender-button";
+import { NameEditor } from "@/components/name-editor";
+import { StatCard } from "@/components/stat-card";
 import {
   CLASSES,
   MAX_CLASSES_PER_PLAYER,
   MAX_RACES_PER_PLAYER,
   MIN_LEVEL,
   RACES,
-} from "@/munchkin/constants";
+} from "@/lib/constants";
 import {
   AVATAR_COLORS,
   avatarColor,
   avatarInitial,
-} from "@/munchkin/lib/avatar-color";
-import { useMunchkinStore } from "@/munchkin/store";
+} from "@/lib/avatar-color";
+import { useMunchkinStore } from "@/lib/store";
 import type {
   Gender,
   MunchkinClass,
   MunchkinRace,
   Player,
-} from "@/munchkin/types";
+} from "@/lib/types";
 
 type Draft = Omit<Player, "id">;
 

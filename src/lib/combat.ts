@@ -1,4 +1,4 @@
-import type { Player, CombatState } from '../types'
+import type { Player, CombatState } from './types'
 import { calculateStrength } from './strength'
 
 export type CombatOutcome = 'winning' | 'losing'

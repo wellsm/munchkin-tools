@@ -1,10 +1,10 @@
 import { Mars, Venus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { classById, raceById } from "../constants";
-import { avatarInitial, playerAvatarColor } from "../lib/avatar-color";
-import { calculateStrength } from "../lib/strength";
-import type { Player } from "../types";
+import { classById, raceById } from "@/lib/constants";
+import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
+import { calculateStrength } from "@/lib/strength";
+import type { Player } from "@/lib/types";
 import { StatBox } from "./stat-box";
 
 type Props = {

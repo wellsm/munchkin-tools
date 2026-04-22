@@ -10,10 +10,10 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
-import { MIN_LEVEL } from '../constants'
-import { avatarInitial, playerAvatarColor } from '../lib/avatar-color'
-import { useMunchkinStore } from '../store'
-import type { Player } from '../types'
+import { MIN_LEVEL } from '@/lib/constants'
+import { avatarInitial, playerAvatarColor } from '@/lib/avatar-color'
+import { useMunchkinStore } from '@/lib/store'
+import type { Player } from '@/lib/types'
 
 type Props = {
   open: boolean
