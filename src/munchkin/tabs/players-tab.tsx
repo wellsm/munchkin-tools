@@ -1,11 +1,10 @@
-import { Link } from 'react-router-dom'
-import { useMunchkinStore } from '../store'
-import { calculateStrength } from '../lib/strength'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
 import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import type { Player } from '../types'
+import { useMunchkinStore } from '../store'
+import { HeroRow } from '../components/hero-row'
 import { PlayerForm } from '../components/player-form'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -23,25 +22,53 @@ export function PlayersTab() {
   const [addOpen, setAddOpen] = useState(false)
 
   const canAdd = players.length < maxPlayers
+  const heroCount = players.length
+
+  if (players.length === 0) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center gap-4 p-6 text-center">
+        <p className="text-muted-foreground">No heroes yet.</p>
+        <Button onClick={() => setAddOpen(true)}>
+          <Plus className="size-5" /> Add hero
+        </Button>
+        <AddHeroDialog
+          open={addOpen}
+          onOpenChange={setAddOpen}
+          maxLevel={maxLevel}
+          onSubmit={(values) => {
+            addPlayer(values)
+            setAddOpen(false)
+          }}
+        />
+      </div>
+    )
+  }
 
   return (
-    <div className="relative h-full w-full overflow-auto p-4">
-      <h2 className="text-3xl font-munchkin mb-4">Munchkins</h2>
-      <ul className="flex flex-col gap-2">
-        {players.map((p) => (
-          <li key={p.id}>
-            <Link
-              to={`/player/${p.id}`}
-              className="block rounded-md border border-border p-3 hover:bg-accent transition-colors"
-            >
-              <div className="flex justify-between items-center">
-                <span className="font-semibold">{p.name}</span>
-                <span className="font-munchkin text-primary text-xl">{calculateStrength(p)}</span>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <div className="relative h-full w-full">
+      <div className="h-full overflow-auto p-4 pb-24">
+        <div className="flex items-end justify-between mb-4">
+          <h2 className="text-4xl font-munchkin leading-none">Munchkins</h2>
+          <span className="text-sm tracking-wider uppercase text-muted-foreground">
+            {heroCount} {heroCount === 1 ? 'Hero' : 'Heroes'}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3 mb-3">
+          <span className="text-base tracking-wider uppercase text-muted-foreground shrink-0">
+            The Party
+          </span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
+        <ul className="flex flex-col gap-3">
+          {players.map((p) => (
+            <li key={p.id}>
+              <HeroRow player={p} />
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {canAdd && (
         <Button
@@ -54,7 +81,7 @@ export function PlayersTab() {
         </Button>
       )}
 
-      <AddPlayerDialog
+      <AddHeroDialog
         open={addOpen}
         onOpenChange={setAddOpen}
         maxLevel={maxLevel}
@@ -74,12 +101,12 @@ type AddDialogProps = {
   onSubmit: (values: NewPlayerInput) => void
 }
 
-function AddPlayerDialog({ open, onOpenChange, maxLevel, onSubmit }: AddDialogProps) {
+function AddHeroDialog({ open, onOpenChange, maxLevel, onSubmit }: AddDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90dvh] overflow-auto">
         <DialogHeader>
-          <DialogTitle>Add hero</DialogTitle>
+          <DialogTitle className="font-munchkin text-2xl">Add hero</DialogTitle>
         </DialogHeader>
         <PlayerForm
           maxLevel={maxLevel}
