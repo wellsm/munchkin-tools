@@ -1,3 +1,4 @@
+import { useSearchParams } from "react-router-dom";
 import {
   Settings as SettingsIcon,
   Swords,
@@ -11,14 +12,33 @@ import { SettingsTab } from "@/munchkin/tabs/settings-tab";
 const TAB_TRIGGER_CLS =
   "relative flex flex-col gap-1.5 h-full rounded-none data-[state=active]:text-primary data-[state=active]:bg-accent/30 before:absolute before:top-0 before:left-1/2 before:-translate-x-1/2 before:h-1 before:w-12 before:rounded-b-full before:bg-primary before:opacity-0 data-[state=active]:before:opacity-100 before:transition-opacity";
 
+const VALID_TABS = ["players", "combat", "settings"] as const;
+type TabValue = (typeof VALID_TABS)[number];
+
 export function MunchkinGame() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const rawTab = searchParams.get("tab");
+  const tab: TabValue = (VALID_TABS as readonly string[]).includes(rawTab ?? "")
+    ? (rawTab as TabValue)
+    : "players";
+
+  function setTab(next: string) {
+    setSearchParams((params) => {
+      const copy = new URLSearchParams(params);
+      copy.set("tab", next);
+
+      return copy;
+    });
+  }
+
   return (
     <div className="flex flex-col h-dvh bg-background text-foreground">
       <header className="flex items-center border-b border-border p-4">
         <h1 className="text-2xl font-munchkin">Munchkin Tools</h1>
       </header>
       <Tabs
-        defaultValue="players"
+        value={tab}
+        onValueChange={setTab}
         className="flex flex-col flex-1 overflow-hidden"
       >
         <TabsContent value="players" className="flex-1 overflow-hidden p-0 m-0">
