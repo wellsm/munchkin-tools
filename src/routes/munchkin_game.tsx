@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { PlayersTab } from '@/games/munchkin/tabs/players_tab'
 import { CombatTab } from '@/games/munchkin/tabs/combat_tab'
+import { SettingsTab } from '@/games/munchkin/tabs/settings_tab'
 
 export function MunchkinGame() {
   return (
@@ -24,7 +25,7 @@ export function MunchkinGame() {
           <CombatTab />
         </TabsContent>
         <TabsContent value="settings" className="flex-1 overflow-hidden p-0 m-0">
-          <div className="p-4 text-muted-foreground">Settings tab (em breve)</div>
+          <SettingsTab />
         </TabsContent>
         <TabsList className="grid grid-cols-3 w-full rounded-none border-t border-border h-16">
           <TabsTrigger value="players" className="flex flex-col gap-1 h-full">
