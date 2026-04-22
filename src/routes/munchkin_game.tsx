@@ -3,6 +3,7 @@ import { ArrowLeft, Swords, Users, Settings as SettingsIcon } from 'lucide-react
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { PlayersTab } from '@/games/munchkin/tabs/players_tab'
+import { CombatTab } from '@/games/munchkin/tabs/combat_tab'
 
 export function MunchkinGame() {
   return (
@@ -20,7 +21,7 @@ export function MunchkinGame() {
           <PlayersTab />
         </TabsContent>
         <TabsContent value="combat" className="flex-1 overflow-hidden p-0 m-0">
-          <div className="p-4 text-muted-foreground">Combat tab (em breve)</div>
+          <CombatTab />
         </TabsContent>
         <TabsContent value="settings" className="flex-1 overflow-hidden p-0 m-0">
           <div className="p-4 text-muted-foreground">Settings tab (em breve)</div>
