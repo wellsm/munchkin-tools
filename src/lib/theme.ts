@@ -1,6 +1,6 @@
 export type Theme = 'light' | 'dark'
 
-const THEME_KEY = 'game-tools-theme'
+const THEME_KEY = 'munchkin-tools-theme'
 
 export function getStoredTheme(): Theme {
   const stored = localStorage.getItem(THEME_KEY)
@@ -9,9 +9,7 @@ export function getStoredTheme(): Theme {
     return stored
   }
 
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-
-  return prefersDark ? 'dark' : 'light'
+  return 'dark'
 }
 
 export function applyTheme(theme: Theme) {

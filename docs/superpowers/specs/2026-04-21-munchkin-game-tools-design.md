@@ -214,19 +214,15 @@ Two regions (side-by-side on desktop, stacked on mobile):
 ```ts
 // src/games/munchkin/lib/grid_layout.ts
 export function gridLayoutFor(count: number) {
-  if (count <= 2) {
-    return { cols: count, rows: 1, density: 'loose' as const }
-  }
-
   if (count <= 4) {
-    return { cols: 2, rows: 2, density: 'loose' as const }
+    return { cols: 1, rows: 4, density: 'loose' as const }
   }
 
   if (count <= 6) {
-    return { cols: 3, rows: 2, density: 'normal' as const }
+    return { cols: 2, rows: 3, density: 'normal' as const }
   }
 
-  return { cols: 4, rows: 2, density: 'dense' as const }
+  return { cols: 2, rows: 4, density: 'dense' as const }
 }
 ```
 

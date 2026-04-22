@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { combatTotals } from './combat'
 import type { Player, CombatState } from '../types'
 
-function p(id: string, level: number, itemBonus = 0): Player {
-  return { id, name: id, level, itemBonus, classes: [], races: [] }
+function p(id: string, level: number, gear = 0): Player {
+  return { id, name: id, level, gear, gender: null, classes: [], races: [] }
 }
 
 const emptyCombat: CombatState = {

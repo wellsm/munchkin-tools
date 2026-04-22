@@ -22,7 +22,7 @@ export function CombatTab() {
   if (players.length === 0) {
     return (
       <div className="h-full flex items-center justify-center p-6 text-center">
-        <p className="text-muted-foreground">Adicione jogadores na aba Players antes de combater.</p>
+        <p className="text-muted-foreground">Add heroes in the Heroes tab before combat.</p>
       </div>
     )
   }
@@ -30,7 +30,7 @@ export function CombatTab() {
   return (
     <div className="h-full flex flex-col md:flex-row overflow-hidden">
       <section className="flex-1 overflow-auto border-b md:border-b-0 md:border-r border-border p-4">
-        <h2 className="font-semibold mb-3">Participantes</h2>
+        <h2 className="font-semibold mb-3">Participants</h2>
         <ul className="flex flex-col gap-2">
           {players.map((p) => {
             const checked = combat.participatingIds.includes(p.id)
@@ -47,7 +47,7 @@ export function CombatTab() {
                 />
                 <Label htmlFor={`part-${p.id}`} className="flex-1 flex justify-between gap-2 cursor-pointer">
                   <span>{p.name}</span>
-                  <span className="tabular-nums text-muted-foreground">Força {calculateStrength(p)}</span>
+                  <span className="tabular-nums text-muted-foreground">STR {calculateStrength(p)}</span>
                 </Label>
               </li>
             )
@@ -76,11 +76,11 @@ export function CombatTab() {
             result.outcome === 'winning' ? 'bg-primary text-primary-foreground' : 'bg-destructive text-destructive-foreground',
           )}
         >
-          {result.outcome === 'winning' ? `Vencendo por ${result.difference}` : `Perdendo por ${result.difference}`}
+          {result.outcome === 'winning' ? `Winning by ${result.difference}` : `Losing by ${result.difference}`}
         </div>
 
         <Button variant="outline" onClick={resetCombat}>
-          <RotateCcw className="size-4" /> Resetar combate
+          <RotateCcw className="size-4" /> Reset combat
         </Button>
       </section>
     </div>
@@ -101,7 +101,7 @@ function Stepper({ value, onChange, min, label }: StepperProps) {
         type="button"
         size="icon"
         variant="outline"
-        aria-label={`Diminuir ${label}`}
+        aria-label={`Decrease ${label}`}
         onClick={() => onChange(value - 1)}
         disabled={min !== undefined && value <= min}
       >
@@ -118,7 +118,7 @@ function Stepper({ value, onChange, min, label }: StepperProps) {
         type="button"
         size="icon"
         variant="outline"
-        aria-label={`Aumentar ${label}`}
+        aria-label={`Increase ${label}`}
         onClick={() => onChange(value + 1)}
       >
         <Plus className="size-4" />
@@ -142,8 +142,8 @@ function TeamPanel({ title, total, buff, onBuffChange }: TeamPanelProps) {
         <span className="text-3xl font-bold tabular-nums">{total}</span>
       </div>
       <div className="flex items-center justify-between">
-        <Label>Buff de equipe</Label>
-        <Stepper value={buff} onChange={onBuffChange} label="Buff Munchkins" />
+        <Label>Team buff</Label>
+        <Stepper value={buff} onChange={onBuffChange} label="Munchkins buff" />
       </div>
     </div>
   )
@@ -161,16 +161,16 @@ function MonsterPanel({ level, buff, total, onLevelChange, onBuffChange }: Monst
   return (
     <div className="rounded-lg border border-border p-4 flex flex-col gap-3">
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold">Monstro</h3>
+        <h3 className="font-semibold">Monster</h3>
         <span className="text-3xl font-bold tabular-nums">{total}</span>
       </div>
       <div className="flex items-center justify-between">
-        <Label>Nível do monstro</Label>
-        <Stepper value={level} onChange={onLevelChange} min={0} label="Nível do monstro" />
+        <Label>Monster level</Label>
+        <Stepper value={level} onChange={onLevelChange} min={0} label="Monster level" />
       </div>
       <div className="flex items-center justify-between">
-        <Label>Buff do monstro</Label>
-        <Stepper value={buff} onChange={onBuffChange} label="Buff monstro" />
+        <Label>Monster buff</Label>
+        <Stepper value={buff} onChange={onBuffChange} label="Monster buff" />
       </div>
     </div>
   )

@@ -25,7 +25,8 @@ type Props = {
 const EMPTY_FORM: FormValues = {
   name: '',
   level: 1,
-  itemBonus: 0,
+  gear: 0,
+  gender: null,
   classes: [],
   races: [],
 }
@@ -79,19 +80,19 @@ export function PlayerForm({ initialValues, maxLevel, submitLabel, onSubmit, onC
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        <Label htmlFor="player-name">Nome</Label>
+        <Label htmlFor="player-name">Name</Label>
         <Input
           id="player-name"
           autoFocus
           value={values.name}
           onChange={(e) => setValues({ ...values, name: e.target.value })}
-          placeholder="Nome do jogador"
+          placeholder="Hero name"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="player-level">Nível</Label>
+          <Label htmlFor="player-level">Level</Label>
           <Input
             id="player-level"
             type="number"
@@ -102,18 +103,18 @@ export function PlayerForm({ initialValues, maxLevel, submitLabel, onSubmit, onC
           />
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="player-items">Bônus de itens</Label>
+          <Label htmlFor="player-gear">Gear</Label>
           <Input
-            id="player-items"
+            id="player-gear"
             type="number"
-            value={values.itemBonus}
-            onChange={(e) => setValues({ ...values, itemBonus: Number(e.target.value) })}
+            value={values.gear}
+            onChange={(e) => setValues({ ...values, gear: Number(e.target.value) })}
           />
         </div>
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Classes (até {MAX_CLASSES_PER_PLAYER})</Label>
+        <Label>Classes (up to {MAX_CLASSES_PER_PLAYER})</Label>
         <div className="flex flex-wrap gap-2">
           {CLASSES.map((c) => {
             const Icon = c.icon
@@ -138,7 +139,7 @@ export function PlayerForm({ initialValues, maxLevel, submitLabel, onSubmit, onC
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>Raças (até {MAX_RACES_PER_PLAYER})</Label>
+        <Label>Races (up to {MAX_RACES_PER_PLAYER})</Label>
         <div className="flex flex-wrap gap-2">
           {RACES.map((r) => {
             const Icon = r.icon
@@ -165,7 +166,7 @@ export function PlayerForm({ initialValues, maxLevel, submitLabel, onSubmit, onC
       <div className="flex justify-end gap-2 pt-2">
         {onCancel && (
           <Button type="button" variant="ghost" onClick={onCancel}>
-            Cancelar
+            Cancel
           </Button>
         )}
         <Button type="submit" disabled={!isValid}>

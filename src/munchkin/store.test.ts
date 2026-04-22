@@ -25,7 +25,8 @@ describe('munchkin store', () => {
     useMunchkinStore.getState().addPlayer({
       name: 'Ana',
       level: 1,
-      itemBonus: 0,
+      gear: 0,
+      gender: null,
       classes: ['warrior'],
       races: ['elf'],
     })
@@ -38,9 +39,9 @@ describe('munchkin store', () => {
   it('addPlayer refuses when at maxPlayers', () => {
     const { addPlayer, setMaxPlayers } = useMunchkinStore.getState()
     setMaxPlayers(2)
-    addPlayer({ name: 'A', level: 1, itemBonus: 0, classes: [], races: [] })
-    addPlayer({ name: 'B', level: 1, itemBonus: 0, classes: [], races: [] })
-    addPlayer({ name: 'C', level: 1, itemBonus: 0, classes: [], races: [] })
+    addPlayer({ name: 'A', level: 1, gear: 0, gender: null, classes: [], races: [] })
+    addPlayer({ name: 'B', level: 1, gear: 0, gender: null, classes: [], races: [] })
+    addPlayer({ name: 'C', level: 1, gear: 0, gender: null, classes: [], races: [] })
 
     expect(useMunchkinStore.getState().players.length).toBe(2)
   })
@@ -49,7 +50,8 @@ describe('munchkin store', () => {
     useMunchkinStore.getState().addPlayer({
       name: 'Over',
       level: 1,
-      itemBonus: 0,
+      gear: 0,
+      gender: null,
       classes: ['warrior', 'wizard', 'cleric'],
       races: ['elf', 'dwarf', 'human'],
     })
@@ -61,7 +63,7 @@ describe('munchkin store', () => {
 
   it('updatePlayer merges patch', () => {
     const { addPlayer, updatePlayer } = useMunchkinStore.getState()
-    addPlayer({ name: 'Ana', level: 1, itemBonus: 0, classes: [], races: [] })
+    addPlayer({ name: 'Ana', level: 1, gear: 0, gender: null, classes: [], races: [] })
     const id = useMunchkinStore.getState().players[0].id
     updatePlayer(id, { level: 5 })
 
@@ -70,7 +72,7 @@ describe('munchkin store', () => {
 
   it('updatePlayer clamps classes/races to 2', () => {
     const { addPlayer, updatePlayer } = useMunchkinStore.getState()
-    addPlayer({ name: 'Ana', level: 1, itemBonus: 0, classes: [], races: [] })
+    addPlayer({ name: 'Ana', level: 1, gear: 0, gender: null, classes: [], races: [] })
     const id = useMunchkinStore.getState().players[0].id
     updatePlayer(id, { classes: ['warrior', 'wizard', 'thief'] })
 
@@ -79,7 +81,7 @@ describe('munchkin store', () => {
 
   it('removePlayer drops from players and participatingIds', () => {
     const { addPlayer, removePlayer, toggleParticipant } = useMunchkinStore.getState()
-    addPlayer({ name: 'Ana', level: 1, itemBonus: 0, classes: [], races: [] })
+    addPlayer({ name: 'Ana', level: 1, gear: 0, gender: null, classes: [], races: [] })
     const id = useMunchkinStore.getState().players[0].id
     toggleParticipant(id)
     removePlayer(id)
@@ -90,7 +92,7 @@ describe('munchkin store', () => {
 
   it('toggleParticipant is idempotent toggle', () => {
     const { addPlayer, toggleParticipant } = useMunchkinStore.getState()
-    addPlayer({ name: 'Ana', level: 1, itemBonus: 0, classes: [], races: [] })
+    addPlayer({ name: 'Ana', level: 1, gear: 0, gender: null, classes: [], races: [] })
     const id = useMunchkinStore.getState().players[0].id
     toggleParticipant(id)
 
@@ -101,7 +103,7 @@ describe('munchkin store', () => {
 
   it('resetCombat zeroes combat state without touching players', () => {
     const { addPlayer, toggleParticipant, setMunchkinBuff, setMonsterLevel, resetCombat } = useMunchkinStore.getState()
-    addPlayer({ name: 'Ana', level: 1, itemBonus: 0, classes: [], races: [] })
+    addPlayer({ name: 'Ana', level: 1, gear: 0, gender: null, classes: [], races: [] })
     toggleParticipant(useMunchkinStore.getState().players[0].id)
     setMunchkinBuff(5)
     setMonsterLevel(8)
@@ -114,9 +116,9 @@ describe('munchkin store', () => {
 
   it('setMaxPlayers refuses to drop below current player count', () => {
     const { addPlayer, setMaxPlayers } = useMunchkinStore.getState()
-    addPlayer({ name: 'A', level: 1, itemBonus: 0, classes: [], races: [] })
-    addPlayer({ name: 'B', level: 1, itemBonus: 0, classes: [], races: [] })
-    addPlayer({ name: 'C', level: 1, itemBonus: 0, classes: [], races: [] })
+    addPlayer({ name: 'A', level: 1, gear: 0, gender: null, classes: [], races: [] })
+    addPlayer({ name: 'B', level: 1, gear: 0, gender: null, classes: [], races: [] })
+    addPlayer({ name: 'C', level: 1, gear: 0, gender: null, classes: [], races: [] })
     setMaxPlayers(2)
 
     expect(useMunchkinStore.getState().settings.maxPlayers).toBe(3)
@@ -133,7 +135,7 @@ describe('munchkin store', () => {
 
   it('resetAllPlayers clears players and combat, keeps settings', () => {
     const { addPlayer, setMaxLevel, resetAllPlayers } = useMunchkinStore.getState()
-    addPlayer({ name: 'A', level: 1, itemBonus: 0, classes: [], races: [] })
+    addPlayer({ name: 'A', level: 1, gear: 0, gender: null, classes: [], races: [] })
     setMaxLevel(20)
     resetAllPlayers()
     const s = useMunchkinStore.getState()

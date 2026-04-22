@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Home } from './routes/home'
 import { MunchkinGame } from './routes/munchkin-game'
+import { PlayerEdit } from './routes/player-edit'
 import { applyTheme, getStoredTheme } from './lib/theme'
 
 export function App() {
@@ -12,8 +12,8 @@ export function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/munchkin" element={<MunchkinGame />} />
+        <Route path="/" element={<MunchkinGame />} />
+        <Route path="/player/:id" element={<PlayerEdit />} />
       </Routes>
     </BrowserRouter>
   )

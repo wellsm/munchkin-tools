@@ -1,11 +1,13 @@
 export type MunchkinClass = 'cleric' | 'warrior' | 'thief' | 'wizard'
 export type MunchkinRace = 'dwarf' | 'elf' | 'halfling' | 'human'
+export type Gender = 'male' | 'female'
 
 export type Player = {
   id: string
   name: string
   level: number
-  itemBonus: number
+  gear: number
+  gender: Gender | null
   classes: MunchkinClass[]
   races: MunchkinRace[]
 }
