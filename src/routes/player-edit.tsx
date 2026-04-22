@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowLeft,
+  Check,
   ChevronDown,
   ChevronUp,
   Mars,
@@ -11,7 +12,6 @@ import {
   Venus,
 } from 'lucide-react'
 import { useMunchkinStore } from '@/munchkin/store'
-import { calculateStrength } from '@/munchkin/lib/strength'
 import { avatarColor, avatarInitial } from '@/munchkin/lib/avatar-color'
 import {
   CLASSES,
@@ -36,16 +36,41 @@ import {
 } from '@/components/ui/alert-dialog'
 import { cn } from '@/lib/utils'
 
+type Draft = Omit<Player, 'id'>
+
+const EMPTY_DRAFT: Draft = {
+  name: 'New Hero',
+  level: 1,
+  gear: 0,
+  gender: null,
+  classes: [],
+  races: [],
+}
+
 export function PlayerEdit() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const player = useMunchkinStore((s) => s.players.find((p) => p.id === id))
+  const isNew = id === 'new'
+
   const maxLevel = useMunchkinStore((s) => s.settings.maxLevel)
+  const existingPlayer = useMunchkinStore((s) => {
+    if (isNew) {
+      return null
+    }
+
+    return s.players.find((p) => p.id === id) ?? null
+  })
   const updatePlayer = useMunchkinStore((s) => s.updatePlayer)
   const removePlayer = useMunchkinStore((s) => s.removePlayer)
+  const addPlayer = useMunchkinStore((s) => s.addPlayer)
   const setMainCombatant = useMunchkinStore((s) => s.setMainCombatant)
 
-  if (!player) {
+  const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT)
+
+  const source: Draft | null = isNew ? draft : existingPlayer
+  const avatarSeed = isNew ? draft.name.trim() || 'new-hero' : (existingPlayer?.id ?? 'new-hero')
+
+  if (!source) {
     return (
       <div className="min-h-dvh flex items-center justify-center p-6 text-center bg-background text-foreground">
         <div className="flex flex-col gap-4 items-center">
@@ -56,87 +81,103 @@ export function PlayerEdit() {
     )
   }
 
-  function handleRemove() {
-    if (!player) {
+  function commitField<K extends keyof Draft>(key: K, value: Draft[K]) {
+    if (isNew) {
+      setDraft((prev) => ({ ...prev, [key]: value }))
+
       return
     }
 
-    removePlayer(player.id)
+    if (!existingPlayer) {
+      return
+    }
+
+    updatePlayer(existingPlayer.id, { [key]: value })
+  }
+
+  function handleRemove() {
+    if (!existingPlayer) {
+      return
+    }
+
+    removePlayer(existingPlayer.id)
+    navigate('/')
+  }
+
+  function handleSave() {
+    const trimmedName = draft.name.trim()
+
+    if (trimmedName.length === 0) {
+      return
+    }
+
+    addPlayer({ ...draft, name: trimmedName })
     navigate('/')
   }
 
   function handleEnterCombat() {
-    if (!player) {
+    if (!existingPlayer) {
       return
     }
 
-    setMainCombatant(player.id)
+    setMainCombatant(existingPlayer.id)
     navigate('/?tab=combat')
   }
 
   function handleGender(next: Gender) {
-    if (!player) {
-      return
-    }
-
-    const nextGender = player.gender === next ? null : next
-    updatePlayer(player.id, { gender: nextGender })
+    const nextGender = source!.gender === next ? null : next
+    commitField('gender', nextGender)
   }
 
   function handleLevelChange(delta: number) {
-    if (!player) {
-      return
-    }
-
-    const next = Math.max(MIN_LEVEL, Math.min(maxLevel, player.level + delta))
-    updatePlayer(player.id, { level: next })
+    const next = Math.max(MIN_LEVEL, Math.min(maxLevel, source!.level + delta))
+    commitField('level', next)
   }
 
   function handleGearChange(delta: number) {
-    if (!player) {
-      return
-    }
-
-    updatePlayer(player.id, { gear: player.gear + delta })
+    commitField('gear', source!.gear + delta)
   }
 
   function toggleRace(race: MunchkinRace) {
-    if (!player) {
+    const current = source!.races
+
+    if (current.includes(race)) {
+      commitField(
+        'races',
+        current.filter((r) => r !== race),
+      )
+
       return
     }
 
-    if (player.races.includes(race)) {
-      updatePlayer(player.id, { races: player.races.filter((r) => r !== race) })
-
+    if (current.length >= MAX_RACES_PER_PLAYER) {
       return
     }
 
-    if (player.races.length >= MAX_RACES_PER_PLAYER) {
-      return
-    }
-
-    updatePlayer(player.id, { races: [...player.races, race] })
+    commitField('races', [...current, race])
   }
 
   function toggleClass(klass: MunchkinClass) {
-    if (!player) {
+    const current = source!.classes
+
+    if (current.includes(klass)) {
+      commitField(
+        'classes',
+        current.filter((c) => c !== klass),
+      )
+
       return
     }
 
-    if (player.classes.includes(klass)) {
-      updatePlayer(player.id, { classes: player.classes.filter((c) => c !== klass) })
-
+    if (current.length >= MAX_CLASSES_PER_PLAYER) {
       return
     }
 
-    if (player.classes.length >= MAX_CLASSES_PER_PLAYER) {
-      return
-    }
-
-    updatePlayer(player.id, { classes: [...player.classes, klass] })
+    commitField('classes', [...current, klass])
   }
 
-  const strength = calculateStrength(player)
+  const strength = source.level + source.gear
+  const canSave = draft.name.trim().length > 0
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
@@ -145,48 +186,52 @@ export function PlayerEdit() {
           <Button variant="ghost" size="icon" aria-label="Back" onClick={() => navigate('/')}>
             <ArrowLeft className="size-6" />
           </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Remove hero">
-                <Trash2 className="size-6" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Remove {player.name}?</AlertDialogTitle>
-                <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleRemove}>Remove</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {isNew ? (
+            <div className="size-11" aria-hidden />
+          ) : (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Remove hero">
+                  <Trash2 className="size-6" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Remove {existingPlayer?.name}?</AlertDialogTitle>
+                  <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleRemove}>Remove</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </header>
 
         <div className="flex flex-col items-center mt-6">
           <div
             className="size-28 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: avatarColor(player.id) }}
+            style={{ backgroundColor: avatarColor(avatarSeed) }}
             aria-hidden
           >
             <span className="font-munchkin text-6xl text-background leading-none">
-              {avatarInitial(player.name)}
+              {avatarInitial(source.name)}
             </span>
           </div>
 
-          <NameEditor player={player} onRename={(name) => updatePlayer(player.id, { name })} />
+          <NameEditor name={source.name} onRename={(name) => commitField('name', name)} />
 
           <div className="flex items-center gap-3 mt-2">
             <GenderButton
-              active={player.gender === 'male'}
+              active={source.gender === 'male'}
               label="Male"
               onClick={() => handleGender('male')}
             >
               <Mars className="size-5" />
             </GenderButton>
             <GenderButton
-              active={player.gender === 'female'}
+              active={source.gender === 'female'}
               label="Female"
               onClick={() => handleGender('female')}
             >
@@ -201,22 +246,22 @@ export function PlayerEdit() {
             {strength}
           </span>
           <span className="text-sm text-muted-foreground mt-3">
-            Level {player.level} + Gear {player.gear}
+            Level {source.level} + Gear {source.gear}
           </span>
         </div>
 
         <div className="grid grid-cols-2 gap-3 mt-8">
           <StatCard
             label="LEVEL"
-            value={player.level}
+            value={source.level}
             onDown={() => handleLevelChange(-1)}
             onUp={() => handleLevelChange(1)}
-            downDisabled={player.level <= MIN_LEVEL}
-            upDisabled={player.level >= maxLevel}
+            downDisabled={source.level <= MIN_LEVEL}
+            upDisabled={source.level >= maxLevel}
           />
           <StatCard
             label="GEAR"
-            value={player.gear}
+            value={source.gear}
             onDown={() => handleGearChange(-1)}
             onUp={() => handleGearChange(1)}
           />
@@ -224,12 +269,12 @@ export function PlayerEdit() {
 
         <div className="mt-6 flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">
-            Race {player.races.length}/{MAX_RACES_PER_PLAYER}
+            Race {source.races.length}/{MAX_RACES_PER_PLAYER}
           </span>
           <div className="flex flex-wrap gap-2">
             {RACES.map((r) => {
               const Icon = r.icon
-              const active = player.races.includes(r.id)
+              const active = source.races.includes(r.id)
 
               return (
                 <Chip key={r.id} active={active} onClick={() => toggleRace(r.id)}>
@@ -243,12 +288,12 @@ export function PlayerEdit() {
 
         <div className="mt-4 flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">
-            Class {player.classes.length}/{MAX_CLASSES_PER_PLAYER}
+            Class {source.classes.length}/{MAX_CLASSES_PER_PLAYER}
           </span>
           <div className="flex flex-wrap gap-2">
             {CLASSES.map((c) => {
               const Icon = c.icon
-              const active = player.classes.includes(c.id)
+              const active = source.classes.includes(c.id)
 
               return (
                 <Chip key={c.id} active={active} onClick={() => toggleClass(c.id)}>
@@ -260,33 +305,39 @@ export function PlayerEdit() {
           </div>
         </div>
 
-        <Button size="lg" className="w-full mt-8" onClick={handleEnterCombat}>
-          <Swords className="size-5" /> Enter combat
-        </Button>
+        {isNew ? (
+          <Button size="lg" className="w-full mt-8" onClick={handleSave} disabled={!canSave}>
+            <Check className="size-5" /> Save
+          </Button>
+        ) : (
+          <Button size="lg" className="w-full mt-8" onClick={handleEnterCombat}>
+            <Swords className="size-5" /> Enter combat
+          </Button>
+        )}
       </div>
     </div>
   )
 }
 
 type NameEditorProps = {
-  player: Player
+  name: string
   onRename: (name: string) => void
 }
 
-function NameEditor({ player, onRename }: NameEditorProps) {
+function NameEditor({ name, onRename }: NameEditorProps) {
   const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState(player.name)
+  const [draft, setDraft] = useState(name)
 
   useEffect(() => {
     if (!editing) {
-      setDraft(player.name)
+      setDraft(name)
     }
-  }, [player.name, editing])
+  }, [name, editing])
 
   function commit() {
     const trimmed = draft.trim()
 
-    if (trimmed.length > 0 && trimmed !== player.name) {
+    if (trimmed.length > 0 && trimmed !== name) {
       onRename(trimmed)
     }
 
@@ -294,7 +345,7 @@ function NameEditor({ player, onRename }: NameEditorProps) {
   }
 
   function cancel() {
-    setDraft(player.name)
+    setDraft(name)
     setEditing(false)
   }
 
@@ -326,7 +377,7 @@ function NameEditor({ player, onRename }: NameEditorProps) {
       className="mt-4 flex items-center gap-2 cursor-pointer"
       aria-label="Edit hero name"
     >
-      <span className="text-3xl font-munchkin">{player.name}</span>
+      <span className="text-3xl font-munchkin">{name}</span>
       <Pencil className="size-4 text-muted-foreground" aria-hidden />
     </button>
   )
