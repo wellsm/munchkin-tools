@@ -4,7 +4,7 @@ import type { Player } from '../types'
 import { calculateStrength } from '../lib/strength'
 import { avatarColor, avatarInitial } from '../lib/avatar-color'
 import { classById, raceById } from '../constants'
-import { cn } from '@/lib/utils'
+import { StatBox } from './stat-box'
 
 type Props = {
   player: Player
@@ -48,34 +48,5 @@ export function HeroRow({ player }: Props) {
 
       <ChevronRight className="size-5 text-muted-foreground shrink-0" aria-hidden />
     </Link>
-  )
-}
-
-type StatBoxProps = {
-  value: number
-  label: string
-  highlighted?: boolean
-}
-
-function StatBox({ value, label, highlighted }: StatBoxProps) {
-  return (
-    <div
-      className={cn(
-        'flex flex-col items-center justify-center rounded-md border px-2.5 py-1.5 min-w-12',
-        highlighted ? 'border-primary/60 bg-primary/10' : 'border-border/60',
-      )}
-    >
-      <span
-        className={cn(
-          'font-munchkin text-xl leading-none tabular-nums',
-          highlighted ? 'text-primary' : 'text-foreground',
-        )}
-      >
-        {value}
-      </span>
-      <span className="text-[10px] tracking-wider uppercase text-muted-foreground leading-none mt-0.5">
-        {label}
-      </span>
-    </div>
   )
 }

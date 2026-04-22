@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { Minus, Moon, Plus, Sun, Trash2 } from 'lucide-react'
+import { Moon, Sun, Trash2 } from 'lucide-react'
 import { useMunchkinStore } from '../store'
 import {
   MIN_MAX_PLAYERS,
   PRODUCT_MAX_PLAYERS,
 } from '../constants'
+import { SectionLabel } from '../components/section-label'
+import { StepperCard } from '../components/stepper-card'
 import { applyTheme, getStoredTheme, type Theme } from '@/lib/theme'
 import {
   AlertDialog,
@@ -17,7 +19,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { cn } from '@/lib/utils'
 
 export function SettingsTab() {
   const players = useMunchkinStore((s) => s.players)
@@ -42,7 +43,7 @@ export function SettingsTab() {
 
       <SectionLabel>Party</SectionLabel>
       <div className="flex flex-col gap-3 mb-6">
-        <StepperPanel
+        <StepperCard
           label="Max Heroes"
           value={settings.maxPlayers}
           onChange={setMaxPlayers}
@@ -50,7 +51,7 @@ export function SettingsTab() {
           increaseDisabled={increaseMaxPlayersDisabled}
           hint={`Cannot be lower than current hero count (${players.length}).`}
         />
-        <StepperPanel
+        <StepperCard
           label="Max Level"
           value={settings.maxLevel}
           onChange={setMaxLevel}
@@ -104,73 +105,5 @@ export function SettingsTab() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
-}
-
-type SectionLabelProps = {
-  children: React.ReactNode
-  variant?: 'default' | 'danger'
-}
-
-function SectionLabel({ children, variant = 'default' }: SectionLabelProps) {
-  return (
-    <div className="flex items-center gap-3 mb-3">
-      <span
-        className={cn(
-          'text-base tracking-wider uppercase shrink-0',
-          variant === 'danger' ? 'text-destructive' : 'text-muted-foreground',
-        )}
-      >
-        {children}
-      </span>
-      <div className={cn('flex-1 h-px', variant === 'danger' ? 'bg-destructive/40' : 'bg-border')} />
-    </div>
-  )
-}
-
-type StepperPanelProps = {
-  label: string
-  value: number
-  onChange: (n: number) => void
-  decreaseDisabled?: boolean
-  increaseDisabled?: boolean
-  hint?: string
-}
-
-function StepperPanel({ label, value, onChange, decreaseDisabled, increaseDisabled, hint }: StepperPanelProps) {
-  return (
-    <section className="rounded-xl border border-border/60 bg-card/50 p-4 flex flex-col gap-2">
-      <div className="flex items-center justify-between gap-3">
-        <span className="text-base tracking-widest uppercase text-muted-foreground font-munchkin">
-          {label}
-        </span>
-        <div className="flex items-center rounded-md border border-border/60 overflow-hidden">
-          <button
-            type="button"
-            aria-label={`Decrease ${label}`}
-            onClick={() => onChange(value - 1)}
-            disabled={decreaseDisabled}
-            className="px-3 py-2 text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <Minus className="size-4" />
-          </button>
-          <span className="px-4 py-2 font-munchkin text-primary text-xl tabular-nums min-w-10 text-center">
-            {value}
-          </span>
-          <button
-            type="button"
-            aria-label={`Increase ${label}`}
-            onClick={() => onChange(value + 1)}
-            disabled={increaseDisabled}
-            className="px-3 py-2 text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <Plus className="size-4" />
-          </button>
-        </div>
-      </div>
-      {hint && (
-        <span className="text-xs text-muted-foreground">{hint}</span>
-      )}
-    </section>
   )
 }
