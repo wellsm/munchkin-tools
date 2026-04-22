@@ -31,7 +31,7 @@ export function PlayersTab() {
 
   return (
     <div className="relative h-full w-full">
-      <Header title={t.tabs.heroes} />
+      <Header title={t.heroes.title} />
       <div className="overflow-auto p-4 pb-24">
         <ul className="flex flex-col gap-3">
           {players.map((p) => (

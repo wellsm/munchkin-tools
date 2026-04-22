@@ -14,6 +14,7 @@ export const pt: Dictionary = {
     settings: 'Configurações',
   },
   heroes: {
+    title: 'Munchkins',
     noHeroes: 'Nenhum herói ainda.',
     addHero: 'Adicionar herói',
     lvlShort: 'NV',

@@ -12,6 +12,7 @@ export const en = {
     settings: 'Settings',
   },
   heroes: {
+    title: 'Munchkins',
     noHeroes: 'No heroes yet.',
     addHero: 'Add hero',
     lvlShort: 'LVL',
