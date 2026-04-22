@@ -55,12 +55,13 @@ describe('munchkin store', () => {
 
   it('addPlayer refuses when at maxPlayers', () => {
     const { setMaxPlayers } = useMunchkinStore.getState()
-    setMaxPlayers(2)
+    setMaxPlayers(3)
     addHero('A')
     addHero('B')
     addHero('C')
+    addHero('D')
 
-    expect(useMunchkinStore.getState().players.length).toBe(2)
+    expect(useMunchkinStore.getState().players.length).toBe(3)
   })
 
   it('addPlayer caps classes and races at 2', () => {
@@ -274,9 +275,10 @@ describe('munchkin store', () => {
     addHero('A')
     addHero('B')
     addHero('C')
-    setMaxPlayers(2)
+    addHero('D')
+    setMaxPlayers(3)
 
-    expect(useMunchkinStore.getState().settings.maxPlayers).toBe(3)
+    expect(useMunchkinStore.getState().settings.maxPlayers).toBe(4)
   })
 
   it('setMaxPlayers clamps to product range', () => {
@@ -285,7 +287,7 @@ describe('munchkin store', () => {
 
     expect(useMunchkinStore.getState().settings.maxPlayers).toBe(8)
     setMaxPlayers(0)
-    expect(useMunchkinStore.getState().settings.maxPlayers).toBe(2)
+    expect(useMunchkinStore.getState().settings.maxPlayers).toBe(3)
   })
 
   it('resetAllPlayers clears players and combat, keeps settings', () => {

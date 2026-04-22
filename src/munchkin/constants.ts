@@ -4,7 +4,7 @@ import type { MunchkinClass, MunchkinRace, Gender } from './types'
 export const MAX_CLASSES_PER_PLAYER = 2
 export const MAX_RACES_PER_PLAYER = 2
 export const DEFAULT_MAX_PLAYERS = 8
-export const MIN_MAX_PLAYERS = 2
+export const MIN_MAX_PLAYERS = 3
 export const PRODUCT_MAX_PLAYERS = 8
 export const DEFAULT_MAX_LEVEL = 10
 export const MIN_LEVEL = 1
