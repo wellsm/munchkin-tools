@@ -12,6 +12,8 @@ import {
 
 type NewPlayerInput = Omit<Player, 'id'>
 
+const MAX_HELPERS = 1
+
 type MunchkinStore = {
   players: Player[]
   settings: GameSettings
@@ -20,11 +22,15 @@ type MunchkinStore = {
   addPlayer: (input: NewPlayerInput) => void
   updatePlayer: (id: string, patch: Partial<NewPlayerInput>) => void
   removePlayer: (id: string) => void
+  levelUpHeroes: (ids: string[]) => void
 
-  toggleParticipant: (id: string) => void
-  setMunchkinBuff: (n: number) => void
+  setMainCombatant: (id: string | null) => void
+  addHelper: (id: string) => void
+  removeHelper: (id: string) => void
+  clearHelpers: () => void
+  setPartyModifier: (n: number) => void
   setMonsterLevel: (n: number) => void
-  setMonsterBuff: (n: number) => void
+  setMonsterModifier: (n: number) => void
   resetCombat: () => void
 
   setMaxPlayers: (n: number) => void
@@ -33,10 +39,11 @@ type MunchkinStore = {
 }
 
 const INITIAL_COMBAT: CombatState = {
-  participatingIds: [],
-  munchkinBuff: 0,
+  mainCombatantId: null,
+  helperIds: [],
+  partyModifier: 0,
   monsterLevel: 0,
-  monsterBuff: 0,
+  monsterModifier: 0,
 }
 
 const INITIAL_SETTINGS: GameSettings = {
@@ -105,27 +112,92 @@ export const useMunchkinStore = create<MunchkinStore>()(
 
       removePlayer: (id) => {
         const { players, combat } = get()
-        set({
-          players: players.filter((p) => p.id !== id),
-          combat: {
-            ...combat,
-            participatingIds: combat.participatingIds.filter((pid) => pid !== id),
-          },
+        const players_next = players.filter((p) => p.id !== id)
+
+        if (combat.mainCombatantId === id) {
+          set({
+            players: players_next,
+            combat: { ...combat, mainCombatantId: null, helperIds: [] },
+          })
+
+          return
+        }
+
+        if (combat.helperIds.includes(id)) {
+          set({
+            players: players_next,
+            combat: { ...combat, helperIds: combat.helperIds.filter((hid) => hid !== id) },
+          })
+
+          return
+        }
+
+        set({ players: players_next })
+      },
+
+      levelUpHeroes: (ids) => {
+        const { players, settings } = get()
+        const idSet = new Set(ids)
+        const next = players.map((p) => {
+          if (!idSet.has(p.id)) {
+            return p
+          }
+
+          const nextLevel = Math.min(settings.maxLevel, p.level + 1)
+
+          return { ...p, level: nextLevel }
         })
+        set({ players: next })
       },
 
-      toggleParticipant: (id) => {
+      setMainCombatant: (id) => {
         const { combat } = get()
-        const exists = combat.participatingIds.includes(id)
-        const participatingIds = exists
-          ? combat.participatingIds.filter((pid) => pid !== id)
-          : [...combat.participatingIds, id]
-        set({ combat: { ...combat, participatingIds } })
+
+        if (id === null) {
+          set({ combat: { ...combat, mainCombatantId: null, helperIds: [] } })
+
+          return
+        }
+
+        const helperIds = combat.helperIds.filter((hid) => hid !== id)
+        set({ combat: { ...combat, mainCombatantId: id, helperIds } })
       },
 
-      setMunchkinBuff: (n) => set({ combat: { ...get().combat, munchkinBuff: Math.round(n) || 0 } }),
+      addHelper: (id) => {
+        const { combat } = get()
+
+        if (id === null) {
+          return
+        }
+
+        if (id === combat.mainCombatantId) {
+          return
+        }
+
+        if (combat.helperIds.includes(id)) {
+          return
+        }
+
+        if (combat.helperIds.length >= MAX_HELPERS) {
+          return
+        }
+
+        set({ combat: { ...combat, helperIds: [...combat.helperIds, id] } })
+      },
+
+      removeHelper: (id) => {
+        const { combat } = get()
+        set({ combat: { ...combat, helperIds: combat.helperIds.filter((hid) => hid !== id) } })
+      },
+
+      clearHelpers: () => {
+        const { combat } = get()
+        set({ combat: { ...combat, helperIds: [] } })
+      },
+
+      setPartyModifier: (n) => set({ combat: { ...get().combat, partyModifier: Math.round(n) || 0 } }),
       setMonsterLevel: (n) => set({ combat: { ...get().combat, monsterLevel: Math.max(0, Math.round(n) || 0) } }),
-      setMonsterBuff: (n) => set({ combat: { ...get().combat, monsterBuff: Math.round(n) || 0 } }),
+      setMonsterModifier: (n) => set({ combat: { ...get().combat, monsterModifier: Math.round(n) || 0 } }),
 
       resetCombat: () => set({ combat: { ...INITIAL_COMBAT } }),
 

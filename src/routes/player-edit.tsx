@@ -43,8 +43,7 @@ export function PlayerEdit() {
   const maxLevel = useMunchkinStore((s) => s.settings.maxLevel)
   const updatePlayer = useMunchkinStore((s) => s.updatePlayer)
   const removePlayer = useMunchkinStore((s) => s.removePlayer)
-  const toggleParticipant = useMunchkinStore((s) => s.toggleParticipant)
-  const participating = useMunchkinStore((s) => s.combat.participatingIds)
+  const setMainCombatant = useMunchkinStore((s) => s.setMainCombatant)
 
   if (!player) {
     return (
@@ -71,10 +70,7 @@ export function PlayerEdit() {
       return
     }
 
-    if (!participating.includes(player.id)) {
-      toggleParticipant(player.id)
-    }
-
+    setMainCombatant(player.id)
     navigate('/?tab=combat')
   }
 

@@ -13,10 +13,11 @@ export type Player = {
 }
 
 export type CombatState = {
-  participatingIds: string[]
-  munchkinBuff: number
+  mainCombatantId: string | null
+  helperIds: string[]
+  partyModifier: number
   monsterLevel: number
-  monsterBuff: number
+  monsterModifier: number
 }
 
 export type GameSettings = {
