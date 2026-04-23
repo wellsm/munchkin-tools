@@ -7,9 +7,14 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=@munchkin-tools/web",
-    "build": "npm run build --workspace=@munchkin-tools/web",
-    "test": "npm run test --workspace=@munchkin-tools/web",
-    "lint": "npm run lint --workspace=@munchkin-tools/web"
+    "dev": "concurrently -n web,convex -c cyan,magenta --kill-others-on-fail \"npm:dev:*\"",
+    "dev:web": "npm run dev --workspace=@munchkin-tools/web",
+    "dev:convex": "npm run dev --workspace=@munchkin-tools/convex",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
