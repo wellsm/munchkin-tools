@@ -53,6 +53,7 @@ function defaultHero(): Omit<RoomPlayer, 'playerId' | 'name' | 'joinedAt' | 'isH
     color: null,
     classes: [],
     races: [],
+    ready: false,
   }
 }
 
@@ -128,6 +129,7 @@ export const createRoom = mutation({
           joinedAt: now,
           isHost: true,
           ...defaultHero(),
+          ready: true,
         },
       ],
       combat: defaultCombat(),
@@ -285,6 +287,7 @@ export const updatePlayer = mutation({
       color: v.optional(v.union(v.string(), v.null())),
       classes: v.optional(v.array(classValidator)),
       races: v.optional(v.array(raceValidator)),
+      ready: v.optional(v.boolean()),
     }),
   },
   handler: async (ctx, args) => {
@@ -341,6 +344,10 @@ export const updatePlayer = mutation({
 
     if (args.patch.races !== undefined) {
       next.races = args.patch.races.slice(0, MAX_RACES_PER_PLAYER)
+    }
+
+    if (args.patch.ready !== undefined) {
+      next.ready = args.patch.ready
     }
 
     const nextPlayers = [...room.players]

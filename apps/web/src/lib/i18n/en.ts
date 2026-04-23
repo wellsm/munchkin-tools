@@ -56,6 +56,12 @@ export const en = {
     removePlayerAria: (name: string) => `Remove ${name}`,
     removePlayerTitle: (name: string) => `Remove ${name}?`,
     removePlayerDescription: 'They will leave the room. This cannot be undone.',
+    ready: 'Ready',
+    notReady: 'Not ready',
+    youLabel: '(you)',
+    changeColor: 'Change color',
+    waitingReady: (n: number) =>
+      `Waiting for ${n} ${n === 1 ? 'player' : 'players'} to be ready`,
   },
   tabs: {
     heroes: 'Heroes',

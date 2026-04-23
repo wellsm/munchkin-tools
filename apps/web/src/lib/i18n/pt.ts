@@ -58,6 +58,12 @@ export const pt: Dictionary = {
     removePlayerAria: (name: string) => `Remover ${name}`,
     removePlayerTitle: (name: string) => `Remover ${name}?`,
     removePlayerDescription: 'Ele sai da sala. Essa ação não pode ser desfeita.',
+    ready: 'Pronto',
+    notReady: 'Não pronto',
+    youLabel: '(você)',
+    changeColor: 'Mudar cor',
+    waitingReady: (n: number) =>
+      `Aguardando ${n} ${n === 1 ? 'jogador' : 'jogadores'} ficar pronto`,
   },
   tabs: {
     heroes: 'Heróis',

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '@munchkin-tools/convex/convex/_generated/api'
 import type { Id } from '@munchkin-tools/convex/convex/_generated/dataModel'
-import { ArrowLeft, Check, Crown, Flag, Share2, UserMinus } from 'lucide-react'
+import { ArrowLeft, Check, Crown, Flag, Palette, Share2, UserMinus, X } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import {
   AlertDialog,
@@ -23,6 +23,8 @@ import { Label } from '@/components/ui/label'
 import { OnlineGame } from '@/components/online/online-game'
 import { useT } from '@/lib/i18n/store'
 import { usePlayerIdentityStore } from '@/lib/player-identity'
+import { AVATAR_COLORS, avatarInitial, playerAvatarColor } from '@/lib/avatar-color'
+import { cn } from '@/lib/utils'
 
 const MIN_PLAYERS_TO_START = 3
 
@@ -33,8 +35,10 @@ export function WaitingRoom() {
   const room = useQuery(api.rooms.getRoom, roomId ? { roomId: roomId as Id<'rooms'> } : 'skip')
   const startMatch = useMutation(api.rooms.startMatch)
   const removePlayer = useMutation(api.rooms.removePlayer)
+  const updatePlayer = useMutation(api.rooms.updatePlayer)
   const playerId = usePlayerIdentityStore((s) => s.playerId)
   const [copied, setCopied] = useState(false)
+  const [colorPickerOpen, setColorPickerOpen] = useState(false)
 
   if (!roomId) {
     return null
@@ -85,8 +89,11 @@ export function WaitingRoom() {
 
   const inviteUrl = window.location.href
   const playerCount = room.players.length
-  const missing = Math.max(0, MIN_PLAYERS_TO_START - playerCount)
-  const canStart = playerCount >= MIN_PLAYERS_TO_START
+  const missingPlayers = Math.max(0, MIN_PLAYERS_TO_START - playerCount)
+  const notReadyCount = room.players.filter((p) => !p.ready).length
+  const hasEnoughPlayers = playerCount >= MIN_PLAYERS_TO_START
+  const everyoneReady = notReadyCount === 0
+  const canStart = hasEnoughPlayers && everyoneReady
   const isHost = myPlayer.isHost
 
   async function handleStart() {
@@ -101,6 +108,25 @@ export function WaitingRoom() {
     } catch {
       // Clipboard API can fail in insecure contexts; user can still scan the QR
     }
+  }
+
+  function handleToggleReady() {
+    updatePlayer({
+      roomId: roomId as Id<'rooms'>,
+      requesterId: playerId,
+      targetId: playerId,
+      patch: { ready: !myPlayer!.ready },
+    })
+  }
+
+  function handlePickColor(color: string | null) {
+    updatePlayer({
+      roomId: roomId as Id<'rooms'>,
+      requesterId: playerId,
+      targetId: playerId,
+      patch: { color },
+    })
+    setColorPickerOpen(false)
   }
 
   return (
@@ -139,58 +165,158 @@ export function WaitingRoom() {
           </div>
 
           <ul className="flex flex-col gap-2">
-            {room.players.map((p) => (
-              <li
-                key={p.playerId}
-                className="flex items-center gap-2 rounded-md border border-border/60 bg-card/50 p-3"
-              >
-                <span className="font-munchkin text-lg flex-1 truncate">{p.name}</span>
-                {p.isHost && (
-                  <span className="flex items-center gap-1 text-xs tracking-wider uppercase text-primary">
-                    <Crown className="size-4" /> {t.waitingRoom.hostBadge}
-                  </span>
-                )}
-                {isHost && !p.isHost && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
+            {room.players.map((p) => {
+              const isMe = p.playerId === playerId
+              const bg = playerAvatarColor({ id: p.playerId, color: p.color ?? undefined })
+
+              return (
+                <li key={p.playerId} className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3 rounded-md border border-border/60 bg-card/50 p-3">
+                    {isMe ? (
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        aria-label={t.waitingRoom.removePlayerAria(p.name)}
-                        className="text-muted-foreground hover:text-destructive"
+                        onClick={() => setColorPickerOpen((v) => !v)}
+                        aria-label={t.waitingRoom.changeColor}
+                        className="size-10 shrink-0 rounded-full flex items-center justify-center relative hover:ring-2 hover:ring-primary transition"
+                        style={{ backgroundColor: bg }}
                       >
-                        <UserMinus className="size-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="font-munchkin text-2xl">
-                          {t.waitingRoom.removePlayerTitle(p.name)}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t.waitingRoom.removePlayerDescription}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() =>
-                            removePlayer({
-                              roomId: roomId as Id<'rooms'>,
-                              requesterId: playerId,
-                              targetId: p.playerId,
-                            })
-                          }
+                        <span className="font-munchkin text-lg text-background leading-none">
+                          {avatarInitial(p.name)}
+                        </span>
+                        <span
+                          className="absolute -bottom-1 -right-1 size-5 rounded-full bg-card border border-border flex items-center justify-center text-foreground"
+                          aria-hidden
                         >
-                          {t.common.remove}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </li>
-            ))}
+                          <Palette className="size-3" />
+                        </span>
+                      </button>
+                    ) : (
+                      <div
+                        className="size-10 shrink-0 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: bg }}
+                        aria-hidden
+                      >
+                        <span className="font-munchkin text-lg text-background leading-none">
+                          {avatarInitial(p.name)}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="font-munchkin text-lg truncate">{p.name}</span>
+                        {isMe && (
+                          <span className="text-xs text-muted-foreground shrink-0">
+                            {t.waitingRoom.youLabel}
+                          </span>
+                        )}
+                      </div>
+                      {p.isHost && (
+                        <span className="flex items-center gap-1 text-xs tracking-wider uppercase text-primary">
+                          <Crown className="size-3" /> {t.waitingRoom.hostBadge}
+                        </span>
+                      )}
+                    </div>
+
+                    {isMe ? (
+                      <Button
+                        size="sm"
+                        variant={p.ready ? 'default' : 'outline'}
+                        onClick={handleToggleReady}
+                      >
+                        {p.ready && <Check className="size-3.5" />}
+                        {p.ready ? t.waitingRoom.ready : t.waitingRoom.notReady}
+                      </Button>
+                    ) : (
+                      <span
+                        className={cn(
+                          'text-xs tracking-wider uppercase inline-flex items-center gap-1 shrink-0',
+                          p.ready ? 'text-primary' : 'text-muted-foreground',
+                        )}
+                      >
+                        {p.ready && <Check className="size-3.5" />}
+                        {p.ready ? t.waitingRoom.ready : t.waitingRoom.notReady}
+                      </span>
+                    )}
+
+                    {isHost && !p.isHost && !isMe && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            aria-label={t.waitingRoom.removePlayerAria(p.name)}
+                            className="text-muted-foreground hover:text-destructive"
+                          >
+                            <UserMinus className="size-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="font-munchkin text-2xl">
+                              {t.waitingRoom.removePlayerTitle(p.name)}
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              {t.waitingRoom.removePlayerDescription}
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() =>
+                                removePlayer({
+                                  roomId: roomId as Id<'rooms'>,
+                                  requesterId: playerId,
+                                  targetId: p.playerId,
+                                })
+                              }
+                            >
+                              {t.common.remove}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
+
+                  {isMe && colorPickerOpen && (
+                    <div className="p-3 rounded-md border border-border/60 bg-card/30 flex flex-wrap gap-2 justify-center">
+                      {AVATAR_COLORS.map((c) => {
+                        const selected = p.color === c
+
+                        return (
+                          <button
+                            key={c}
+                            type="button"
+                            aria-label={t.heroEdit.pickColor}
+                            aria-pressed={selected}
+                            onClick={() => handlePickColor(c)}
+                            className={cn(
+                              'size-9 rounded-full transition-all',
+                              selected && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
+                            )}
+                            style={{ backgroundColor: c }}
+                          />
+                        )
+                      })}
+                      <button
+                        type="button"
+                        aria-label={t.heroEdit.resetColor}
+                        aria-pressed={p.color === null}
+                        onClick={() => handlePickColor(null)}
+                        className={cn(
+                          'size-9 rounded-full border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors',
+                          p.color === null && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
+                        )}
+                      >
+                        <X className="size-4" />
+                      </button>
+                    </div>
+                  )}
+                </li>
+              )
+            })}
           </ul>
         </section>
 
@@ -201,9 +327,14 @@ export function WaitingRoom() {
 
       {isHost && (
         <footer className="p-4 border-t border-border flex flex-col gap-2">
-          {!canStart && (
+          {!hasEnoughPlayers && (
             <p className="text-xs text-muted-foreground text-center">
-              {t.waitingRoom.startNeedsMore(missing)}
+              {t.waitingRoom.startNeedsMore(missingPlayers)}
+            </p>
+          )}
+          {hasEnoughPlayers && !everyoneReady && (
+            <p className="text-xs text-muted-foreground text-center">
+              {t.waitingRoom.waitingReady(notReadyCount)}
             </p>
           )}
           <Button size="lg" className="w-full" onClick={handleStart} disabled={!canStart}>
