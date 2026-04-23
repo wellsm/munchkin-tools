@@ -10,6 +10,7 @@
     "deploy": "convex deploy"
   },
   "dependencies": {
+    "@munchkin-tools/utils": "*",
     "convex": "^1.28.0"
   }
 }

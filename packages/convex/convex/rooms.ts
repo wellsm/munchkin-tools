@@ -1,3 +1,4 @@
+import { AVATAR_COLORS } from '@munchkin-tools/utils/avatar-color'
 import { mutation, query } from './_generated/server'
 import type { MutationCtx } from './_generated/server'
 import { v } from 'convex/values'
@@ -50,7 +51,7 @@ function defaultHero(): Omit<RoomPlayer, 'playerId' | 'name' | 'joinedAt' | 'isH
     level: MIN_LEVEL,
     gear: 0,
     gender: null,
-    color: null,
+    color: AVATAR_COLORS[0],
     classes: [],
     races: [],
     ready: false,
