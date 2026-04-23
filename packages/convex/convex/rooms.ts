@@ -5,7 +5,7 @@ import type { Id } from './_generated/dataModel'
 export const createRoom = mutation({
   args: {
     hostName: v.string(),
-    accessCode: v.string(),
+    accessCode: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const trimmedName = args.hostName.trim()
@@ -14,19 +14,19 @@ export const createRoom = mutation({
       throw new Error('Name is required')
     }
 
-    const trimmedCode = args.accessCode.trim()
+    const settings = await ctx.db.query('settings').first()
+    const needed = settings?.accessCodeNeeded ?? false
 
-    if (trimmedCode.length === 0) {
-      throw new Error('Access code is required')
-    }
+    if (needed) {
+      const providedCode = args.accessCode?.trim() ?? ''
 
-    const code = await ctx.db
-      .query('accessCodes')
-      .withIndex('by_code', (q) => q.eq('code', trimmedCode))
-      .first()
+      if (providedCode.length === 0) {
+        throw new Error('Access code is required')
+      }
 
-    if (!code || !code.active) {
-      throw new Error('Invalid access code')
+      if (settings?.accessCode !== providedCode) {
+        throw new Error('Invalid access code')
+      }
     }
 
     const now = Date.now()

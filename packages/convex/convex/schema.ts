@@ -2,11 +2,12 @@ import { defineSchema, defineTable } from 'convex/server'
 import { v } from 'convex/values'
 
 export default defineSchema({
-  accessCodes: defineTable({
-    code: v.string(),
-    active: v.boolean(),
-    notes: v.optional(v.string()),
-  }).index('by_code', ['code']),
+  // Singleton row. At most one document exists at a time — queried via .first().
+  settings: defineTable({
+    accessCodeNeeded: v.boolean(),
+    accessCode: v.union(v.string(), v.null()),
+    rotatedAt: v.optional(v.number()),
+  }),
 
   rooms: defineTable({
     hostName: v.string(),

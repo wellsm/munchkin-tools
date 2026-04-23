@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useMutation } from 'convex/react'
+import { useMutation, useQuery } from 'convex/react'
 import { api } from '@munchkin-tools/convex/convex/_generated/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -24,12 +24,18 @@ export function OnlineSheet({ open, onOpenChange }: Props) {
   const t = useT()
   const navigate = useNavigate()
   const createRoom = useMutation(api.rooms.createRoom)
+  const needsCode = useQuery(api.access.isAccessCodeNeeded)
   const [name, setName] = useState('')
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  const canSubmit = name.trim().length > 0 && code.trim().length > 0 && !submitting
+  const isLoading = needsCode === undefined
+  const canSubmit =
+    !submitting &&
+    !isLoading &&
+    name.trim().length > 0 &&
+    (!needsCode || code.trim().length > 0)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -42,7 +48,13 @@ export function OnlineSheet({ open, onOpenChange }: Props) {
     setError(null)
 
     try {
-      const roomId = await createRoom({ hostName: name, accessCode: code })
+      const args: { hostName: string; accessCode?: string } = { hostName: name }
+
+      if (needsCode) {
+        args.accessCode = code
+      }
+
+      const roomId = await createRoom(args)
       onOpenChange(false)
       navigate(`/online/${roomId}`)
     } catch (err) {
@@ -73,16 +85,18 @@ export function OnlineSheet({ open, onOpenChange }: Props) {
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="online-code">{t.online.accessCode}</Label>
-            <Input
-              id="online-code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder={t.online.accessCodePlaceholder}
-              autoCapitalize="characters"
-            />
-          </div>
+          {needsCode && (
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="online-code">{t.online.accessCode}</Label>
+              <Input
+                id="online-code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder={t.online.accessCodePlaceholder}
+                autoCapitalize="characters"
+              />
+            </div>
+          )}
 
           {error && (
             <p className="text-sm text-destructive">{error}</p>

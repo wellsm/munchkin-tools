@@ -11,7 +11,17 @@ The online features require Convex. Before `npm run dev` works end-to-end:
 
        VITE_CONVEX_URL=https://your-deployment.convex.cloud
 
-3. Seed an access code via the Convex dashboard or:
+### Access gating (optional)
+
+By default, room creation is open — anyone can create a room. To require an access code:
+
+- From the repo root:
 
        cd packages/convex
-       npx convex run accessCodes:seed --json '{"code":"LETME1N","notes":"dev"}'
+       npx convex run access:setNeeded --json '{"needed":true}'
+
+  The first call also generates a 6-char code.
+
+- The current code lives in the Convex dashboard → Data → `settings` table → `accessCode` field. Share it with testers.
+- A cron (`packages/convex/convex/crons.ts`) rotates the code every 24 hours.
+- To disable gating: `npx convex run access:setNeeded --json '{"needed":false}'`.
