@@ -27,13 +27,17 @@ export const en = {
     players: 'Players',
     hostBadge: 'Host',
     startMatch: 'Start match',
-    waitingHint: 'Share the link above with other heroes.',
+    waitingHint: 'Share the code or QR above with other heroes.',
     roomCode: 'Room code',
     loading: 'Loading…',
     roomNotFound: 'Room not found.',
     backHome: 'Back home',
     started: 'Match started!',
     startedPlaceholder: 'Online multiplayer gameplay is coming soon.',
+    invite: 'Copy invite link',
+    copied: 'Link copied!',
+    startNeedsMore: (missing: number) =>
+      `Need ${missing} more ${missing === 1 ? 'player' : 'players'} to start`,
   },
   tabs: {
     heroes: 'Heroes',
