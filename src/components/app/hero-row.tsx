@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { StatBox } from "@/components/app/stat-box";
 import { Button } from "@/components/ui/button";
 import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
+import { classById, raceById } from "@/lib/constants";
 import { useT } from "@/lib/i18n/store";
 import { calculateStrength } from "@/lib/strength";
 import type { Player } from "@/lib/types";
+import { Chip } from "./chip";
 
 type Props = {
   player: Player;
@@ -56,17 +58,41 @@ export function HeroRow({ player, onClick }: Props) {
             />
           )}
         </div>
-        <div className="flex flex-col">
-          <span className="text-sm text-muted-foreground truncate">
-            {races}
+        <div className="flex flex-col items-start sm:gap-2">
+          <span className="text-sm text-muted-foreground truncate hidden sm:flex gap-2">
+            {
+              player.races.map((r) => {
+                const Icon = raceById(r).icon;
+
+                return (
+                  <Chip key={r} active size="sm">
+                    <Icon className="size-4" aria-hidden />
+                    {t.heroEdit.races[r]}
+                  </Chip>
+                );
+              })
+            }
           </span>
-          <span className="text-sm text-muted-foreground truncate">
-            {classes}
+          <span className="text-sm text-muted-foreground truncate sm:hidden">{races}</span>
+          <span className="text-sm text-muted-foreground truncate hidden sm:flex gap-2">
+            {
+              player.classes.map((r) => {
+                const Icon = classById(r).icon;
+
+                return (
+                  <Chip key={r} active size="sm">
+                    <Icon className="size-4" aria-hidden />
+                    {t.heroEdit.classes[r]}
+                  </Chip>
+                );
+              })
+            }
           </span>
+          <span className="text-sm text-muted-foreground truncate sm:hidden">{classes}</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-1.5 shrink-0">
+      <div className="flex sm:flex-col items-center gap-1.5 shrink-0">
         <StatBox value={player.level} label={t.heroes.lvlShort} />
         <StatBox value={player.gear} label={t.heroes.gearShort} />
         <StatBox value={strength} label={t.heroes.strShort} highlighted />

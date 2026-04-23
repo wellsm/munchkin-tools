@@ -53,9 +53,9 @@ export function SettingsTab() {
   }
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
       <Header title={t.settings.title} />
-      <div className="h-full overflow-auto p-4 pb-8 max-w-md mx-auto w-full flex flex-col gap-4">
+      <div className="flex-1 min-h-0 overflow-auto p-4 pb-8 max-w-md mx-auto w-full flex flex-col gap-4">
         <div>
           <SectionLabel>{t.settings.party}</SectionLabel>
           <div className="flex flex-col gap-3 mb-6">

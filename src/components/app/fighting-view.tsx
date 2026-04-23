@@ -49,9 +49,9 @@ export function FightingView() {
   }
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
       <Header title={t.combat.title} onBack={() => setMainCombatant(null)} />
-      <div className="h-full overflow-auto p-4 max-w-md mx-auto w-full flex flex-col gap-4">
+      <div className="flex-1 min-h-0 overflow-auto p-4 pb-8 max-w-md mx-auto w-full flex flex-col gap-4">
         <section className="rounded-xl border border-border/60 bg-card/50 p-5">
           <div className="grid grid-cols-3 gap-2 items-start">
             <div className="flex flex-col items-center text-center">

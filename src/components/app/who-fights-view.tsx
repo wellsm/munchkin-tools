@@ -25,9 +25,9 @@ export function WhoFightsView() {
   }
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
       <Header title={t.combat.title} />
-      <div className="h-full overflow-auto p-4 max-w-md mx-auto w-full">
+      <div className="flex-1 min-h-0 overflow-auto p-4 mx-auto w-full">
         <div className="flex items-center gap-3 mb-3">
           <span className="text-base tracking-wider uppercase text-muted-foreground shrink-0">
             {t.combat.whoFights}
@@ -35,7 +35,7 @@ export function WhoFightsView() {
           <div className="flex-1 h-px bg-border" />
         </div>
 
-        <ul className="flex flex-col gap-3">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {players.map((p) => (
             <HeroRow key={p.id} player={p} onClick={() => setHero(p.id)} />
           ))}

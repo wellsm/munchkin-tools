@@ -1,5 +1,4 @@
 import {
-  ArrowLeft,
   Check,
   Mars,
   Palette,
@@ -11,6 +10,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Chip } from "@/components/app/chip";
 import { GenderButton } from "@/components/app/gender-button";
+import { Header } from "@/components/app/header";
 import { NameEditor } from "@/components/app/name-editor";
 import { StatCard } from "@/components/app/stat-card";
 import {
@@ -56,7 +56,8 @@ export function PlayerEdit() {
   const navigate = useNavigate();
   const isNew = id === "new";
 
-  const { settings, updatePlayer, removePlayer, addPlayer, setMainCombatant } = useMunchkinStore();
+  const { settings, updatePlayer, removePlayer, addPlayer, setMainCombatant } =
+    useMunchkinStore();
 
   const existingPlayer = useMunchkinStore((s) => {
     if (isNew) {
@@ -79,7 +80,9 @@ export function PlayerEdit() {
       <div className="min-h-dvh flex items-center justify-center p-6 text-center bg-background text-foreground">
         <div className="flex flex-col gap-4 items-center">
           <p className="text-muted-foreground">{t.heroEdit.heroNotFound}</p>
-          <Button onClick={() => navigate("/")}>{t.heroEdit.backToParty}</Button>
+          <Button onClick={() => navigate("/")}>
+            {t.heroEdit.backToParty}
+          </Button>
         </div>
       </div>
     );
@@ -134,7 +137,10 @@ export function PlayerEdit() {
   }
 
   function handleLevelChange(delta: number) {
-    const next = Math.max(MIN_LEVEL, Math.min(settings.maxLevel, source!.level + delta));
+    const next = Math.max(
+      MIN_LEVEL,
+      Math.min(settings.maxLevel, source!.level + delta),
+    );
     commitField("level", next);
   }
 
@@ -185,49 +191,38 @@ export function PlayerEdit() {
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
-      <div className="max-w-md mx-auto w-full p-4 pb-8 flex flex-col">
-        <header className="flex justify-between items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={t.heroEdit.backAria}
-            onClick={() => navigate("/")}
-          >
-            <ArrowLeft className="size-6" />
-          </Button>
-          {isNew ? (
-            <div className="size-11" aria-hidden />
-          ) : (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label={t.heroEdit.removeHeroAria}
-                >
-                  <Trash2 className="size-6" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {t.heroEdit.confirmRemoveTitle(existingPlayer?.name ?? "")}
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {t.heroEdit.confirmRemoveDescription}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleRemove}>
-                    {t.common.remove}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
-        </header>
-
+      <Header title={isNew ? t.heroEdit.newHero : t.heroEdit.editHero} onBack={() => navigate("/")} right={isNew ? (
+        <div className="size-11" aria-hidden />
+      ) : (
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={t.heroEdit.removeHeroAria}
+            >
+              <Trash2 className="size-6" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t.heroEdit.confirmRemoveTitle(existingPlayer?.name ?? "")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t.heroEdit.confirmRemoveDescription}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
+              <AlertDialogAction onClick={handleRemove}>
+                {t.common.remove}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )} />
+      <div className="max-w-md mx-auto w-full px-4 pb-8 flex flex-col">
         <div className="flex flex-col items-center mt-6">
           <div className="relative">
             <div
@@ -255,7 +250,7 @@ export function PlayerEdit() {
           {pickerOpen && (
             <div className="mt-4 px-2 py-4 rounded-xl border border-border bg-card/70 flex items-center gap-2 flex-wrap justify-center">
               {AVATAR_COLORS.map((c) => {
-                const selected = source.color === c
+                const selected = source.color === c;
 
                 return (
                   <button
@@ -368,7 +363,10 @@ export function PlayerEdit() {
 
         <div className="mt-4 flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">
-            {t.heroEdit.classSlots(source.classes.length, MAX_CLASSES_PER_PLAYER)}
+            {t.heroEdit.classSlots(
+              source.classes.length,
+              MAX_CLASSES_PER_PLAYER,
+            )}
           </span>
           <div className="flex flex-wrap gap-2">
             {CLASSES.map((c) => {

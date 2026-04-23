@@ -44,6 +44,7 @@ export const en = {
     chooseAvatarColor: 'Choose avatar color',
     pickColor: 'Pick color',
     resetColor: 'Reset to default color',
+    editHero: 'Edit hero',
     editName: 'Edit hero name',
     heroNameAria: 'Hero name',
     races: {
