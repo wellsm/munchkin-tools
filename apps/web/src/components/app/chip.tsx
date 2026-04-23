@@ -6,16 +6,18 @@ type Props = {
   size?: 'sm' | 'default';
   children: ReactNode
   onClick?: () => void
+  disabled?: boolean
 }
 
-export function Chip({ active, size = 'default', children, onClick }: Props) {
+export function Chip({ active, size = 'default', children, onClick, disabled }: Props) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={active}
+      disabled={disabled}
       className={cn(
-        'inline-flex items-center gap-2 rounded-full border transition-colors',
+        'inline-flex items-center gap-2 rounded-full border transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
         active
           ? 'bg-primary text-primary-foreground border-primary'
           : 'bg-transparent text-foreground border-border hover:bg-accent',

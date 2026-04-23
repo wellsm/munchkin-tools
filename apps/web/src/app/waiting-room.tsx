@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { OnlineGame } from '@/components/online/online-game'
 import { useT } from '@/lib/i18n/store'
 import { usePlayerIdentityStore } from '@/lib/player-identity'
 
@@ -79,12 +80,7 @@ export function WaitingRoom() {
   }
 
   if (room.started) {
-    return (
-      <div className="min-h-dvh flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <h1 className="text-4xl font-munchkin">{t.waitingRoom.started}</h1>
-        <p className="text-muted-foreground">{t.waitingRoom.startedPlaceholder}</p>
-      </div>
-    )
+    return <OnlineGame room={room} />
   }
 
   const inviteUrl = window.location.href
