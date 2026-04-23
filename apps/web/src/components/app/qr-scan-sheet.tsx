@@ -84,7 +84,10 @@ export function QrScanSheet({ open, onOpenChange }: Props) {
                       handleScan(value)
                     }
                   }}
-                  onError={() => setError(t.scanQr.cameraError)}
+                  onError={(error) => {
+                    setError(t.scanQr.cameraError)
+                    alert(error)
+                  }}
                   components={{ finder: true }}
                   allowMultiple={false}
                 />
