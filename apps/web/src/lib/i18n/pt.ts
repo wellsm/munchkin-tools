@@ -12,6 +12,13 @@ export const pt: Dictionary = {
     title: 'Munchkin Tools',
     offline: 'Offline',
     online: 'Online',
+    scanQr: 'Escanear QR',
+  },
+  scanQr: {
+    title: 'Escanear QR da sala',
+    description: 'Aponte a câmera para o QR de convite.',
+    invalidCode: 'Esse QR não é um convite de sala.',
+    cameraError: 'Não foi possível acessar a câmera.',
   },
   online: {
     title: 'Criar sala online',
@@ -48,6 +55,9 @@ export const pt: Dictionary = {
     joining: 'Entrando…',
     joinError: 'Não foi possível entrar. Tente novamente.',
     alreadyStarted: 'Essa partida já começou.',
+    removePlayerAria: (name: string) => `Remover ${name}`,
+    removePlayerTitle: (name: string) => `Remover ${name}?`,
+    removePlayerDescription: 'Ele sai da sala. Essa ação não pode ser desfeita.',
   },
   tabs: {
     heroes: 'Heróis',

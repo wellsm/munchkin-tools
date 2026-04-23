@@ -4,8 +4,19 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '@munchkin-tools/convex/convex/_generated/api'
 import type { Id } from '@munchkin-tools/convex/convex/_generated/dataModel'
-import { ArrowLeft, Check, Crown, Flag, Share2 } from 'lucide-react'
+import { ArrowLeft, Check, Crown, Flag, Share2, UserMinus } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,6 +31,7 @@ export function WaitingRoom() {
   const { roomId } = useParams<{ roomId: string }>()
   const room = useQuery(api.rooms.getRoom, roomId ? { roomId: roomId as Id<'rooms'> } : 'skip')
   const startMatch = useMutation(api.rooms.startMatch)
+  const removePlayer = useMutation(api.rooms.removePlayer)
   const playerId = usePlayerIdentityStore((s) => s.playerId)
   const [copied, setCopied] = useState(false)
 
@@ -61,6 +73,7 @@ export function WaitingRoom() {
       <JoinRoomView
         roomId={roomId as Id<'rooms'>}
         hostName={room.hostName}
+        roomCode={room.code}
       />
     )
   }
@@ -141,6 +154,45 @@ export function WaitingRoom() {
                     <Crown className="size-4" /> {t.waitingRoom.hostBadge}
                   </span>
                 )}
+                {isHost && !p.isHost && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t.waitingRoom.removePlayerAria(p.name)}
+                        className="text-muted-foreground hover:text-destructive"
+                      >
+                        <UserMinus className="size-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="font-munchkin text-2xl">
+                          {t.waitingRoom.removePlayerTitle(p.name)}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {t.waitingRoom.removePlayerDescription}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() =>
+                            removePlayer({
+                              roomId: roomId as Id<'rooms'>,
+                              requesterId: playerId,
+                              targetId: p.playerId,
+                            })
+                          }
+                        >
+                          {t.common.remove}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </li>
             ))}
           </ul>
@@ -170,9 +222,10 @@ export function WaitingRoom() {
 type JoinRoomViewProps = {
   roomId: Id<'rooms'>
   hostName: string
+  roomCode: string
 }
 
-function JoinRoomView({ roomId, hostName }: JoinRoomViewProps) {
+function JoinRoomView({ roomId, hostName, roomCode }: JoinRoomViewProps) {
   const t = useT()
   const navigate = useNavigate()
   const joinRoom = useMutation(api.rooms.joinRoom)
@@ -217,8 +270,16 @@ function JoinRoomView({ roomId, hostName }: JoinRoomViewProps) {
       </header>
 
       <main className="flex-1 overflow-auto max-w-sm w-full mx-auto p-6 flex flex-col justify-center gap-6">
-        <div className="text-center">
-          <p className="text-muted-foreground">{t.waitingRoom.joinDescription(hostName)}</p>
+        <div className="flex flex-col items-center gap-2 text-center">
+          <p className="text-xs tracking-widest uppercase text-muted-foreground">
+            {t.waitingRoom.roomCode}
+          </p>
+          <p className="font-munchkin text-5xl text-primary tabular-nums tracking-widest">
+            {roomCode}
+          </p>
+          <p className="text-muted-foreground mt-2">
+            {t.waitingRoom.joinDescription(hostName)}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

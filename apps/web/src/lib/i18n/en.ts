@@ -10,6 +10,13 @@ export const en = {
     title: 'Munchkin Tools',
     offline: 'Offline',
     online: 'Online',
+    scanQr: 'Scan QR',
+  },
+  scanQr: {
+    title: 'Scan room QR',
+    description: 'Point your camera at an invite QR code.',
+    invalidCode: 'That QR is not a room invite.',
+    cameraError: 'Could not access the camera.',
   },
   online: {
     title: 'Create online room',
@@ -46,6 +53,9 @@ export const en = {
     joining: 'Joining…',
     joinError: 'Could not join. Try again.',
     alreadyStarted: 'This match already started.',
+    removePlayerAria: (name: string) => `Remove ${name}`,
+    removePlayerTitle: (name: string) => `Remove ${name}?`,
+    removePlayerDescription: 'They will leave the room. This cannot be undone.',
   },
   tabs: {
     heroes: 'Heroes',

@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Globe, User } from 'lucide-react'
+import { Globe, QrCode, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useT } from '@/lib/i18n/store'
 import { OnlineSheet } from '@/components/app/online-sheet'
+import { QrScanSheet } from '@/components/app/qr-scan-sheet'
 
 export function Landing() {
   const t = useT()
   const navigate = useNavigate()
   const [onlineOpen, setOnlineOpen] = useState(false)
+  const [scanOpen, setScanOpen] = useState(false)
 
   return (
     <div className="min-h-dvh bg-background text-foreground flex flex-col items-center justify-center px-6 gap-12">
@@ -25,9 +27,14 @@ export function Landing() {
           <Globe className="size-6" />
           {t.landing.online}
         </Button>
+        <Button size="lg" variant="outline" className="h-16 text-lg" onClick={() => setScanOpen(true)}>
+          <QrCode className="size-6" />
+          {t.landing.scanQr}
+        </Button>
       </div>
 
       <OnlineSheet open={onlineOpen} onOpenChange={setOnlineOpen} />
+      <QrScanSheet open={scanOpen} onOpenChange={setScanOpen} />
     </div>
   )
 }

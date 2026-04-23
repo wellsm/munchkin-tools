@@ -145,6 +145,39 @@ export const getRoom = query({
   },
 })
 
+export const removePlayer = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    requesterId: v.string(),
+    targetId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    const requester = room.players.find((p) => p.playerId === args.requesterId)
+
+    if (!requester || !requester.isHost) {
+      throw new Error('Only the host can remove players')
+    }
+
+    if (args.targetId === args.requesterId) {
+      throw new Error('Host cannot remove themselves')
+    }
+
+    const nextPlayers = room.players.filter((p) => p.playerId !== args.targetId)
+
+    if (nextPlayers.length === room.players.length) {
+      return
+    }
+
+    await ctx.db.patch(args.roomId, { players: nextPlayers })
+  },
+})
+
 export const startMatch = mutation({
   args: { roomId: v.id('rooms') },
   handler: async (ctx, args) => {
