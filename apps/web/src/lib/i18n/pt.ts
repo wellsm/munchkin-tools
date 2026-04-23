@@ -29,13 +29,17 @@ export const pt: Dictionary = {
     players: 'Jogadores',
     hostBadge: 'Host',
     startMatch: 'Começar partida',
-    waitingHint: 'Compartilhe o link acima com outros heróis.',
+    waitingHint: 'Compartilhe o código ou o QR acima com outros heróis.',
     roomCode: 'Código da sala',
     loading: 'Carregando…',
     roomNotFound: 'Sala não encontrada.',
     backHome: 'Voltar ao início',
     started: 'Partida iniciada!',
     startedPlaceholder: 'Gameplay multiplayer online em breve.',
+    invite: 'Copiar link de convite',
+    copied: 'Link copiado!',
+    startNeedsMore: (missing: number) =>
+      `Falta${missing === 1 ? '' : 'm'} ${missing} ${missing === 1 ? 'jogador' : 'jogadores'} para começar`,
   },
   tabs: {
     heroes: 'Heróis',
