@@ -7,10 +7,24 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies (any depth)
 node_modules
+**/node_modules
+
+# Build output (any depth — covers apps/web/dist)
 dist
+**/dist
 dist-ssr
 *.local
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Convex
+packages/convex/convex/_generated
+.convex/
 
 # Editor directories and files
 .vscode/*

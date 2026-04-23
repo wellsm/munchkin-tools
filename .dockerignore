@@ -1,6 +1,9 @@
 node_modules
-dist
+**/node_modules
+apps/web/dist
+packages/*/convex/_generated
 coverage
+**/coverage
 .git
 .gitignore
 .github
@@ -9,6 +12,7 @@ coverage
 .claude
 .env
 .env.*
+!.env.example
 docs
 *.md
 !README.md
