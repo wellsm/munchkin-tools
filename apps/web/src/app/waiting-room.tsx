@@ -58,9 +58,9 @@ export function WaitingRoom() {
       </header>
 
       <main className="flex-1 overflow-auto max-w-md w-full mx-auto p-4 flex flex-col gap-4">
-        <section className="rounded-xl border border-border/60 bg-card/50 p-4">
+        <section className="rounded-xl border border-border/60 bg-card/50 p-4 text-center">
           <p className="text-xs tracking-widest uppercase text-muted-foreground">{t.waitingRoom.roomCode}</p>
-          <p className="font-munchkin text-2xl tabular-nums mt-1 break-all">{roomId}</p>
+          <p className="font-munchkin text-6xl text-primary tabular-nums tracking-widest mt-2">{room.code}</p>
         </section>
 
         <section>

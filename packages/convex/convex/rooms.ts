@@ -1,6 +1,26 @@
 import { mutation, query } from './_generated/server'
+import type { MutationCtx } from './_generated/server'
 import { v } from 'convex/values'
 import type { Id } from './_generated/dataModel'
+import { generateCode } from './lib/codes'
+
+const MAX_CODE_GENERATION_ATTEMPTS = 10
+
+async function generateUniqueRoomCode(ctx: MutationCtx): Promise<string> {
+  for (let attempt = 0; attempt < MAX_CODE_GENERATION_ATTEMPTS; attempt++) {
+    const candidate = generateCode()
+    const existing = await ctx.db
+      .query('rooms')
+      .withIndex('by_code', (q) => q.eq('code', candidate))
+      .first()
+
+    if (!existing) {
+      return candidate
+    }
+  }
+
+  throw new Error('Could not generate a unique room code; try again')
+}
 
 export const createRoom = mutation({
   args: {
@@ -29,8 +49,10 @@ export const createRoom = mutation({
       }
     }
 
+    const code = await generateUniqueRoomCode(ctx)
     const now = Date.now()
     const roomId = await ctx.db.insert('rooms', {
+      code,
       hostName: trimmedName,
       players: [{ name: trimmedName, joinedAt: now, isHost: true }],
       started: false,

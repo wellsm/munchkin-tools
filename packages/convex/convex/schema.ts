@@ -2,7 +2,6 @@ import { defineSchema, defineTable } from 'convex/server'
 import { v } from 'convex/values'
 
 export default defineSchema({
-  // Singleton row. At most one document exists at a time — queried via .first().
   settings: defineTable({
     accessCodeNeeded: v.boolean(),
     accessCode: v.union(v.string(), v.null()),
@@ -10,6 +9,7 @@ export default defineSchema({
   }),
 
   rooms: defineTable({
+    code: v.string(),
     hostName: v.string(),
     players: v.array(
       v.object({
@@ -20,5 +20,5 @@ export default defineSchema({
     ),
     started: v.boolean(),
     createdAt: v.number(),
-  }),
+  }).index('by_code', ['code']),
 })
