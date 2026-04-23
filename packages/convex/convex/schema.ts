@@ -13,6 +13,7 @@ export default defineSchema({
     hostName: v.string(),
     players: v.array(
       v.object({
+        playerId: v.string(),
         name: v.string(),
         joinedAt: v.number(),
         isHost: v.boolean(),

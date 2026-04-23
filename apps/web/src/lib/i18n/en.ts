@@ -38,6 +38,14 @@ export const en = {
     copied: 'Link copied!',
     startNeedsMore: (missing: number) =>
       `Need ${missing} more ${missing === 1 ? 'player' : 'players'} to start`,
+    joinTitle: 'Join the party',
+    joinDescription: (host: string) => `${host}'s room`,
+    yourName: 'Your name',
+    yourNamePlaceholder: 'Enter your name',
+    join: 'Join room',
+    joining: 'Joining…',
+    joinError: 'Could not join. Try again.',
+    alreadyStarted: 'This match already started.',
   },
   tabs: {
     heroes: 'Heroes',

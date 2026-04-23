@@ -40,6 +40,14 @@ export const pt: Dictionary = {
     copied: 'Link copiado!',
     startNeedsMore: (missing: number) =>
       `Falta${missing === 1 ? '' : 'm'} ${missing} ${missing === 1 ? 'jogador' : 'jogadores'} para começar`,
+    joinTitle: 'Entrar no grupo',
+    joinDescription: (host: string) => `Sala de ${host}`,
+    yourName: 'Seu nome',
+    yourNamePlaceholder: 'Digite seu nome',
+    join: 'Entrar na sala',
+    joining: 'Entrando…',
+    joinError: 'Não foi possível entrar. Tente novamente.',
+    alreadyStarted: 'Essa partida já começou.',
   },
   tabs: {
     heroes: 'Heróis',

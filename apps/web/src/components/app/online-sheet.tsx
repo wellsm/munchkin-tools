@@ -14,6 +14,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { useT } from '@/lib/i18n/store'
+import { usePlayerIdentityStore } from '@/lib/player-identity'
 
 type Props = {
   open: boolean
@@ -25,7 +26,10 @@ export function OnlineSheet({ open, onOpenChange }: Props) {
   const navigate = useNavigate()
   const createRoom = useMutation(api.rooms.createRoom)
   const needsCode = useQuery(api.access.isAccessCodeNeeded)
-  const [name, setName] = useState('')
+  const playerId = usePlayerIdentityStore((s) => s.playerId)
+  const lastUsedName = usePlayerIdentityStore((s) => s.lastUsedName)
+  const setLastUsedName = usePlayerIdentityStore((s) => s.setLastUsedName)
+  const [name, setName] = useState(lastUsedName ?? '')
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -48,13 +52,17 @@ export function OnlineSheet({ open, onOpenChange }: Props) {
     setError(null)
 
     try {
-      const args: { hostName: string; accessCode?: string } = { hostName: name }
+      const args: { playerId: string; hostName: string; accessCode?: string } = {
+        playerId,
+        hostName: name,
+      }
 
       if (needsCode) {
         args.accessCode = code
       }
 
       const roomId = await createRoom(args)
+      setLastUsedName(name)
       onOpenChange(false)
       navigate(`/online/${roomId}`)
     } catch (err) {

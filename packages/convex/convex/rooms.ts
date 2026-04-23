@@ -24,6 +24,7 @@ async function generateUniqueRoomCode(ctx: MutationCtx): Promise<string> {
 
 export const createRoom = mutation({
   args: {
+    playerId: v.string(),
     hostName: v.string(),
     accessCode: v.optional(v.string()),
   },
@@ -32,6 +33,10 @@ export const createRoom = mutation({
 
     if (trimmedName.length === 0) {
       throw new Error('Name is required')
+    }
+
+    if (args.playerId.trim().length === 0) {
+      throw new Error('Player id is required')
     }
 
     const settings = await ctx.db.query('settings').first()
@@ -54,12 +59,76 @@ export const createRoom = mutation({
     const roomId = await ctx.db.insert('rooms', {
       code,
       hostName: trimmedName,
-      players: [{ name: trimmedName, joinedAt: now, isHost: true }],
+      players: [
+        {
+          playerId: args.playerId,
+          name: trimmedName,
+          joinedAt: now,
+          isHost: true,
+        },
+      ],
       started: false,
       createdAt: now,
     })
 
     return roomId
+  },
+})
+
+export const joinRoom = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    playerId: v.string(),
+    name: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    if (room.started) {
+      throw new Error('Match already started')
+    }
+
+    const trimmedName = args.name.trim()
+
+    if (trimmedName.length === 0) {
+      throw new Error('Name is required')
+    }
+
+    if (args.playerId.trim().length === 0) {
+      throw new Error('Player id is required')
+    }
+
+    const existingIndex = room.players.findIndex((p) => p.playerId === args.playerId)
+
+    if (existingIndex >= 0) {
+      const current = room.players[existingIndex]
+
+      if (current.name === trimmedName) {
+        return
+      }
+
+      const nextPlayers = [...room.players]
+      nextPlayers[existingIndex] = { ...current, name: trimmedName }
+      await ctx.db.patch(args.roomId, { players: nextPlayers })
+
+      return
+    }
+
+    const nextPlayers = [
+      ...room.players,
+      {
+        playerId: args.playerId,
+        name: trimmedName,
+        joinedAt: Date.now(),
+        isHost: false,
+      },
+    ]
+
+    await ctx.db.patch(args.roomId, { players: nextPlayers })
   },
 })
 
