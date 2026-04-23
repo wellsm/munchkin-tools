@@ -80,7 +80,7 @@ export function PlayerEdit() {
       <div className="min-h-dvh flex items-center justify-center p-6 text-center bg-background text-foreground">
         <div className="flex flex-col gap-4 items-center">
           <p className="text-muted-foreground">{t.heroEdit.heroNotFound}</p>
-          <Button onClick={() => navigate("/")}>
+          <Button onClick={() => navigate("/offline")}>
             {t.heroEdit.backToParty}
           </Button>
         </div>
@@ -108,7 +108,7 @@ export function PlayerEdit() {
     }
 
     removePlayer(existingPlayer.id);
-    navigate("/");
+    navigate("/offline");
   }
 
   function handleSave() {
@@ -119,7 +119,7 @@ export function PlayerEdit() {
     }
 
     addPlayer({ ...draft, name: trimmedName });
-    navigate("/");
+    navigate("/offline");
   }
 
   function handleEnterCombat() {
@@ -128,7 +128,7 @@ export function PlayerEdit() {
     }
 
     setMainCombatant(existingPlayer.id);
-    navigate("/?tab=combat");
+    navigate("/offline?tab=combat");
   }
 
   function handleGender(next: Gender) {
@@ -191,7 +191,7 @@ export function PlayerEdit() {
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
-      <Header title={isNew ? t.heroEdit.newHero : t.heroEdit.editHero} onBack={() => navigate("/")} right={isNew ? (
+      <Header title={isNew ? t.heroEdit.newHero : t.heroEdit.editHero} onBack={() => navigate("/offline")} right={isNew ? (
         <div className="size-11" aria-hidden />
       ) : (
         <AlertDialog>

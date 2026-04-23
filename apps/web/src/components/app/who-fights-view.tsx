@@ -11,7 +11,7 @@ export function WhoFightsView() {
 
   const setHero = (id: string) => {
     setMainCombatant(id);
-    navigate(`?tab=combat`);
+    navigate(`/offline?tab=combat`);
   };
 
   if (players.length === 0) {
