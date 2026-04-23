@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n web,convex -c cyan,magenta --kill-others-on-fail \"npm:dev:*\"",
+    "dev": "concurrently -c cyan,magenta --kill-others-on-fail \"npm:dev:*\"",
     "dev:web": "npm run dev --workspace=@munchkin-tools/web",
     "dev:convex": "npm run dev --workspace=@munchkin-tools/convex",
     "build": "npm run build --workspaces --if-present",
