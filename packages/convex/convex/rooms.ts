@@ -9,9 +9,11 @@ const MAX_CODE_GENERATION_ATTEMPTS = 10
 const MAX_CLASSES_PER_PLAYER = 2
 const MAX_RACES_PER_PLAYER = 2
 const MAX_HELPERS = 1
-const MAX_PLAYERS_PER_ROOM = 8
+const MIN_MAX_PLAYERS = 3
+const PRODUCT_MAX_PLAYERS = 8
 const DEFAULT_MAX_LEVEL = 10
 const MIN_LEVEL = 1
+const MAX_LEVEL_CEILING = 99
 
 const classValidator = v.union(
   v.literal('cleric'),
@@ -134,6 +136,7 @@ export const createRoom = mutation({
         },
       ],
       combat: defaultCombat(),
+      maxPlayers: PRODUCT_MAX_PLAYERS,
       maxLevel: DEFAULT_MAX_LEVEL,
       started: false,
       createdAt: now,
@@ -186,7 +189,7 @@ export const joinRoom = mutation({
       return
     }
 
-    if (room.players.length >= MAX_PLAYERS_PER_ROOM) {
+    if (room.players.length >= room.maxPlayers) {
       throw new Error('Room is full')
     }
 
@@ -198,6 +201,7 @@ export const joinRoom = mutation({
         joinedAt: Date.now(),
         isHost: false,
         ...defaultHero(),
+        color: AVATAR_COLORS[room.players.length]
       },
     ]
 
@@ -272,6 +276,121 @@ export const startMatch = mutation({
     }
 
     await ctx.db.patch(args.roomId, { started: true })
+  },
+})
+
+export const findRoomIdByCode = query({
+  args: { code: v.string() },
+  handler: async (ctx, args) => {
+    const normalized = args.code.trim().toUpperCase()
+
+    if (normalized.length === 0) {
+      return null
+    }
+
+    const room = await ctx.db
+      .query('rooms')
+      .withIndex('by_code', (q) => q.eq('code', normalized))
+      .first()
+
+    if (!room) {
+      return null
+    }
+
+    return room._id
+  },
+})
+
+export const leaveRoom = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    playerId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      return
+    }
+
+    const leaver = room.players.find((p) => p.playerId === args.playerId)
+
+    if (!leaver) {
+      return
+    }
+
+    if (leaver.isHost) {
+      await ctx.db.delete(args.roomId)
+
+      return
+    }
+
+    const nextPlayers = room.players.filter((p) => p.playerId !== args.playerId)
+    const nextCombat = {
+      ...room.combat,
+      mainCombatantId:
+        room.combat.mainCombatantId === args.playerId ? null : room.combat.mainCombatantId,
+      helperIds: room.combat.helperIds.filter((id) => id !== args.playerId),
+    }
+
+    await ctx.db.patch(args.roomId, { players: nextPlayers, combat: nextCombat })
+  },
+})
+
+export const setMaxPlayers = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    requesterId: v.string(),
+    value: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    const requester = requireMember(room, args.requesterId)
+
+    if (!requester.isHost) {
+      throw new Error('Only the host can change max players')
+    }
+
+    const clamped = clampInt(args.value, MIN_MAX_PLAYERS, PRODUCT_MAX_PLAYERS)
+    const floor = Math.max(MIN_MAX_PLAYERS, room.players.length)
+    const next = Math.max(clamped, floor)
+    await ctx.db.patch(args.roomId, { maxPlayers: next })
+  },
+})
+
+export const setMaxLevel = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    requesterId: v.string(),
+    value: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    const requester = requireMember(room, args.requesterId)
+
+    if (!requester.isHost) {
+      throw new Error('Only the host can change max level')
+    }
+
+    const nextMax = clampInt(args.value, MIN_LEVEL, MAX_LEVEL_CEILING)
+    const demotedPlayers = room.players.map((p) => {
+      if (p.level <= nextMax) {
+        return p
+      }
+
+      return { ...p, level: nextMax }
+    })
+    await ctx.db.patch(args.roomId, { maxLevel: nextMax, players: demotedPlayers })
   },
 })
 

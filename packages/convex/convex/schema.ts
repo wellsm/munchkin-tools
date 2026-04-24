@@ -47,6 +47,7 @@ export default defineSchema({
       monsterLevel: v.number(),
       monsterModifier: v.number(),
     }),
+    maxPlayers: v.number(),
     maxLevel: v.number(),
     started: v.boolean(),
     createdAt: v.number(),
