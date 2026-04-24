@@ -173,6 +173,9 @@ export const en = {
     noOtherHeroes: 'No other heroes available.',
     decreaseStepper: (label: string) => `Decrease ${label}`,
     increaseStepper: (label: string) => `Increase ${label}`,
+    fledTitle: 'Flee the battle?',
+    fledDescription: 'Combat ends and you go back to the heroes list. No level-ups.',
+    fledConfirm: 'Flee',
   },
   finish: {
     title: 'Finish',

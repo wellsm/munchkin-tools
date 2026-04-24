@@ -1,9 +1,13 @@
+import { useState } from "react";
+import { Share2 } from "lucide-react";
 import type { Doc } from "@munchkin-tools/convex/convex/_generated/dataModel";
 import { Header } from "@/components/app/header";
+import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n/store";
 import { usePlayerIdentityStore } from "@/lib/player-identity";
 import { NotificationButton } from "./notification-button";
 import { OnlineHeroRow } from "./online-hero-row";
+import { ShareSheet } from "./share-sheet";
 
 type Room = Doc<"rooms">;
 
@@ -14,7 +18,9 @@ type Props = {
 export function OnlineHeroesTab({ room }: Props) {
   const t = useT();
   const viewerId = usePlayerIdentityStore((s) => s.playerId);
+  const [shareOpen, setShareOpen] = useState(false);
   const players = room.players;
+  const inviteUrl = `${window.location.origin}/online/${room._id}`;
 
   if (players.length === 0) {
     return (
@@ -40,6 +46,22 @@ export function OnlineHeroesTab({ room }: Props) {
           ))}
         </ul>
       </div>
+
+      <Button
+        size="icon"
+        className="absolute bottom-4 right-4 size-14 rounded-full shadow-lg"
+        onClick={() => setShareOpen(true)}
+        aria-label={t.waitingRoom.invite}
+      >
+        <Share2 className="size-7" />
+      </Button>
+
+      <ShareSheet
+        open={shareOpen}
+        onOpenChange={setShareOpen}
+        roomCode={room.code}
+        inviteUrl={inviteUrl}
+      />
     </div>
   );
 }

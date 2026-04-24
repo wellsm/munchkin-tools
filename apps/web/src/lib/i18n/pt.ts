@@ -102,7 +102,7 @@ export const pt: Dictionary = {
   tabs: {
     heroes: 'Heróis',
     combat: 'Combate',
-    settings: 'Configurações',
+    settings: 'Ajustes',
   },
   heroes: {
     title: 'Munchkins',
@@ -130,7 +130,7 @@ export const pt: Dictionary = {
     increaseLevel: 'Aumentar NÍVEL',
     decreaseGear: 'Diminuir ITENS',
     increaseGear: 'Aumentar ITENS',
-    raceSlots: (current: number, max: number) => `Raça ${current}/${max}`,
+    raceSlots: (current: number, max: number) => `Raca ${current}/${max}`,
     classSlots: (current: number, max: number) => `Classe ${current}/${max}`,
     enterCombat: 'Entrar em combate',
     save: 'Salvar',
@@ -175,6 +175,9 @@ export const pt: Dictionary = {
     noOtherHeroes: 'Nenhum outro herói disponível.',
     decreaseStepper: (label: string) => `Diminuir ${label}`,
     increaseStepper: (label: string) => `Aumentar ${label}`,
+    fledTitle: 'Fugir da batalha?',
+    fledDescription: 'O combate termina e você volta pra lista de heróis. Sem subir de nível.',
+    fledConfirm: 'Fugir',
   },
   finish: {
     title: 'Finalizar',
@@ -186,7 +189,7 @@ export const pt: Dictionary = {
     levelTransition: (from: number, to: number) => `Nível ${from} → ${to}`,
   },
   settings: {
-    title: 'Configurações',
+    title: 'Ajustes',
     party: 'Grupo',
     preferences: 'Preferências',
     dangerZone: 'Zona de Perigo',

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { DoorOpen, Moon, Share2, Sun } from 'lucide-react'
+import { DoorOpen, Moon, Sun } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from 'convex/react'
 import { api } from '@munchkin-tools/convex/convex/_generated/api'
@@ -27,7 +27,6 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { NotificationButton } from '@/components/online/notification-button'
-import { ShareSheet } from '@/components/online/share-sheet'
 import { useI18nStore, useT, type Locale } from '@/lib/i18n/store'
 import { applyTheme, getStoredTheme, type Theme } from '@/lib/theme'
 import { isWakeLockSupported, useWakeLockStore } from '@/lib/wake-lock'
@@ -57,7 +56,6 @@ export function OnlineSettingsTab({ room }: Props) {
   const setWakeLockEnabled = useWakeLockStore((s) => s.setEnabled)
   const wakeLockSupported = isWakeLockSupported()
   const [theme, setTheme] = useState<Theme>(() => getStoredTheme())
-  const [shareOpen, setShareOpen] = useState(false)
 
   const myPlayer = room.players.find((p) => p.playerId === playerId)
   const isHost = myPlayer?.isHost ?? false
@@ -78,8 +76,6 @@ export function OnlineSettingsTab({ room }: Props) {
     await leaveRoom({ roomId, playerId })
     navigate('/')
   }
-
-  const inviteUrl = `${window.location.origin}/online/${roomId}`
 
   return (
     <div className="h-full flex flex-col">
@@ -171,18 +167,6 @@ export function OnlineSettingsTab({ room }: Props) {
         </div>
 
         <div>
-          <SectionLabel>{t.settings.shareSection}</SectionLabel>
-          <button
-            type="button"
-            onClick={() => setShareOpen(true)}
-            className="w-full flex items-center gap-3 rounded-xl border border-border/60 bg-card/50 p-4 hover:bg-accent transition-colors"
-          >
-            <Share2 className="size-5" />
-            <span className="font-munchkin text-lg">{t.settings.shareRoom}</span>
-          </button>
-        </div>
-
-        <div>
           <SectionLabel variant="danger">{t.settings.dangerZone}</SectionLabel>
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -217,12 +201,6 @@ export function OnlineSettingsTab({ room }: Props) {
           </AlertDialog>
         </div>
       </div>
-      <ShareSheet
-        open={shareOpen}
-        onOpenChange={setShareOpen}
-        roomCode={room.code}
-        inviteUrl={inviteUrl}
-      />
     </div>
   )
 }

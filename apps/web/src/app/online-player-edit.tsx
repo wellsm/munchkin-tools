@@ -14,6 +14,8 @@ import { Chip } from "@/components/app/chip";
 import { GenderButton } from "@/components/app/gender-button";
 import { Header } from "@/components/app/header";
 import { NameEditor } from "@/components/app/name-editor";
+import { RaceClassPickerSheet } from "@/components/app/race-class-picker-sheet";
+import { SelectionDisplay } from "@/components/app/selection-display";
 import { StatCard } from "@/components/app/stat-card";
 import {
   AlertDialog,
@@ -30,10 +32,13 @@ import { Button } from "@/components/ui/button";
 import { AVATAR_COLORS, avatarInitial } from "@/lib/avatar-color";
 import {
   CLASSES,
+  DEFAULT_RACE,
   MAX_CLASSES_PER_PLAYER,
   MAX_RACES_PER_PLAYER,
   MIN_LEVEL,
-  RACES,
+  SELECTABLE_RACES,
+  classById,
+  raceById,
 } from "@/lib/constants";
 import { useT } from "@/lib/i18n/store";
 import { usePlayerIdentityStore } from "@/lib/player-identity";
@@ -60,6 +65,8 @@ export function OnlinePlayerEdit() {
   const setMainCombatant = useMutation(api.rooms.setMainCombatant);
 
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [racePickerOpen, setRacePickerOpen] = useState(false);
+  const [classPickerOpen, setClassPickerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!roomId || !playerId) {
@@ -381,56 +388,75 @@ export function OnlinePlayerEdit() {
           />
         </div>
 
-        <div className="mt-6 flex flex-col gap-2">
-          <span className="text-sm text-muted-foreground">
-            {t.heroEdit.raceSlots(target.races.length, MAX_RACES_PER_PLAYER)}
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {RACES.map((r) => {
-              const Icon = r.icon;
-              const active = target.races.includes(r.id);
+        <SelectionDisplay
+          label={t.heroEdit.raceSlots(target.races.length, MAX_RACES_PER_PLAYER)}
+          onEdit={canEdit ? () => setRacePickerOpen(true) : undefined}
+          empty={target.races.length === 0}
+          emptyChip={
+            <Chip active color={DEFAULT_RACE.color}>
+              <DEFAULT_RACE.icon className="size-4" aria-hidden />
+              {t.heroEdit.races.human}
+            </Chip>
+          }
+          chips={target.races.map((id) => {
+            const entry = raceById(id);
 
-              return (
-                <Chip
-                  key={r.id}
-                  active={active}
-                  onClick={() => toggleRace(r.id)}
-                  disabled={!canEdit}
-                >
-                  <Icon className="size-4" aria-hidden />
-                  {t.heroEdit.races[r.id]}
-                </Chip>
-              );
-            })}
-          </div>
-        </div>
+            return (
+              <Chip key={id} active color={entry.color}>
+                <entry.icon className="size-4" aria-hidden />
+                {t.heroEdit.races[id]}
+              </Chip>
+            );
+          })}
+          className="mt-6"
+        />
 
-        <div className="mt-4 flex flex-col gap-2">
-          <span className="text-sm text-muted-foreground">
-            {t.heroEdit.classSlots(
-              target.classes.length,
-              MAX_CLASSES_PER_PLAYER,
-            )}
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {CLASSES.map((c) => {
-              const Icon = c.icon;
-              const active = target.classes.includes(c.id);
+        <SelectionDisplay
+          label={t.heroEdit.classSlots(target.classes.length, MAX_CLASSES_PER_PLAYER)}
+          onEdit={canEdit ? () => setClassPickerOpen(true) : undefined}
+          empty={target.classes.length === 0}
+          chips={target.classes.map((id) => {
+            const entry = classById(id);
 
-              return (
-                <Chip
-                  key={c.id}
-                  active={active}
-                  onClick={() => toggleClass(c.id)}
-                  disabled={!canEdit}
-                >
-                  <Icon className="size-4" aria-hidden />
-                  {t.heroEdit.classes[c.id]}
-                </Chip>
-              );
-            })}
-          </div>
-        </div>
+            return (
+              <Chip key={id} active color={entry.color}>
+                <entry.icon className="size-4" aria-hidden />
+                {t.heroEdit.classes[id]}
+              </Chip>
+            );
+          })}
+          className="mt-4"
+        />
+
+        <RaceClassPickerSheet
+          open={racePickerOpen}
+          onOpenChange={setRacePickerOpen}
+          title={t.heroEdit.raceSlots(target.races.length, MAX_RACES_PER_PLAYER)}
+          items={SELECTABLE_RACES.map((r) => ({
+            id: r.id,
+            label: t.heroEdit.races[r.id],
+            icon: r.icon,
+            color: r.color,
+          }))}
+          selected={target.races}
+          max={MAX_RACES_PER_PLAYER}
+          onToggle={toggleRace}
+        />
+
+        <RaceClassPickerSheet
+          open={classPickerOpen}
+          onOpenChange={setClassPickerOpen}
+          title={t.heroEdit.classSlots(target.classes.length, MAX_CLASSES_PER_PLAYER)}
+          items={CLASSES.map((c) => ({
+            id: c.id,
+            label: t.heroEdit.classes[c.id],
+            icon: c.icon,
+            color: c.color,
+          }))}
+          selected={target.classes}
+          max={MAX_CLASSES_PER_PLAYER}
+          onToggle={toggleClass}
+        />
 
         {error && (
           <p className="text-sm text-muted-foreground mt-4">{error}</p>

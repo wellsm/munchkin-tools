@@ -7,6 +7,17 @@ import type { Doc } from "@munchkin-tools/convex/convex/_generated/dataModel";
 import { Header } from "@/components/app/header";
 import { StepperCard } from "@/components/app/stepper-card";
 import { VersusBadge } from "@/components/app/versus-badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
 import { combatTotals } from "@/lib/combat";
@@ -228,14 +239,33 @@ export function OnlineFightingView({ room }: Props) {
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          <Button
-            variant="outline"
-            onClick={handleFled}
-            disabled={!canControl}
-            className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
-          >
-            <X className="size-5" /> {t.combat.fled}
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                disabled={!canControl}
+                className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              >
+                <X className="size-5" /> {t.combat.fled}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-munchkin text-2xl">
+                  {t.combat.fledTitle}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t.combat.fledDescription}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t.common.cancel}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleFled}>
+                  {t.combat.fledConfirm}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button onClick={() => setFinishOpen(true)} disabled={!canControl}>
             <Flag className="size-5" /> {t.combat.finish}
           </Button>
