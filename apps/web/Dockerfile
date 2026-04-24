@@ -9,6 +9,12 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+# Required at build time: Vite inlines import.meta.env.VITE_* values into
+# the bundle during `npm run build`, so the Convex URL must be available
+# during the build step — runtime env vars cannot reach the client bundle.
+ARG VITE_CONVEX_URL
+ENV VITE_CONVEX_URL=$VITE_CONVEX_URL
+
 # Copy workspace manifests first for better caching
 COPY package.json package-lock.json ./
 COPY apps/web/package.json ./apps/web/
