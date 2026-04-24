@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '@munchkin-tools/convex/convex/_generated/api'
 import type { Id } from '@munchkin-tools/convex/convex/_generated/dataModel'
-import { ArrowLeft, Check, Crown, Flag, Palette, UserMinus, X } from 'lucide-react'
+import { ArrowLeft, Crown, Flag, Palette, UserMinus, X } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,6 +19,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import { OnlineGame } from '@/components/online/online-game'
 import { RoomShareCard } from '@/components/online/room-share-card'
 import { useT } from '@/lib/i18n/store'
@@ -123,12 +124,12 @@ export function WaitingRoom() {
     await startMatch({ roomId: roomId as Id<'rooms'> })
   }
 
-  function handleToggleReady() {
+  function handleToggleReady(checked: boolean) {
     updatePlayer({
       roomId: roomId as Id<'rooms'>,
       requesterId: playerId,
       targetId: playerId,
-      patch: { ready: !myPlayer!.ready },
+      patch: { ready: checked },
     })
   }
 
@@ -217,27 +218,6 @@ export function WaitingRoom() {
                       )}
                     </div>
 
-                    {isMe ? (
-                      <Button
-                        size="sm"
-                        variant={p.ready ? 'default' : 'outline'}
-                        onClick={handleToggleReady}
-                      >
-                        {p.ready && <Check className="size-3.5" />}
-                        {p.ready ? t.waitingRoom.ready : t.waitingRoom.notReady}
-                      </Button>
-                    ) : (
-                      <span
-                        className={cn(
-                          'text-xs tracking-wider uppercase inline-flex items-center gap-1 shrink-0',
-                          p.ready ? 'text-primary' : 'text-muted-foreground',
-                        )}
-                      >
-                        {p.ready && <Check className="size-3.5" />}
-                        {p.ready ? t.waitingRoom.ready : t.waitingRoom.notReady}
-                      </span>
-                    )}
-
                     {isHost && !p.isHost && !isMe && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -277,6 +257,23 @@ export function WaitingRoom() {
                         </AlertDialogContent>
                       </AlertDialog>
                     )}
+
+                    <div className="flex items-center gap-2 shrink-0 border p-3 px-4 rounded-full">
+                      <span
+                        className={cn(
+                          'text-xs tracking-wider uppercase',
+                          p.ready ? 'text-primary' : 'text-muted-foreground',
+                        )}
+                      >
+                        {p.ready ? t.waitingRoom.ready : t.waitingRoom.notReady}
+                      </span>
+                      <Switch
+                        checked={p.ready}
+                        onCheckedChange={isMe ? handleToggleReady : undefined}
+                        disabled={!isMe}
+                        aria-label={p.ready ? t.waitingRoom.ready : t.waitingRoom.notReady}
+                      />
+                    </div>
                   </div>
 
                   {isMe && colorPickerOpen && (
