@@ -9,12 +9,18 @@ import { QrScanSheet } from '@/components/app/qr-scan-sheet'
 import { SuggestionSheet } from '@/components/app/suggestion-sheet'
 import { WhoAmISheet } from '@/components/app/whoami-sheet'
 import { avatarColor, avatarInitial } from '@/lib/avatar-color'
-import { useT } from '@/lib/i18n/store'
+import { useI18nStore, useT, type Locale } from '@/lib/i18n/store'
 import { usePlayerIdentityStore } from '@/lib/player-identity'
 import { useOnlineAccess } from '@/lib/use-online-access'
 import { useSuggestionsVisible } from '@/lib/use-suggestions-visible'
 import { useSupportVisible } from '@/lib/use-support-visible'
 import { SUPPORT_URL } from '@/lib/support'
+import { cn } from '@/lib/utils'
+
+const LOCALE_OPTIONS: { locale: Locale; flag: string; label: string }[] = [
+  { locale: 'en', flag: '🇺🇸', label: 'English' },
+  { locale: 'pt', flag: '🇧🇷', label: 'Português' },
+]
 
 export function Landing() {
   const t = useT()
@@ -24,6 +30,8 @@ export function Landing() {
   const { loading, unlocked } = useOnlineAccess()
   const supportVisible = useSupportVisible()
   const suggestionsVisible = useSuggestionsVisible()
+  const locale = useI18nStore((s) => s.locale)
+  const setLocale = useI18nStore((s) => s.setLocale)
 
   const [gateOpen, setGateOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
@@ -37,6 +45,28 @@ export function Landing() {
 
   return (
     <div className="min-h-dvh bg-background text-foreground relative flex flex-col items-center justify-center px-6 gap-10">
+      <div
+        className="absolute top-4 left-4 flex rounded-full border border-border/60 bg-card/50 overflow-hidden"
+        role="group"
+        aria-label="Language"
+      >
+        {LOCALE_OPTIONS.map((opt) => (
+          <button
+            key={opt.locale}
+            type="button"
+            onClick={() => setLocale(opt.locale)}
+            aria-label={opt.label}
+            aria-pressed={locale === opt.locale}
+            className={cn(
+              'px-3 py-1 text-lg leading-none transition-colors',
+              locale === opt.locale ? 'bg-accent' : 'hover:bg-accent/50',
+            )}
+          >
+            {opt.flag}
+          </button>
+        ))}
+      </div>
+
       <button
         type="button"
         onClick={() => setWhoamiOpen(true)}
