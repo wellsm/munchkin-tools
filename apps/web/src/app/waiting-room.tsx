@@ -258,21 +258,31 @@ export function WaitingRoom() {
                       </AlertDialog>
                     )}
 
-                    <div className="flex items-center gap-2 shrink-0 border p-3 px-4 rounded-full">
+                    <div
+                      onClick={isMe ? () => handleToggleReady(!p.ready) : undefined}
+                      role={isMe ? 'button' : undefined}
+                      aria-pressed={isMe ? p.ready : undefined}
+                      className={cn(
+                        'flex items-center gap-2 shrink-0 border border-border p-3 px-4 rounded-full transition-colors',
+                        isMe && 'cursor-pointer select-none hover:bg-accent',
+                      )}
+                    >
                       <span
                         className={cn(
                           'text-xs tracking-wider uppercase',
                           p.ready ? 'text-primary' : 'text-muted-foreground',
                         )}
                       >
-                        {p.ready ? t.waitingRoom.ready : t.waitingRoom.notReady}
+                        {t.waitingRoom.ready}
                       </span>
-                      <Switch
-                        checked={p.ready}
-                        onCheckedChange={isMe ? handleToggleReady : undefined}
-                        disabled={!isMe}
-                        aria-label={p.ready ? t.waitingRoom.ready : t.waitingRoom.notReady}
-                      />
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Switch
+                          checked={p.ready}
+                          onCheckedChange={isMe ? handleToggleReady : undefined}
+                          disabled={!isMe}
+                          aria-label={p.ready ? t.waitingRoom.ready : t.waitingRoom.notReady}
+                        />
+                      </div>
                     </div>
                   </div>
 
