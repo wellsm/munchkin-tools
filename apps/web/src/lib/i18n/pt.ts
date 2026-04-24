@@ -14,6 +14,22 @@ export const pt: Dictionary = {
     online: 'Online',
     scanQr: 'Escanear QR',
   },
+  whoami: {
+    trigger: 'Quem sou eu?',
+    title: 'Quem sou eu?',
+    description: 'Sua identidade neste dispositivo. Seu nome é carregado pra novas salas.',
+    guest: 'Convidado',
+    name: 'Nome de exibição',
+    namePlaceholder: 'Digite seu nome',
+    playerId: 'ID do jogador',
+    save: 'Salvar',
+    saved: 'Salvo!',
+    resetIdentity: 'Nova identidade',
+    resetIdentityTitle: 'Começar como um novo jogador?',
+    resetIdentityDescription:
+      'Gera um novo ID de jogador e limpa o nome. Salas existentes deixam de reconhecer você.',
+    resetConfirm: 'Resetar',
+  },
   scanQr: {
     title: 'Escanear QR da sala',
     description: 'Aponte a câmera para o QR de convite.',

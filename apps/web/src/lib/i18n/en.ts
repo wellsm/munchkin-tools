@@ -12,6 +12,22 @@ export const en = {
     online: 'Online',
     scanQr: 'Scan QR',
   },
+  whoami: {
+    trigger: 'Who am I?',
+    title: 'Who am I?',
+    description: 'Your identity on this device. Your name carries over to new rooms.',
+    guest: 'Guest',
+    name: 'Display name',
+    namePlaceholder: 'Enter your name',
+    playerId: 'Player ID',
+    save: 'Save',
+    saved: 'Saved!',
+    resetIdentity: 'New identity',
+    resetIdentityTitle: 'Start over as a new player?',
+    resetIdentityDescription:
+      'Generates a fresh player ID and clears your name. Existing rooms will stop recognizing you.',
+    resetConfirm: 'Reset',
+  },
   scanQr: {
     title: 'Scan room QR',
     description: 'Point your camera at an invite QR code.',

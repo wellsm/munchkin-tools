@@ -5,6 +5,7 @@ type PlayerIdentityState = {
   playerId: string
   lastUsedName: string | null
   setLastUsedName: (name: string) => void
+  resetIdentity: () => void
 }
 
 function generateId(): string {
@@ -22,6 +23,7 @@ export const usePlayerIdentityStore = create<PlayerIdentityState>()(
       playerId: generateId(),
       lastUsedName: null,
       setLastUsedName: (name) => set({ lastUsedName: name.trim() || null }),
+      resetIdentity: () => set({ playerId: generateId(), lastUsedName: null }),
     }),
     { name: 'munchkin-tools-player-identity' },
   ),
