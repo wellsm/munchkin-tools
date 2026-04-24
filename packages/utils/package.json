@@ -1,0 +1,9 @@
+{
+  "name": "@munchkin-tools/utils",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./avatar-color": "./src/avatar-color.ts"
+  }
+}

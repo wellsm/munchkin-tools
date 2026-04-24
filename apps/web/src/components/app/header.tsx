@@ -13,7 +13,7 @@ export function Header({ title, onBack, right }: Props) {
   const t = useT();
 
   return (
-    <div className="flex border-b p-4 items-center justify-between">
+    <div className="flex border-b px-4 py-3 items-center justify-between">
       {onBack ? (
         <Button
           variant="ghost"

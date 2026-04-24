@@ -45,7 +45,7 @@ export function FightingView() {
 
   function handleFled() {
     resetCombat();
-    navigate("/?tab=players");
+    navigate("/offline?tab=players");
   }
 
   return (
