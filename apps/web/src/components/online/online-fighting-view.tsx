@@ -121,20 +121,13 @@ export function OnlineFightingView({ room }: Props) {
                 {result.partyTotal}
               </span>
               <div className="flex gap-2 mt-3 justify-center flex-wrap">
-                <Link
-                  to={`/online/${room._id}/player/${main.playerId}?from=combat`}
-                  aria-label={main.name}
-                  className={cn(
-                    "size-10 rounded-full flex items-center justify-center hover:ring-2 hover:ring-primary hover:ring-offset-2 hover:ring-offset-card transition",
-                    main.playerId === requesterId &&
-                      "ring-2 ring-primary ring-offset-2 ring-offset-card",
-                  )}
-                  style={{ backgroundColor: mainAvatarBg }}
-                >
-                  <span className="font-munchkin text-lg text-background leading-none">
-                    {avatarInitial(main.name)}
-                  </span>
-                </Link>
+                <AvatarSlot
+                  roomId={room._id}
+                  player={main}
+                  bg={mainAvatarBg}
+                  isMe={main.playerId === requesterId}
+                  canEdit={isHost || main.playerId === requesterId}
+                />
                 {helpers.map((h) => {
                   const bg = playerAvatarColor({
                     id: h.playerId,
@@ -143,21 +136,14 @@ export function OnlineFightingView({ room }: Props) {
                   const isMeHelper = h.playerId === requesterId;
 
                   return (
-                    <Link
+                    <AvatarSlot
                       key={h.playerId}
-                      to={`/online/${room._id}/player/${h.playerId}?from=combat`}
-                      aria-label={h.name}
-                      className={cn(
-                        "size-10 rounded-full flex items-center justify-center hover:ring-2 hover:ring-primary hover:ring-offset-2 hover:ring-offset-card transition",
-                        isMeHelper &&
-                          "ring-2 ring-primary ring-offset-2 ring-offset-card",
-                      )}
-                      style={{ backgroundColor: bg }}
-                    >
-                      <span className="font-munchkin text-lg text-background leading-none">
-                        {avatarInitial(h.name)}
-                      </span>
-                    </Link>
+                      roomId={room._id}
+                      player={h}
+                      bg={bg}
+                      isMe={isMeHelper}
+                      canEdit={isHost || isMeHelper}
+                    />
                   );
                 })}
                 {canAddHelper && (
@@ -268,5 +254,47 @@ export function OnlineFightingView({ room }: Props) {
         />
       </div>
     </div>
+  );
+}
+
+type AvatarSlotProps = {
+  roomId: string;
+  player: RoomPlayer;
+  bg: string;
+  isMe: boolean;
+  canEdit: boolean;
+};
+
+function AvatarSlot({ roomId, player, bg, isMe, canEdit }: AvatarSlotProps) {
+  const baseClasses = cn(
+    "size-10 rounded-full flex items-center justify-center",
+    isMe && "ring-2 ring-primary ring-offset-2 ring-offset-card",
+  );
+  const initial = (
+    <span className="font-munchkin text-lg text-background leading-none">
+      {avatarInitial(player.name)}
+    </span>
+  );
+
+  if (!canEdit) {
+    return (
+      <div className={baseClasses} style={{ backgroundColor: bg }} aria-hidden>
+        {initial}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      to={`/online/${roomId}/player/${player.playerId}?from=combat`}
+      aria-label={player.name}
+      className={cn(
+        baseClasses,
+        "hover:ring-2 hover:ring-primary hover:ring-offset-2 hover:ring-offset-card transition",
+      )}
+      style={{ backgroundColor: bg }}
+    >
+      {initial}
+    </Link>
   );
 }
