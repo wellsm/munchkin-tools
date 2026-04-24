@@ -89,6 +89,20 @@ function clampInt(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, Math.round(value)))
 }
 
+// Combat controls (Monster Level, Modifiers, Remove Helper, Fled, Finish) can
+// only be operated by the active participants — main combatant or current
+// helper(s). The host is NOT implicitly privileged here; if the host wants
+// control they must also be in combat.
+function requireCombatControl(room: Room, requesterId: string): void {
+  requireMember(room, requesterId)
+  const isMain = room.combat.mainCombatantId === requesterId
+  const isHelper = room.combat.helperIds.includes(requesterId)
+
+  if (!isMain && !isHelper) {
+    throw new Error('Only the fighter or their helper can control this combat')
+  }
+}
+
 export const createRoom = mutation({
   args: {
     playerId: v.string(),
@@ -644,7 +658,11 @@ export const addHelper = mutation({
       throw new Error('Room not found')
     }
 
-    requireMember(room, args.requesterId)
+    const requester = requireMember(room, args.requesterId)
+
+    if (!requester.isHost) {
+      throw new Error('Only the host can add a helper')
+    }
 
     const helperExists = room.players.some((p) => p.playerId === args.helperId)
 
@@ -686,7 +704,7 @@ export const removeHelper = mutation({
       throw new Error('Room not found')
     }
 
-    requireMember(room, args.requesterId)
+    requireCombatControl(room, args.requesterId)
 
     const nextHelpers = room.combat.helperIds.filter((id) => id !== args.helperId)
 
@@ -712,7 +730,7 @@ export const clearHelpers = mutation({
       throw new Error('Room not found')
     }
 
-    requireMember(room, args.requesterId)
+    requireCombatControl(room, args.requesterId)
 
     if (room.combat.helperIds.length === 0) {
       return
@@ -737,7 +755,7 @@ export const setPartyModifier = mutation({
       throw new Error('Room not found')
     }
 
-    requireMember(room, args.requesterId)
+    requireCombatControl(room, args.requesterId)
 
     await ctx.db.patch(args.roomId, {
       combat: { ...room.combat, partyModifier: Math.round(args.value) || 0 },
@@ -758,7 +776,7 @@ export const setMonsterLevel = mutation({
       throw new Error('Room not found')
     }
 
-    requireMember(room, args.requesterId)
+    requireCombatControl(room, args.requesterId)
 
     await ctx.db.patch(args.roomId, {
       combat: {
@@ -782,7 +800,7 @@ export const setMonsterModifier = mutation({
       throw new Error('Room not found')
     }
 
-    requireMember(room, args.requesterId)
+    requireCombatControl(room, args.requesterId)
 
     await ctx.db.patch(args.roomId, {
       combat: { ...room.combat, monsterModifier: Math.round(args.value) || 0 },
@@ -802,7 +820,7 @@ export const resetCombat = mutation({
       throw new Error('Room not found')
     }
 
-    requireMember(room, args.requesterId)
+    requireCombatControl(room, args.requesterId)
     await ctx.db.patch(args.roomId, { combat: defaultCombat() })
   },
 })

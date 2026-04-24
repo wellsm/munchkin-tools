@@ -67,7 +67,12 @@ export function OnlineFightingView({ room }: Props) {
 
   const result = combatTotals(players.map(toCombatPlayer), combat);
   const hasHelper = helpers.length > 0;
-  const canAddHelper = helpers.length < 1;
+  const me = players.find((p) => p.playerId === requesterId);
+  const isHost = me?.isHost ?? false;
+  const isMain = main.playerId === requesterId;
+  const isHelper = combat.helperIds.includes(requesterId);
+  const canControl = isMain || isHelper;
+  const canAddHelper = isHost && helpers.length < 1;
 
   function runMutation<T>(fn: () => Promise<T>) {
     setError(null);
@@ -106,17 +111,14 @@ export function OnlineFightingView({ room }: Props) {
     <div className="h-full flex flex-col">
       <Header title={t.combat.title} onBack={handleBack} right={<NotificationButton room={room} />} />
       <div className="flex-1 min-h-0 overflow-auto p-4 pb-8 max-w-md mx-auto w-full flex flex-col gap-4">
-        <section className="rounded-xl border border-border/60 bg-card/50 p-5">
-          <div className="grid grid-cols-3 gap-2 items-start">
-            <div className="flex flex-col items-center text-center">
+        <section className="rounded-xl border border-border/60 bg-card/50 p-5 relative">
+          <div className="flex w-full justify-between gap-2 items-start">
+            <div className="flex flex-1 flex-col items-center text-center">
               <span className="text-xs tracking-widest uppercase text-muted-foreground">
                 {t.combat.party}
               </span>
               <span className="font-munchkin text-6xl text-primary tabular-nums leading-none mt-2">
                 {result.partyTotal}
-              </span>
-              <span className="text-sm text-muted-foreground mt-2">
-                {main.name} · L{main.level} +G{main.gear}
               </span>
               <div className="flex gap-2 mt-3 justify-center flex-wrap">
                 <div
@@ -169,7 +171,7 @@ export function OnlineFightingView({ room }: Props) {
               </div>
             </div>
 
-            <div className="flex flex-col items-center text-center gap-1 pt-6">
+            <div className="flex shrink-0 flex-col items-center text-center gap-1 pt-6">
               <span className="text-xs tracking-widest text-muted-foreground">
                 {t.combat.vs}
               </span>
@@ -179,15 +181,12 @@ export function OnlineFightingView({ room }: Props) {
               />
             </div>
 
-            <div className="flex flex-col items-center text-center">
+            <div className="flex flex-1 flex-col items-center text-center">
               <span className="text-xs tracking-widest uppercase text-muted-foreground">
                 {t.combat.monster}
               </span>
               <span className="font-munchkin text-6xl text-foreground tabular-nums leading-none mt-2">
                 {combat.monsterLevel + combat.monsterModifier}
-              </span>
-              <span className="text-sm text-muted-foreground mt-2">
-                {t.combat.levelFormat(combat.monsterLevel)}
               </span>
               <div className="size-10 rounded-full bg-destructive/20 border border-destructive/40 flex items-center justify-center mt-3 mx-auto">
                 <Skull className="size-5 text-destructive" />
@@ -204,7 +203,8 @@ export function OnlineFightingView({ room }: Props) {
               setMonsterLevel({ roomId: room._id, requesterId, value }),
             )
           }
-          decreaseDisabled={combat.monsterLevel <= 0}
+          decreaseDisabled={!canControl || combat.monsterLevel <= 0}
+          increaseDisabled={!canControl}
         />
         <StepperCard
           label={t.combat.partyModifiers}
@@ -214,6 +214,8 @@ export function OnlineFightingView({ room }: Props) {
               setPartyModifier({ roomId: room._id, requesterId, value }),
             )
           }
+          decreaseDisabled={!canControl}
+          increaseDisabled={!canControl}
         />
         <StepperCard
           label={t.combat.monsterModifiers}
@@ -223,10 +225,12 @@ export function OnlineFightingView({ room }: Props) {
               setMonsterModifier({ roomId: room._id, requesterId, value }),
             )
           }
+          decreaseDisabled={!canControl}
+          increaseDisabled={!canControl}
         />
 
         {hasHelper && (
-          <Button variant="outline" onClick={handleRemoveHelper}>
+          <Button variant="outline" onClick={handleRemoveHelper} disabled={!canControl}>
             <UserMinus className="size-4" /> {t.combat.removeHelper}
           </Button>
         )}
@@ -239,11 +243,12 @@ export function OnlineFightingView({ room }: Props) {
           <Button
             variant="outline"
             onClick={handleFled}
+            disabled={!canControl}
             className="border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive"
           >
             <X className="size-5" /> {t.combat.fled}
           </Button>
-          <Button onClick={() => setFinishOpen(true)}>
+          <Button onClick={() => setFinishOpen(true)} disabled={!canControl}>
             <Flag className="size-5" /> {t.combat.finish}
           </Button>
         </div>

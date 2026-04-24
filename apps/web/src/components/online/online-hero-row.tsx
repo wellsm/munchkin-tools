@@ -45,7 +45,7 @@ export function OnlineHeroRow({ player, roomId, isMe = false, onClick }: Props) 
       className={cn(
         "w-full flex items-center gap-3 h-auto py-3 rounded-lg bg-card/50 hover:bg-accent transition-colors border",
         isMe
-          ? "border-primary/70 ring-1 ring-primary/40"
+          ? "ring-1 ring-primary/30"
           : "border-border/60",
       )}
     >
