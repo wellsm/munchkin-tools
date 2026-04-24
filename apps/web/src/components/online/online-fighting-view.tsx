@@ -23,6 +23,7 @@ import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
 import { combatTotals } from "@/lib/combat";
 import { useT } from "@/lib/i18n/store";
 import { usePlayerIdentityStore } from "@/lib/player-identity";
+import { useDebouncedServerValue } from "@/lib/use-debounced-server-value";
 import { cn } from "@/lib/utils";
 import { NotificationButton } from "./notification-button";
 import { OnlineFinishSheet } from "./online-finish-sheet";
@@ -65,6 +66,38 @@ export function OnlineFightingView({ room }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const { combat, players } = room;
+
+  const [localMonsterLevel, setLocalMonsterLevel] = useDebouncedServerValue(
+    combat.monsterLevel,
+    async (next) => {
+      try {
+        await setMonsterLevel({ roomId: room._id, requesterId, value: next });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      }
+    },
+  );
+  const [localPartyMod, setLocalPartyMod] = useDebouncedServerValue(
+    combat.partyModifier,
+    async (next) => {
+      try {
+        await setPartyModifier({ roomId: room._id, requesterId, value: next });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      }
+    },
+  );
+  const [localMonsterMod, setLocalMonsterMod] = useDebouncedServerValue(
+    combat.monsterModifier,
+    async (next) => {
+      try {
+        await setMonsterModifier({ roomId: room._id, requesterId, value: next });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      }
+    },
+  );
+
   const main = players.find((p) => p.playerId === combat.mainCombatantId);
   const helpers = combat.helperIds
     .map((id) => players.find((p) => p.playerId === id))
@@ -76,7 +109,13 @@ export function OnlineFightingView({ room }: Props) {
     return null;
   }
 
-  const result = combatTotals(players.map(toCombatPlayer), combat);
+  const localCombat = {
+    ...combat,
+    monsterLevel: localMonsterLevel,
+    partyModifier: localPartyMod,
+    monsterModifier: localMonsterMod,
+  };
+  const result = combatTotals(players.map(toCombatPlayer), localCombat);
   const hasHelper = helpers.length > 0;
   const me = players.find((p) => p.playerId === requesterId);
   const isHost = me?.isHost ?? false;
@@ -185,7 +224,7 @@ export function OnlineFightingView({ room }: Props) {
                 {t.combat.monster}
               </span>
               <span className="font-munchkin text-6xl text-foreground tabular-nums leading-none mt-2">
-                {combat.monsterLevel + combat.monsterModifier}
+                {localMonsterLevel + localMonsterMod}
               </span>
               <div className="size-10 rounded-full bg-destructive/20 border border-destructive/40 flex items-center justify-center mt-3 mx-auto">
                 <Skull className="size-5 text-destructive" />
@@ -196,34 +235,22 @@ export function OnlineFightingView({ room }: Props) {
 
         <StepperCard
           label={t.combat.monsterLevel}
-          value={combat.monsterLevel}
-          onChange={(value) =>
-            runMutation(() =>
-              setMonsterLevel({ roomId: room._id, requesterId, value }),
-            )
-          }
-          decreaseDisabled={!canControl || combat.monsterLevel <= 0}
+          value={localMonsterLevel}
+          onChange={setLocalMonsterLevel}
+          decreaseDisabled={!canControl || localMonsterLevel <= 0}
           increaseDisabled={!canControl}
         />
         <StepperCard
           label={t.combat.partyModifiers}
-          value={combat.partyModifier}
-          onChange={(value) =>
-            runMutation(() =>
-              setPartyModifier({ roomId: room._id, requesterId, value }),
-            )
-          }
+          value={localPartyMod}
+          onChange={setLocalPartyMod}
           decreaseDisabled={!canControl}
           increaseDisabled={!canControl}
         />
         <StepperCard
           label={t.combat.monsterModifiers}
-          value={combat.monsterModifier}
-          onChange={(value) =>
-            runMutation(() =>
-              setMonsterModifier({ roomId: room._id, requesterId, value }),
-            )
-          }
+          value={localMonsterMod}
+          onChange={setLocalMonsterMod}
           decreaseDisabled={!canControl}
           increaseDisabled={!canControl}
         />

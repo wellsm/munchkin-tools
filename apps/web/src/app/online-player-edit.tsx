@@ -43,6 +43,7 @@ import {
 import { useT } from "@/lib/i18n/store";
 import { usePlayerIdentityStore } from "@/lib/player-identity";
 import type { Gender, MunchkinClass, MunchkinRace } from "@/lib/types";
+import { useDebouncedServerValue } from "@/lib/use-debounced-server-value";
 import { cn } from "@/lib/utils";
 
 export function OnlinePlayerEdit() {
@@ -69,6 +70,32 @@ export function OnlinePlayerEdit() {
   const [classPickerOpen, setClassPickerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const target = room?.players.find((p) => p.playerId === playerId);
+  const [localLevel, setLocalLevel] = useDebouncedServerValue(
+    target?.level ?? MIN_LEVEL,
+    (next) => {
+      if (!target || !roomId) return;
+      void updatePlayer({
+        roomId: roomId as Id<"rooms">,
+        requesterId,
+        targetId: target.playerId,
+        patch: { level: next },
+      });
+    },
+  );
+  const [localGear, setLocalGear] = useDebouncedServerValue(
+    target?.gear ?? 0,
+    (next) => {
+      if (!target || !roomId) return;
+      void updatePlayer({
+        roomId: roomId as Id<"rooms">,
+        requesterId,
+        targetId: target.playerId,
+        patch: { gear: next },
+      });
+    },
+  );
+
   if (!roomId || !playerId) {
     return null;
   }
@@ -90,7 +117,6 @@ export function OnlinePlayerEdit() {
     );
   }
 
-  const target = room.players.find((p) => p.playerId === playerId);
   const viewer = room.players.find((p) => p.playerId === requesterId);
 
   if (!target) {
@@ -179,13 +205,13 @@ export function OnlinePlayerEdit() {
   function handleLevelChange(delta: number) {
     const next = Math.max(
       MIN_LEVEL,
-      Math.min(room!.maxLevel, target!.level + delta),
+      Math.min(room!.maxLevel, localLevel + delta),
     );
-    commitPatch({ level: next });
+    setLocalLevel(next);
   }
 
   function handleGearChange(delta: number) {
-    commitPatch({ gear: target!.gear + delta });
+    setLocalGear(localGear + delta);
   }
 
   function toggleRace(race: MunchkinRace) {
@@ -220,7 +246,7 @@ export function OnlinePlayerEdit() {
     commitPatch({ classes: [...current, klass] });
   }
 
-  const strength = target.level + target.gear;
+  const strength = localLevel + localGear;
   const avatarColor = target.color ?? AVATAR_COLORS[0];
 
   return (
@@ -364,11 +390,11 @@ export function OnlinePlayerEdit() {
         <div className="grid grid-cols-3 items-center gap-3 mt-8">
           <StatCard
             label={t.heroEdit.level}
-            value={target.level}
+            value={localLevel}
             onDown={() => handleLevelChange(-1)}
             onUp={() => handleLevelChange(1)}
-            downDisabled={!canEdit || target.level <= MIN_LEVEL}
-            upDisabled={!canEdit || target.level >= room.maxLevel}
+            downDisabled={!canEdit || localLevel <= MIN_LEVEL}
+            upDisabled={!canEdit || localLevel >= room.maxLevel}
           />
           <div className="flex flex-col items-center justify-center">
             <span className="text-xs tracking-widest uppercase text-muted-foreground mt-4">
@@ -380,7 +406,7 @@ export function OnlinePlayerEdit() {
           </div>
           <StatCard
             label={t.heroEdit.gear}
-            value={target.gear}
+            value={localGear}
             onDown={() => handleGearChange(-1)}
             onUp={() => handleGearChange(1)}
             downDisabled={!canEdit}
