@@ -1,4 +1,4 @@
-import { Mars, Venus } from "lucide-react";
+import { Crown, Mars, Venus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Doc } from "@munchkin-tools/convex/convex/_generated/dataModel";
 import { Chip } from "@/components/app/chip";
@@ -65,6 +65,12 @@ export function OnlineHeroRow({ player, roomId, isMe = false, onClick }: Props) 
       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
         <div className="flex items-center gap-2">
           <span className="text-lg font-munchkin truncate">{player.name}</span>
+          {player.isHost && (
+            <Crown
+              className="size-4 text-primary shrink-0"
+              aria-label={t.waitingRoom.hostBadge}
+            />
+          )}
           {isMe && (
             <span className="text-xs text-muted-foreground shrink-0">
               {t.waitingRoom.youLabel}
