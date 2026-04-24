@@ -7,16 +7,18 @@ import { Button } from "@/components/ui/button";
 import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
 import { classById, raceById } from "@/lib/constants";
 import { useT } from "@/lib/i18n/store";
+import { cn } from "@/lib/utils";
 
 type RoomPlayer = Doc<"rooms">["players"][number];
 
 type Props = {
   player: RoomPlayer;
   roomId: string;
+  isMe?: boolean;
   onClick?: () => void;
 };
 
-export function OnlineHeroRow({ player, roomId, onClick }: Props) {
+export function OnlineHeroRow({ player, roomId, isMe = false, onClick }: Props) {
   const t = useT();
   const navigate = useNavigate();
   const strength = player.level + player.gear;
@@ -40,7 +42,12 @@ export function OnlineHeroRow({ player, roomId, onClick }: Props) {
         (() => navigate(`/online/${roomId}/player/${player.playerId}`))
       }
       size="lg"
-      className="w-full flex items-center gap-3 h-auto py-3 rounded-lg bg-card/50 border border-border/60 hover:bg-accent transition-colors"
+      className={cn(
+        "w-full flex items-center gap-3 h-auto py-3 rounded-lg bg-card/50 hover:bg-accent transition-colors border",
+        isMe
+          ? "border-primary/70 ring-1 ring-primary/40"
+          : "border-border/60",
+      )}
     >
       <div
         className="size-12 shrink-0 rounded-full flex items-center justify-center"
@@ -55,6 +62,11 @@ export function OnlineHeroRow({ player, roomId, onClick }: Props) {
       <div className="flex-1 min-w-0 flex flex-col gap-0.5">
         <div className="flex items-center gap-2">
           <span className="text-lg font-munchkin truncate">{player.name}</span>
+          {isMe && (
+            <span className="text-xs text-muted-foreground shrink-0">
+              {t.waitingRoom.youLabel}
+            </span>
+          )}
           {player.gender === "male" && (
             <Mars
               className="size-4 text-muted-foreground shrink-0"

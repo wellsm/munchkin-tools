@@ -12,6 +12,7 @@ import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
 import { combatTotals } from "@/lib/combat";
 import { useT } from "@/lib/i18n/store";
 import { usePlayerIdentityStore } from "@/lib/player-identity";
+import { cn } from "@/lib/utils";
 import { NotificationButton } from "./notification-button";
 import { OnlineFinishSheet } from "./online-finish-sheet";
 import { OnlineHelperPickerSheet } from "./online-helper-picker-sheet";
@@ -119,7 +120,11 @@ export function OnlineFightingView({ room }: Props) {
               </span>
               <div className="flex gap-2 mt-3 justify-center flex-wrap">
                 <div
-                  className="size-10 rounded-full flex items-center justify-center"
+                  className={cn(
+                    "size-10 rounded-full flex items-center justify-center",
+                    main.playerId === requesterId &&
+                      "ring-2 ring-primary ring-offset-2 ring-offset-card",
+                  )}
                   style={{ backgroundColor: mainAvatarBg }}
                   aria-hidden
                 >
@@ -132,11 +137,16 @@ export function OnlineFightingView({ room }: Props) {
                     id: h.playerId,
                     color: h.color ?? undefined,
                   });
+                  const isMeHelper = h.playerId === requesterId;
 
                   return (
                     <div
                       key={h.playerId}
-                      className="size-10 rounded-full flex items-center justify-center"
+                      className={cn(
+                        "size-10 rounded-full flex items-center justify-center",
+                        isMeHelper &&
+                          "ring-2 ring-primary ring-offset-2 ring-offset-card",
+                      )}
                       style={{ backgroundColor: bg }}
                       aria-hidden
                     >

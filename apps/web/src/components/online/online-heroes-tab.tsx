@@ -1,6 +1,7 @@
 import type { Doc } from "@munchkin-tools/convex/convex/_generated/dataModel";
 import { Header } from "@/components/app/header";
 import { useT } from "@/lib/i18n/store";
+import { usePlayerIdentityStore } from "@/lib/player-identity";
 import { NotificationButton } from "./notification-button";
 import { OnlineHeroRow } from "./online-hero-row";
 
@@ -12,6 +13,7 @@ type Props = {
 
 export function OnlineHeroesTab({ room }: Props) {
   const t = useT();
+  const viewerId = usePlayerIdentityStore((s) => s.playerId);
   const players = room.players;
 
   if (players.length === 0) {
@@ -29,7 +31,11 @@ export function OnlineHeroesTab({ room }: Props) {
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {players.map((p) => (
             <li key={p.playerId}>
-              <OnlineHeroRow player={p} roomId={room._id} />
+              <OnlineHeroRow
+                player={p}
+                roomId={room._id}
+                isMe={p.playerId === viewerId}
+              />
             </li>
           ))}
         </ul>

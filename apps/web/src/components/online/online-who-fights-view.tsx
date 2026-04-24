@@ -60,6 +60,7 @@ export function OnlineWhoFightsView({ room }: Props) {
               key={p.playerId}
               player={p}
               roomId={room._id}
+              isMe={p.playerId === requesterId}
               onClick={() => setHero(p.playerId)}
             />
           ))}
