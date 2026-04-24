@@ -1,5 +1,17 @@
-export type MunchkinClass = 'cleric' | 'warrior' | 'thief' | 'wizard'
-export type MunchkinRace = 'dwarf' | 'elf' | 'halfling' | 'human'
+export type MunchkinClass =
+  | 'cleric'
+  | 'warrior'
+  | 'thief'
+  | 'wizard'
+  | 'bard'
+  | 'ranger'
+export type MunchkinRace =
+  | 'dwarf'
+  | 'elf'
+  | 'halfling'
+  | 'human'
+  | 'orc'
+  | 'gnome'
 export type Gender = 'male' | 'female'
 
 export type Player = {

@@ -153,12 +153,16 @@ export const pt: Dictionary = {
       elf: 'Elfo',
       dwarf: 'Anão',
       halfling: 'Halfling',
+      orc: 'Orc',
+      gnome: 'Gnomo',
     },
     classes: {
       warrior: 'Guerreiro',
       wizard: 'Mago',
       cleric: 'Clérigo',
       thief: 'Ladrão',
+      bard: 'Bardo',
+      ranger: 'Ranger',
     },
   },
   combat: {

@@ -151,12 +151,16 @@ export const en = {
       elf: 'Elf',
       dwarf: 'Dwarf',
       halfling: 'Halfling',
+      orc: 'Orc',
+      gnome: 'Gnome',
     },
     classes: {
       warrior: 'Warrior',
       wizard: 'Wizard',
       cleric: 'Cleric',
       thief: 'Thief',
+      bard: 'Bard',
+      ranger: 'Ranger',
     },
   },
   combat: {

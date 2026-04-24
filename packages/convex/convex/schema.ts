@@ -35,6 +35,8 @@ export default defineSchema({
             v.literal('warrior'),
             v.literal('thief'),
             v.literal('wizard'),
+            v.literal('bard'),
+            v.literal('ranger'),
           ),
         ),
         races: v.array(
@@ -43,6 +45,8 @@ export default defineSchema({
             v.literal('elf'),
             v.literal('halfling'),
             v.literal('human'),
+            v.literal('orc'),
+            v.literal('gnome'),
           ),
         ),
         joinedAt: v.number(),

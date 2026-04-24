@@ -20,12 +20,16 @@ const classValidator = v.union(
   v.literal('warrior'),
   v.literal('thief'),
   v.literal('wizard'),
+  v.literal('bard'),
+  v.literal('ranger'),
 )
 const raceValidator = v.union(
   v.literal('dwarf'),
   v.literal('elf'),
   v.literal('halfling'),
   v.literal('human'),
+  v.literal('orc'),
+  v.literal('gnome'),
 )
 const genderValidator = v.union(v.literal('male'), v.literal('female'), v.null())
 
