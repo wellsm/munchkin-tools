@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { StatBox } from "@/components/app/stat-box";
 import { Button } from "@/components/ui/button";
 import { avatarInitial, playerAvatarColor } from "@/lib/avatar-color";
-import { classById, raceById } from "@/lib/constants";
+import { DEFAULT_RACE, classById, raceById } from "@/lib/constants";
 import { useT } from "@/lib/i18n/store";
 import { calculateStrength } from "@/lib/strength";
 import type { Player } from "@/lib/types";
@@ -18,9 +18,12 @@ export function HeroRow({ player, onClick }: Props) {
   const t = useT();
   const navigate = useNavigate();
   const strength = calculateStrength(player);
-  const races = player.races
-    .map((id) => t.heroEdit.races[id].toUpperCase())
-    .join(" | ");
+  const races =
+    player.races.length === 0
+      ? t.heroEdit.races.human.toUpperCase()
+      : player.races
+          .map((id) => t.heroEdit.races[id].toUpperCase())
+          .join(" | ");
   const classes = player.classes
     .map((id) => t.heroEdit.classes[id].toUpperCase())
     .join(" | ");
@@ -59,22 +62,28 @@ export function HeroRow({ player, onClick }: Props) {
           )}
         </div>
         <div className="flex flex-col items-start sm:gap-2">
-          <span className="text-sm text-muted-foreground truncate hidden sm:flex gap-2">
-            {
+          <span className="text-sm text-muted-foreground truncate hidden md:flex gap-2">
+            {player.races.length === 0 ? (
+              <Chip active size="sm" color={DEFAULT_RACE.color}>
+                <DEFAULT_RACE.icon className="size-4" aria-hidden />
+                {t.heroEdit.races.human}
+              </Chip>
+            ) : (
               player.races.map((r) => {
                 const Icon = raceById(r).icon;
+                const { color } = raceById(r);
 
                 return (
-                  <Chip key={r} active size="sm">
+                  <Chip key={r} active size="sm" color={color}>
                     <Icon className="size-4" aria-hidden />
                     {t.heroEdit.races[r]}
                   </Chip>
                 );
               })
-            }
+            )}
           </span>
-          <span className="text-sm text-muted-foreground truncate sm:hidden">{races}</span>
-          <span className="text-sm text-muted-foreground truncate hidden sm:flex gap-2">
+          <span className="text-sm text-muted-foreground truncate md:hidden">{races}</span>
+          <span className="text-sm text-muted-foreground truncate hidden md:flex gap-2">
             {
               player.classes.map((r) => {
                 const Icon = classById(r).icon;
@@ -88,7 +97,7 @@ export function HeroRow({ player, onClick }: Props) {
               })
             }
           </span>
-          <span className="text-sm text-muted-foreground truncate sm:hidden">{classes}</span>
+          <span className="text-sm text-muted-foreground truncate md:hidden">{classes}</span>
         </div>
       </div>
 

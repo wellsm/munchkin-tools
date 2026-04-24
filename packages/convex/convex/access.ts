@@ -16,6 +16,21 @@ export const isAccessCodeNeeded = query({
   },
 })
 
+// PUBLIC — verifies a candidate access code without revealing the real one.
+// Returns { ok: true } when the gate is off OR the code matches.
+export const verifyAccessCode = query({
+  args: { code: v.string() },
+  handler: async (ctx, args) => {
+    const settings = await ctx.db.query('settings').first()
+
+    if (!settings || !settings.accessCodeNeeded) {
+      return { ok: true }
+    }
+
+    return { ok: settings.accessCode === args.code.trim() }
+  },
+})
+
 // INTERNAL — toggle the flag. Enabling auto-generates a code if there is none.
 export const setNeeded = internalMutation({
   args: { needed: v.boolean() },

@@ -13,6 +13,9 @@ export const pt: Dictionary = {
     offline: 'Offline',
     online: 'Online',
     scanQr: 'Escanear QR',
+    localSection: 'Local',
+    onlineSection: 'Online',
+    createMatch: 'Criar partida',
   },
   whoami: {
     trigger: 'Quem sou eu?',
@@ -39,6 +42,10 @@ export const pt: Dictionary = {
   online: {
     title: 'Online',
     description: 'Jogue com amigos.',
+    gateTitle: 'Liberar online',
+    gateDescription: 'Digite o código de acesso para liberar as salas online neste dispositivo.',
+    verify: 'Verificar',
+    verifying: 'Verificando…',
     createTab: 'Criar',
     joinTab: 'Entrar',
     yourName: 'Seu nome',
@@ -53,6 +60,7 @@ export const pt: Dictionary = {
     joining: 'Entrando…',
     errorGeneric: 'Não foi possível criar a sala. Tente novamente.',
     errorRoomNotFound: 'Nenhuma sala encontrada com esse código.',
+    errorInvalidAccessCode: 'Código de acesso inválido.',
   },
   waitingRoom: {
     title: 'Sala de Espera',
@@ -172,6 +180,8 @@ export const pt: Dictionary = {
     addHelper: 'Adicionar ajudante',
     chooseHelper: 'Escolher ajudante',
     pickHelperDescription: 'Escolha outro herói para entrar na luta.',
+    pickMainDescription: 'Escolha o combatente principal para iniciar a luta.',
+    waitingForHost: 'Aguardando o host escolher o combatente principal.',
     noOtherHeroes: 'Nenhum outro herói disponível.',
     decreaseStepper: (label: string) => `Diminuir ${label}`,
     increaseStepper: (label: string) => `Aumentar ${label}`,
@@ -216,5 +226,30 @@ export const pt: Dictionary = {
     increase: (label: string) => `Aumentar ${label}`,
     shareSection: 'Compartilhar',
     shareRoom: 'Compartilhar sala',
+  },
+  support: {
+    section: 'Apoie o projeto',
+    cta: 'Buy me a coffee',
+    description: 'Ajude a manter tudo gratuito e online.',
+    descriptionNoSuggestions:
+      'Ajude a manter tudo gratuito e online — você também pode deixar sugestões ao pagar um café.',
+  },
+  suggestions: {
+    section: 'Sugestões',
+    trigger: 'Enviar sugestão',
+    triggerDescription: 'Ideias, bugs ou qualquer coisa que queira compartilhar.',
+    title: 'Enviar sugestão',
+    description:
+      'Ideias, bugs ou qualquer coisa que queira compartilhar. Contato é opcional — só se quiser uma resposta.',
+    name: 'Nome',
+    namePlaceholder: 'Seu nome (opcional)',
+    contact: 'Contato',
+    contactPlaceholder: 'Email, @ Instagram, Discord (opcional)',
+    message: 'Mensagem',
+    messagePlaceholder: 'O que você tem em mente?',
+    submit: 'Enviar',
+    submitting: 'Enviando…',
+    sent: 'Enviado — obrigado!',
+    errorGeneric: 'Não foi possível enviar. Tente novamente.',
   },
 }

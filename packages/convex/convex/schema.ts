@@ -6,7 +6,17 @@ export default defineSchema({
     accessCodeNeeded: v.boolean(),
     accessCode: v.union(v.string(), v.null()),
     rotatedAt: v.optional(v.number()),
+    supportEnabled: v.optional(v.boolean()),
+    suggestionsEnabled: v.optional(v.boolean()),
   }),
+
+  suggestions: defineTable({
+    name: v.union(v.string(), v.null()),
+    contact: v.union(v.string(), v.null()),
+    message: v.string(),
+    playerId: v.union(v.string(), v.null()),
+    createdAt: v.number(),
+  }).index('by_createdAt', ['createdAt']),
 
   rooms: defineTable({
     code: v.string(),

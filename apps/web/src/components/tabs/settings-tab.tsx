@@ -1,8 +1,12 @@
-import { Moon, Sun, Trash2 } from "lucide-react";
+import { Coffee, MessageSquare, Moon, Sun, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Header } from "@/components/app/header";
 import { SectionLabel } from "@/components/app/section-label";
 import { StepperCard } from "@/components/app/stepper-card";
+import { SuggestionSheet } from "@/components/app/suggestion-sheet";
+import { SUPPORT_URL } from "@/lib/support";
+import { useSuggestionsVisible } from "@/lib/use-suggestions-visible";
+import { useSupportVisible } from "@/lib/use-support-visible";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +45,9 @@ export function SettingsTab() {
   const setWakeLockEnabled = useWakeLockStore((s) => s.setEnabled);
   const wakeLockSupported = isWakeLockSupported();
   const [theme, setTheme] = useState<Theme>(() => getStoredTheme());
+  const supportVisible = useSupportVisible();
+  const suggestionsVisible = useSuggestionsVisible();
+  const [suggestionOpen, setSuggestionOpen] = useState(false);
 
   const decreaseMaxPlayersDisabled =
     settings.maxPlayers <= Math.max(MIN_MAX_PLAYERS, players.length);
@@ -148,6 +155,51 @@ export function SettingsTab() {
           </div>
         </div>
 
+        {(supportVisible || suggestionsVisible) && (
+          <div>
+            <SectionLabel>{t.support.section}</SectionLabel>
+            <div className="flex flex-col gap-3">
+              {supportVisible && (
+                <a
+                  href={SUPPORT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-3 rounded-xl border border-border/60 bg-card/50 p-4 hover:bg-accent transition-colors"
+                >
+                  <Coffee className="size-5" />
+                  <div className="flex-1 flex flex-col items-start">
+                    <span className="font-munchkin text-lg">
+                      {t.support.cta}
+                    </span>
+                    <span className="text-xs text-muted-foreground text-left">
+                      {suggestionsVisible
+                        ? t.support.description
+                        : t.support.descriptionNoSuggestions}
+                    </span>
+                  </div>
+                </a>
+              )}
+              {suggestionsVisible && (
+                <button
+                  type="button"
+                  onClick={() => setSuggestionOpen(true)}
+                  className="w-full flex items-center gap-3 rounded-xl border border-border/60 bg-card/50 p-4 hover:bg-accent transition-colors text-left"
+                >
+                  <MessageSquare className="size-5" />
+                  <div className="flex-1 flex flex-col items-start">
+                    <span className="font-munchkin text-lg">
+                      {t.suggestions.trigger}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {t.suggestions.triggerDescription}
+                    </span>
+                  </div>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         <div>
           <SectionLabel variant="danger">{t.settings.dangerZone}</SectionLabel>
           <AlertDialog>
@@ -181,6 +233,11 @@ export function SettingsTab() {
           </AlertDialog>
         </div>
       </div>
+
+      <SuggestionSheet
+        open={suggestionOpen}
+        onOpenChange={setSuggestionOpen}
+      />
     </div>
   );
 }

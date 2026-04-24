@@ -19,7 +19,11 @@ export function ShareSheet({ open, onOpenChange, roomCode, inviteUrl }: Props) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[90vh]">
+      <SheetContent
+        side="bottom"
+        className="max-h-[90vh]"
+        aria-describedby={undefined}
+      >
         <SheetHeader>
           <SheetTitle className="font-munchkin text-2xl">
             {t.settings.shareRoom}

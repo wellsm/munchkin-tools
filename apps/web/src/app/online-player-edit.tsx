@@ -393,7 +393,7 @@ export function OnlinePlayerEdit() {
           onEdit={canEdit ? () => setRacePickerOpen(true) : undefined}
           empty={target.races.length === 0}
           emptyChip={
-            <Chip active color={DEFAULT_RACE.color}>
+            <Chip active color={DEFAULT_RACE.color} variant="ghost">
               <DEFAULT_RACE.icon className="size-4" aria-hidden />
               {t.heroEdit.races.human}
             </Chip>
@@ -402,7 +402,7 @@ export function OnlinePlayerEdit() {
             const entry = raceById(id);
 
             return (
-              <Chip key={id} active color={entry.color}>
+              <Chip active key={id} color={entry.color} variant="ghost">
                 <entry.icon className="size-4" aria-hidden />
                 {t.heroEdit.races[id]}
               </Chip>
@@ -419,7 +419,7 @@ export function OnlinePlayerEdit() {
             const entry = classById(id);
 
             return (
-              <Chip key={id} active color={entry.color}>
+              <Chip key={id} active color={entry.color} variant="ghost">
                 <entry.icon className="size-4" aria-hidden />
                 {t.heroEdit.classes[id]}
               </Chip>

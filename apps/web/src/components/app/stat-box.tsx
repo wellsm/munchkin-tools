@@ -10,7 +10,7 @@ export function StatBox({ value, label, highlighted }: Props) {
   return (
     <div
       className={cn(
-        'flex flex-col sm:flex-row sm:gap-2 sm:w-24 items-center justify-between rounded-md border px-2.5 py-1.5 min-w-12',
+        'flex flex-col sm:flex-row sm:gap-2 sm:w-20 xl:w-24 items-center justify-between rounded-md border px-1 py-1.5 min-w-12',
         highlighted ? 'border-primary/60 bg-primary/10' : 'border-border/60',
       )}
     >

@@ -6,10 +6,11 @@ type Props = {
   size?: 'sm' | 'default' | 'lg'
   children: ReactNode
   color?: string
+  variant?: 'default' | 'ghost'
   rounded?: boolean
 } & ComponentProps<"button">
 
-export function Chip({ active, size = 'default', children, color, rounded = true, ...props }: Props) {
+export function Chip({ active, size = 'default', children, color, variant = 'default', rounded = true, ...props }: Props) {
   const useCustomColor = active && color !== undefined
 
   return (
@@ -17,7 +18,11 @@ export function Chip({ active, size = 'default', children, color, rounded = true
       {...props}
       type="button"
       aria-pressed={active}
-      style={useCustomColor ? { backgroundColor: color, color: 'oklch(0.15 0 0)' } : undefined}
+      style={useCustomColor && variant !== 'ghost' ? { 
+        backgroundColor: color, color: 'oklch(0.15 0 0)'
+      } : variant === "ghost" ? {
+        borderColor: color, color
+      } : undefined}
       className={cn(
         'inline-flex items-center gap-2 border transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
         active

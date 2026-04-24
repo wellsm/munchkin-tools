@@ -39,7 +39,11 @@ export function RaceClassPickerSheet<T extends string>({
 }: Props<T>) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="max-h-[80dvh]">
+      <SheetContent
+        side="bottom"
+        className="max-h-[80dvh]"
+        {...(description ? {} : { "aria-describedby": undefined })}
+      >
         <SheetHeader>
           <SheetTitle className="font-munchkin text-2xl">{title}</SheetTitle>
           {description && <SheetDescription>{description}</SheetDescription>}
@@ -61,6 +65,7 @@ export function RaceClassPickerSheet<T extends string>({
                 className="w-full"
                 size="lg"
                 rounded={false}
+                variant={isSelected ?  "ghost" : "default"}
               >
                 <Icon className="size-4" aria-hidden />
                 {item.label}

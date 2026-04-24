@@ -1,28 +1,42 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Globe, QrCode, User } from 'lucide-react'
+import { Coffee, Globe, Loader2, LogIn, MessageSquare, Plus, QrCode } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useT } from '@/lib/i18n/store'
+import { CreateRoomSheet } from '@/components/app/create-room-sheet'
+import { JoinRoomSheet } from '@/components/app/join-room-sheet'
 import { OnlineSheet } from '@/components/app/online-sheet'
 import { QrScanSheet } from '@/components/app/qr-scan-sheet'
+import { SuggestionSheet } from '@/components/app/suggestion-sheet'
 import { WhoAmISheet } from '@/components/app/whoami-sheet'
-import { usePlayerIdentityStore } from '@/lib/player-identity'
 import { avatarColor, avatarInitial } from '@/lib/avatar-color'
+import { useT } from '@/lib/i18n/store'
+import { usePlayerIdentityStore } from '@/lib/player-identity'
+import { useOnlineAccess } from '@/lib/use-online-access'
+import { useSuggestionsVisible } from '@/lib/use-suggestions-visible'
+import { useSupportVisible } from '@/lib/use-support-visible'
+import { SUPPORT_URL } from '@/lib/support'
 
 export function Landing() {
   const t = useT()
   const navigate = useNavigate()
   const playerId = usePlayerIdentityStore((s) => s.playerId)
   const lastUsedName = usePlayerIdentityStore((s) => s.lastUsedName)
-  const [onlineOpen, setOnlineOpen] = useState(false)
+  const { loading, unlocked } = useOnlineAccess()
+  const supportVisible = useSupportVisible()
+  const suggestionsVisible = useSuggestionsVisible()
+
+  const [gateOpen, setGateOpen] = useState(false)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [joinOpen, setJoinOpen] = useState(false)
   const [scanOpen, setScanOpen] = useState(false)
   const [whoamiOpen, setWhoamiOpen] = useState(false)
+  const [suggestionOpen, setSuggestionOpen] = useState(false)
 
   const displayName = lastUsedName ?? t.whoami.guest
   const color = avatarColor(playerId)
 
   return (
-    <div className="min-h-dvh bg-background text-foreground relative flex flex-col items-center justify-center px-6 gap-12">
+    <div className="min-h-dvh bg-background text-foreground relative flex flex-col items-center justify-center px-6 gap-10">
       <button
         type="button"
         onClick={() => setWhoamiOpen(true)}
@@ -45,23 +59,105 @@ export function Landing() {
         {t.landing.title}
       </h1>
 
-      <div className="flex flex-col gap-4 w-full max-w-xs">
-        <Button size="lg" variant="outline" className="h-16 text-lg" onClick={() => navigate('/offline')}>
-          <User className="size-6" />
-          {t.landing.offline}
-        </Button>
-        <Button size="lg" className="h-16 text-lg" onClick={() => setOnlineOpen(true)}>
-          <Globe className="size-6" />
-          {t.landing.online}
-        </Button>
-        <Button size="lg" variant="outline" className="h-16 text-lg" onClick={() => setScanOpen(true)}>
-          <QrCode className="size-6" />
-          {t.landing.scanQr}
-        </Button>
+      <div className="flex flex-col gap-6 w-full max-w-xs">
+        <fieldset className="rounded-xl border border-border/60 bg-card/30 px-4 py-3 flex flex-col gap-3">
+          <legend className="font-munchkin text-sm tracking-wider uppercase text-muted-foreground px-2">
+            {t.landing.localSection}
+          </legend>
+          <Button
+            size="lg"
+            variant="outline"
+            className="h-14 text-base"
+            onClick={() => navigate('/offline')}
+          >
+            <Plus className="size-5" />
+            {t.landing.createMatch}
+          </Button>
+        </fieldset>
+
+        <fieldset className="rounded-xl border border-border/60 bg-card/30 px-4 py-3 flex flex-col gap-3">
+          <legend className="font-munchkin text-sm tracking-wider uppercase text-muted-foreground px-2">
+            {t.landing.onlineSection}
+          </legend>
+
+          {unlocked ? (
+            <>
+              <Button
+                size="lg"
+                className="h-14 text-base"
+                onClick={() => setCreateOpen(true)}
+              >
+                <Plus className="size-5" />
+                {t.online.createRoom}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-14 text-base"
+                onClick={() => setJoinOpen(true)}
+              >
+                <LogIn className="size-5" />
+                {t.online.joinRoom}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-14 text-base"
+                onClick={() => setScanOpen(true)}
+              >
+                <QrCode className="size-5" />
+                {t.landing.scanQr}
+              </Button>
+            </>
+          ) : (
+            <Button
+              size="lg"
+              className="h-14 text-base"
+              onClick={() => setGateOpen(true)}
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader2 className="size-5 animate-spin" />
+              ) : (
+                <Globe className="size-5" />
+              )}
+              {t.landing.online}
+            </Button>
+          )}
+        </fieldset>
       </div>
 
-      <OnlineSheet open={onlineOpen} onOpenChange={setOnlineOpen} />
+      {(supportVisible || suggestionsVisible) && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          {supportVisible && (
+            <a
+              href={SUPPORT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent transition-colors"
+            >
+              <Coffee className="size-4" />
+              {t.support.cta}
+            </a>
+          )}
+          {suggestionsVisible && (
+            <button
+              type="button"
+              onClick={() => setSuggestionOpen(true)}
+              className="flex items-center gap-2 rounded-full border border-border/60 bg-card/50 px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent transition-colors"
+            >
+              <MessageSquare className="size-4" />
+              {t.suggestions.trigger}
+            </button>
+          )}
+        </div>
+      )}
+
+      <OnlineSheet open={gateOpen} onOpenChange={setGateOpen} />
+      <CreateRoomSheet open={createOpen} onOpenChange={setCreateOpen} />
+      <JoinRoomSheet open={joinOpen} onOpenChange={setJoinOpen} />
       <QrScanSheet open={scanOpen} onOpenChange={setScanOpen} />
+      <SuggestionSheet open={suggestionOpen} onOpenChange={setSuggestionOpen} />
       <WhoAmISheet open={whoamiOpen} onOpenChange={setWhoamiOpen} />
     </div>
   )

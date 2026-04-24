@@ -11,6 +11,9 @@ export const en = {
     offline: 'Offline',
     online: 'Online',
     scanQr: 'Scan QR',
+    localSection: 'Local',
+    onlineSection: 'Online',
+    createMatch: 'Create match',
   },
   whoami: {
     trigger: 'Who am I?',
@@ -37,6 +40,10 @@ export const en = {
   online: {
     title: 'Online',
     description: 'Play with friends.',
+    gateTitle: 'Unlock online',
+    gateDescription: 'Enter the access code to unlock online rooms on this device.',
+    verify: 'Verify',
+    verifying: 'Verifying…',
     createTab: 'Create',
     joinTab: 'Join',
     yourName: 'Your name',
@@ -51,6 +58,7 @@ export const en = {
     joining: 'Joining…',
     errorGeneric: 'Could not create the room. Try again.',
     errorRoomNotFound: 'Room not found with that code.',
+    errorInvalidAccessCode: 'Invalid access code.',
   },
   waitingRoom: {
     title: 'Waiting Room',
@@ -170,6 +178,8 @@ export const en = {
     addHelper: 'Add helper',
     chooseHelper: 'Choose a helper',
     pickHelperDescription: 'Pick another hero to join the fight.',
+    pickMainDescription: 'Pick the main combatant to start the fight.',
+    waitingForHost: 'Waiting for the host to pick the main combatant.',
     noOtherHeroes: 'No other heroes available.',
     decreaseStepper: (label: string) => `Decrease ${label}`,
     increaseStepper: (label: string) => `Increase ${label}`,
@@ -213,6 +223,31 @@ export const en = {
     increase: (label: string) => `Increase ${label}`,
     shareSection: 'Share',
     shareRoom: 'Share room',
+  },
+  support: {
+    section: 'Support the project',
+    cta: 'Buy me a coffee',
+    description: 'Help keep it free and online.',
+    descriptionNoSuggestions:
+      'Help keep it free and online — you can also leave suggestions when buying a coffee.',
+  },
+  suggestions: {
+    section: 'Suggestions',
+    trigger: 'Send a suggestion',
+    triggerDescription: 'Ideas, bugs, or anything you want to share.',
+    title: 'Send a suggestion',
+    description:
+      'Ideas, bugs, or anything you want to share. Contact is optional — only if you want a reply.',
+    name: 'Name',
+    namePlaceholder: 'Your name (optional)',
+    contact: 'Contact',
+    contactPlaceholder: 'Email, @handle, Discord (optional)',
+    message: 'Message',
+    messagePlaceholder: 'What did you have in mind?',
+    submit: 'Send',
+    submitting: 'Sending…',
+    sent: 'Sent — thanks!',
+    errorGeneric: 'Could not send. Try again.',
   },
 }
 

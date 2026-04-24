@@ -620,7 +620,11 @@ export const setMainCombatant = mutation({
       throw new Error('Room not found')
     }
 
-    requireMember(room, args.requesterId)
+    const requester = requireMember(room, args.requesterId)
+
+    if (!requester.isHost) {
+      throw new Error('Only the host can set the main combatant')
+    }
 
     if (args.targetId !== null) {
       const exists = room.players.some((p) => p.playerId === args.targetId)
