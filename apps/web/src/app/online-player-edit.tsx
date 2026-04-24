@@ -6,7 +6,7 @@ import {
   Venus,
 } from "lucide-react";
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@munchkin-tools/convex/convex/_generated/api";
 import type { Id } from "@munchkin-tools/convex/convex/_generated/dataModel";
@@ -44,6 +44,11 @@ export function OnlinePlayerEdit() {
   const t = useT();
   const { roomId, playerId } = useParams<{ roomId: string; playerId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const cameFromCombat = searchParams.get("from") === "combat";
+  const backPath = cameFromCombat
+    ? `/online/${roomId}?tab=combat`
+    : `/online/${roomId}`;
   const requesterId = usePlayerIdentityStore((s) => s.playerId);
 
   const room = useQuery(
@@ -86,7 +91,7 @@ export function OnlinePlayerEdit() {
       <div className="min-h-dvh flex items-center justify-center p-6 text-center bg-background text-foreground">
         <div className="flex flex-col gap-4 items-center">
           <p className="text-muted-foreground">{t.heroEdit.heroNotFound}</p>
-          <Button onClick={() => navigate(`/online/${roomId}`)}>
+          <Button onClick={() => navigate(backPath)}>
             {t.heroEdit.backToParty}
           </Button>
         </div>
@@ -215,7 +220,7 @@ export function OnlinePlayerEdit() {
     <div className="min-h-dvh bg-background text-foreground">
       <Header
         title={t.heroEdit.editHero}
-        onBack={() => navigate(`/online/${roomId}`)}
+        onBack={() => navigate(backPath)}
         right={
           canRemove ? (
             <AlertDialog>

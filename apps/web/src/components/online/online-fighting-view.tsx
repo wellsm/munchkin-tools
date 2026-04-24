@@ -1,6 +1,6 @@
 import { Flag, Plus, Skull, UserMinus, X } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMutation } from "convex/react";
 import { api } from "@munchkin-tools/convex/convex/_generated/api";
 import type { Doc } from "@munchkin-tools/convex/convex/_generated/dataModel";
@@ -121,19 +121,20 @@ export function OnlineFightingView({ room }: Props) {
                 {result.partyTotal}
               </span>
               <div className="flex gap-2 mt-3 justify-center flex-wrap">
-                <div
+                <Link
+                  to={`/online/${room._id}/player/${main.playerId}?from=combat`}
+                  aria-label={main.name}
                   className={cn(
-                    "size-10 rounded-full flex items-center justify-center",
+                    "size-10 rounded-full flex items-center justify-center hover:ring-2 hover:ring-primary hover:ring-offset-2 hover:ring-offset-card transition",
                     main.playerId === requesterId &&
                       "ring-2 ring-primary ring-offset-2 ring-offset-card",
                   )}
                   style={{ backgroundColor: mainAvatarBg }}
-                  aria-hidden
                 >
                   <span className="font-munchkin text-lg text-background leading-none">
                     {avatarInitial(main.name)}
                   </span>
-                </div>
+                </Link>
                 {helpers.map((h) => {
                   const bg = playerAvatarColor({
                     id: h.playerId,
@@ -142,20 +143,21 @@ export function OnlineFightingView({ room }: Props) {
                   const isMeHelper = h.playerId === requesterId;
 
                   return (
-                    <div
+                    <Link
                       key={h.playerId}
+                      to={`/online/${room._id}/player/${h.playerId}?from=combat`}
+                      aria-label={h.name}
                       className={cn(
-                        "size-10 rounded-full flex items-center justify-center",
+                        "size-10 rounded-full flex items-center justify-center hover:ring-2 hover:ring-primary hover:ring-offset-2 hover:ring-offset-card transition",
                         isMeHelper &&
                           "ring-2 ring-primary ring-offset-2 ring-offset-card",
                       )}
                       style={{ backgroundColor: bg }}
-                      aria-hidden
                     >
                       <span className="font-munchkin text-lg text-background leading-none">
                         {avatarInitial(h.name)}
                       </span>
-                    </div>
+                    </Link>
                   );
                 })}
                 {canAddHelper && (
