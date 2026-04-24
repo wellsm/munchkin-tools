@@ -75,6 +75,13 @@ export const pt: Dictionary = {
     leaveRoomTitle: 'Sair da sala?',
     leaveRoomDescription: 'Você vai sair da sala.',
     leaveRoomHostDescription: 'Sair encerra a partida para todos. Isso não pode ser desfeito.',
+    requestPending: 'Aguardando aprovação do host…',
+    cancelRequest: 'Cancelar pedido',
+    joinRequestsTitle: 'Pedidos de entrada',
+    onlyHostCanAccept: 'Apenas o host pode aceitar',
+    approve: 'Aprovar',
+    deny: 'Recusar',
+    noJoinRequests: 'Nenhum pedido pendente.',
   },
   tabs: {
     heroes: 'Heróis',
@@ -188,5 +195,7 @@ export const pt: Dictionary = {
     removeAll: 'Remover todos',
     decrease: (label: string) => `Diminuir ${label}`,
     increase: (label: string) => `Aumentar ${label}`,
+    shareSection: 'Compartilhar',
+    shareRoom: 'Compartilhar sala',
   },
 }

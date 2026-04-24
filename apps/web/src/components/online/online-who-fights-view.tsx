@@ -5,6 +5,7 @@ import type { Doc } from "@munchkin-tools/convex/convex/_generated/dataModel";
 import { Header } from "@/components/app/header";
 import { useT } from "@/lib/i18n/store";
 import { usePlayerIdentityStore } from "@/lib/player-identity";
+import { NotificationButton } from "./notification-button";
 import { OnlineHeroRow } from "./online-hero-row";
 
 type Room = Doc<"rooms">;
@@ -40,7 +41,7 @@ export function OnlineWhoFightsView({ room }: Props) {
 
   return (
     <div className="h-full flex flex-col">
-      <Header title={t.combat.title} />
+      <Header title={t.combat.title} right={<NotificationButton room={room} />} />
       <div className="flex-1 min-h-0 overflow-auto p-4 mx-auto w-full">
         <div className="flex items-center gap-3 mb-3">
           <span className="text-base tracking-wider uppercase text-muted-foreground shrink-0">

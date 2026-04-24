@@ -73,6 +73,13 @@ export const en = {
     leaveRoomTitle: 'Leave the room?',
     leaveRoomDescription: "You'll leave the room.",
     leaveRoomHostDescription: 'Leaving ends the match for everyone. This cannot be undone.',
+    requestPending: 'Waiting for host approval…',
+    cancelRequest: 'Cancel request',
+    joinRequestsTitle: 'Join requests',
+    onlyHostCanAccept: 'Only the host can accept',
+    approve: 'Approve',
+    deny: 'Deny',
+    noJoinRequests: 'No pending requests.',
   },
   tabs: {
     heroes: 'Heroes',
@@ -185,6 +192,8 @@ export const en = {
     removeAll: 'Remove all',
     decrease: (label: string) => `Decrease ${label}`,
     increase: (label: string) => `Increase ${label}`,
+    shareSection: 'Share',
+    shareRoom: 'Share room',
   },
 }
 

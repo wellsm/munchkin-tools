@@ -31,6 +31,7 @@ const genderValidator = v.union(v.literal('male'), v.literal('female'), v.null()
 
 type Room = Doc<'rooms'>
 type RoomPlayer = Room['players'][number]
+type JoinRequest = Room['joinRequests'][number]
 
 async function generateUniqueRoomCode(ctx: MutationCtx): Promise<string> {
   for (let attempt = 0; attempt < MAX_CODE_GENERATION_ATTEMPTS; attempt++) {
@@ -136,6 +137,7 @@ export const createRoom = mutation({
         },
       ],
       combat: defaultCombat(),
+      joinRequests: [],
       maxPlayers: PRODUCT_MAX_PLAYERS,
       maxLevel: DEFAULT_MAX_LEVEL,
       started: false,
@@ -157,10 +159,6 @@ export const joinRoom = mutation({
 
     if (!room) {
       throw new Error('Room not found')
-    }
-
-    if (room.started) {
-      throw new Error('Match already started')
     }
 
     const trimmedName = args.name.trim()
@@ -189,6 +187,41 @@ export const joinRoom = mutation({
       return
     }
 
+    if (room.started) {
+      const pendingIndex = room.joinRequests.findIndex((r) => r.playerId === args.playerId)
+
+      if (pendingIndex >= 0) {
+        const current = room.joinRequests[pendingIndex]
+
+        if (current.name === trimmedName) {
+          return
+        }
+
+        const nextRequests = [...room.joinRequests]
+        nextRequests[pendingIndex] = { ...current, name: trimmedName }
+        await ctx.db.patch(args.roomId, { joinRequests: nextRequests })
+
+        return
+      }
+
+      if (room.joinRequests.length >= PRODUCT_MAX_PLAYERS) {
+        throw new Error('Too many pending join requests')
+      }
+
+      const nextRequests: JoinRequest[] = [
+        ...room.joinRequests,
+        {
+          playerId: args.playerId,
+          name: trimmedName,
+          requestedAt: Date.now(),
+        },
+      ]
+
+      await ctx.db.patch(args.roomId, { joinRequests: nextRequests })
+
+      return
+    }
+
     if (room.players.length >= room.maxPlayers) {
       throw new Error('Room is full')
     }
@@ -206,6 +239,85 @@ export const joinRoom = mutation({
     ]
 
     await ctx.db.patch(args.roomId, { players: nextPlayers })
+  },
+})
+
+export const approveJoinRequest = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    requesterId: v.string(),
+    targetPlayerId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    const requester = requireMember(room, args.requesterId)
+
+    if (!requester.isHost) {
+      throw new Error('Only the host can approve join requests')
+    }
+
+    const pending = room.joinRequests.find((r) => r.playerId === args.targetPlayerId)
+
+    if (!pending) {
+      return
+    }
+
+    if (room.players.length >= room.maxPlayers) {
+      throw new Error('Room is full')
+    }
+
+    const nextRequests = room.joinRequests.filter((r) => r.playerId !== args.targetPlayerId)
+    const nextPlayers: RoomPlayer[] = [
+      ...room.players,
+      {
+        playerId: pending.playerId,
+        name: pending.name,
+        joinedAt: Date.now(),
+        isHost: false,
+        ...defaultHero(),
+        color: AVATAR_COLORS[room.players.length % AVATAR_COLORS.length],
+      },
+    ]
+
+    await ctx.db.patch(args.roomId, {
+      players: nextPlayers,
+      joinRequests: nextRequests,
+    })
+  },
+})
+
+export const denyJoinRequest = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    requesterId: v.string(),
+    targetPlayerId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    const requester = room.players.find((p) => p.playerId === args.requesterId)
+    const isSelfCancel = args.requesterId === args.targetPlayerId
+
+    if (!isSelfCancel && (!requester || !requester.isHost)) {
+      throw new Error('Only the host can deny join requests')
+    }
+
+    const nextRequests = room.joinRequests.filter((r) => r.playerId !== args.targetPlayerId)
+
+    if (nextRequests.length === room.joinRequests.length) {
+      return
+    }
+
+    await ctx.db.patch(args.roomId, { joinRequests: nextRequests })
   },
 })
 
@@ -332,8 +444,13 @@ export const leaveRoom = mutation({
         room.combat.mainCombatantId === args.playerId ? null : room.combat.mainCombatantId,
       helperIds: room.combat.helperIds.filter((id) => id !== args.playerId),
     }
+    const nextRequests = room.joinRequests.filter((r) => r.playerId !== args.playerId)
 
-    await ctx.db.patch(args.roomId, { players: nextPlayers, combat: nextCombat })
+    await ctx.db.patch(args.roomId, {
+      players: nextPlayers,
+      combat: nextCombat,
+      joinRequests: nextRequests,
+    })
   },
 })
 

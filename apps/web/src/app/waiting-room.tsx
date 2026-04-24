@@ -4,8 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from 'convex/react'
 import { api } from '@munchkin-tools/convex/convex/_generated/api'
 import type { Id } from '@munchkin-tools/convex/convex/_generated/dataModel'
-import { ArrowLeft, Check, Crown, Flag, Palette, Share2, UserMinus, X } from 'lucide-react'
-import { QRCodeSVG } from 'qrcode.react'
+import { ArrowLeft, Check, Crown, Flag, Palette, UserMinus, X } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +20,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { OnlineGame } from '@/components/online/online-game'
+import { RoomShareCard } from '@/components/online/room-share-card'
 import { useT } from '@/lib/i18n/store'
 import { usePlayerIdentityStore } from '@/lib/player-identity'
 import { AVATAR_COLORS, avatarInitial, playerAvatarColor } from '@/lib/avatar-color'
@@ -37,7 +37,7 @@ export function WaitingRoom() {
   const removePlayer = useMutation(api.rooms.removePlayer)
   const updatePlayer = useMutation(api.rooms.updatePlayer)
   const playerId = usePlayerIdentityStore((s) => s.playerId)
-  const [copied, setCopied] = useState(false)
+  const denyJoinRequest = useMutation(api.rooms.denyJoinRequest)
   const [colorPickerOpen, setColorPickerOpen] = useState(false)
 
   if (!roomId) {
@@ -63,13 +63,36 @@ export function WaitingRoom() {
 
   const myPlayer = room.players.find((p) => p.playerId === playerId)
   const isMember = myPlayer !== undefined
+  const hasPendingRequest = room.joinRequests.some((r) => r.playerId === playerId)
 
   if (!isMember) {
-    if (room.started) {
+    if (hasPendingRequest) {
+      async function handleCancelRequest() {
+        await denyJoinRequest({
+          roomId: roomId as Id<'rooms'>,
+          requesterId: playerId,
+          targetPlayerId: playerId,
+        })
+        navigate('/')
+      }
+
       return (
         <div className="min-h-dvh flex flex-col items-center justify-center gap-4 p-6 text-center">
-          <p className="text-muted-foreground">{t.waitingRoom.alreadyStarted}</p>
-          <Button onClick={() => navigate('/')}>{t.waitingRoom.backHome}</Button>
+          <p className="text-xs tracking-widest uppercase text-muted-foreground">
+            {t.waitingRoom.roomCode}
+          </p>
+          <p className="font-munchkin text-5xl text-primary tabular-nums tracking-widest">
+            {room.code}
+          </p>
+          <p className="text-muted-foreground">
+            {t.waitingRoom.joinDescription(room.hostName)}
+          </p>
+          <p className="text-muted-foreground mt-4">
+            {t.waitingRoom.requestPending}
+          </p>
+          <Button variant="outline" onClick={handleCancelRequest}>
+            {t.waitingRoom.cancelRequest}
+          </Button>
         </div>
       )
     }
@@ -98,16 +121,6 @@ export function WaitingRoom() {
 
   async function handleStart() {
     await startMatch({ roomId: roomId as Id<'rooms'> })
-  }
-
-  async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(inviteUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      // Clipboard API can fail in insecure contexts; user can still scan the QR
-    }
   }
 
   function handleToggleReady() {
@@ -140,21 +153,7 @@ export function WaitingRoom() {
       </header>
 
       <main className="flex-1 overflow-auto max-w-md w-full mx-auto p-4 flex flex-col gap-4">
-        <section className="rounded-xl border border-border/60 bg-card/50 p-4 flex flex-col items-center gap-3">
-          <p className="text-xs tracking-widest uppercase text-muted-foreground">
-            {t.waitingRoom.roomCode}
-          </p>
-          <p className="font-munchkin text-6xl text-primary tabular-nums tracking-widest">
-            {room.code}
-          </p>
-          <div className="bg-white rounded-md p-3 mb-2">
-            <QRCodeSVG value={inviteUrl} size={160} aria-label={inviteUrl} />
-          </div>
-          <Button variant="outline" className="w-full" onClick={handleCopy}>
-            {copied ? <Check className="size-4" /> : <Share2 className="size-4" />}
-            {copied ? t.waitingRoom.copied : t.waitingRoom.invite}
-          </Button>
-        </section>
+        <RoomShareCard roomCode={room.code} inviteUrl={inviteUrl} />
 
         <section>
           <div className="flex items-center gap-3 mb-3">
