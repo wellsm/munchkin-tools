@@ -13,9 +13,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useT } from '@/lib/i18n/store'
 import { usePlayerIdentityStore } from '@/lib/player-identity'
+import { cn } from '@/lib/utils'
+
+type Mode = 'create' | 'join'
 
 type Props = {
   open: boolean
@@ -33,6 +35,7 @@ export function OnlineSheet({ open, onOpenChange }: Props) {
   const lastUsedName = usePlayerIdentityStore((s) => s.lastUsedName)
   const setLastUsedName = usePlayerIdentityStore((s) => s.setLastUsedName)
 
+  const [mode, setMode] = useState<Mode>('create')
   const [name, setName] = useState(lastUsedName ?? '')
   const [accessCode, setAccessCode] = useState('')
   const [roomCode, setRoomCode] = useState('')
@@ -119,14 +122,49 @@ export function OnlineSheet({ open, onOpenChange }: Props) {
           <SheetDescription>{t.online.description}</SheetDescription>
         </SheetHeader>
 
-        <Tabs defaultValue="create" className="p-4">
-          <TabsList className="grid grid-cols-2 w-full">
-            <TabsTrigger value="create">{t.online.createTab}</TabsTrigger>
-            <TabsTrigger value="join">{t.online.joinTab}</TabsTrigger>
-          </TabsList>
+        <div className="p-4">
+          <div
+            className="flex w-full rounded-md border border-border overflow-hidden"
+            role="tablist"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'create'}
+              onClick={() => {
+                setMode('create')
+                setError(null)
+              }}
+              className={cn(
+                'flex-1 px-4 py-2 text-sm font-medium font-munchkin transition-colors',
+                mode === 'create'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground',
+              )}
+            >
+              {t.online.createTab}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'join'}
+              onClick={() => {
+                setMode('join')
+                setError(null)
+              }}
+              className={cn(
+                'flex-1 px-4 py-2 text-sm font-medium font-munchkin transition-colors border-l border-border',
+                mode === 'join'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground',
+              )}
+            >
+              {t.online.joinTab}
+            </button>
+          </div>
 
-          <TabsContent value="create" className="mt-4">
-            <form onSubmit={handleCreate} className="flex flex-col gap-4">
+          {mode === 'create' ? (
+            <form onSubmit={handleCreate} className="flex flex-col gap-4 mt-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="create-name">{t.online.yourName}</Label>
                 <Input
@@ -162,10 +200,8 @@ export function OnlineSheet({ open, onOpenChange }: Props) {
                 </Button>
               </div>
             </form>
-          </TabsContent>
-
-          <TabsContent value="join" className="mt-4">
-            <form onSubmit={handleJoin} className="flex flex-col gap-4">
+          ) : (
+            <form onSubmit={handleJoin} className="flex flex-col gap-4 mt-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="join-code">{t.online.roomCode}</Label>
                 <Input
@@ -199,8 +235,8 @@ export function OnlineSheet({ open, onOpenChange }: Props) {
                 </Button>
               </div>
             </form>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   )
