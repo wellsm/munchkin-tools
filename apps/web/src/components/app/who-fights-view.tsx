@@ -29,7 +29,7 @@ export function WhoFightsView() {
 
   return (
     <div className="h-full flex flex-col">
-      <Header title={t.combat.title} />
+      <Header title={t.combat.title} onHome={() => navigate("/")} />
       <div className="flex-1 min-h-0 flex items-center justify-center p-6 text-center">
         <p className="font-munchkin text-2xl text-muted-foreground">
           {t.combat.whoFights}

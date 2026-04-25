@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/sheet'
 import { useT } from '@/lib/i18n/store'
 import { usePlayerIdentityStore } from '@/lib/player-identity'
+import { useRecentRoomsStore } from '@/lib/recent-rooms-store'
 
 type Props = {
   open: boolean
@@ -29,6 +30,7 @@ export function JoinRoomSheet({ open, onOpenChange }: Props) {
   const playerId = usePlayerIdentityStore((s) => s.playerId)
   const lastUsedName = usePlayerIdentityStore((s) => s.lastUsedName)
   const setLastUsedName = usePlayerIdentityStore((s) => s.setLastUsedName)
+  const rememberRoom = useRecentRoomsStore((s) => s.remember)
 
   const [roomCode, setRoomCode] = useState('')
   const [name, setName] = useState(lastUsedName ?? '')
@@ -61,6 +63,18 @@ export function JoinRoomSheet({ open, onOpenChange }: Props) {
       }
 
       await joinRoom({ roomId: foundId, playerId, name })
+
+      const room = await convex.query(api.rooms.getRoom, { roomId: foundId })
+
+      if (room) {
+        rememberRoom({
+          roomId: foundId,
+          code: room.code,
+          hostName: room.hostName,
+          lastJoinedAt: Date.now(),
+        })
+      }
+
       setLastUsedName(name)
       onOpenChange(false)
       navigate(`/online/${foundId}`)

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useMutation } from 'convex/react'
+import { useConvex, useMutation } from 'convex/react'
 import { api } from '@munchkin-tools/convex/convex/_generated/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,7 @@ import {
 import { useAccessStore } from '@/lib/access-store'
 import { useT } from '@/lib/i18n/store'
 import { usePlayerIdentityStore } from '@/lib/player-identity'
+import { useRecentRoomsStore } from '@/lib/recent-rooms-store'
 
 type Props = {
   open: boolean
@@ -25,12 +26,14 @@ type Props = {
 export function CreateRoomSheet({ open, onOpenChange }: Props) {
   const t = useT()
   const navigate = useNavigate()
+  const convex = useConvex()
   const createRoom = useMutation(api.rooms.createRoom)
   const playerId = usePlayerIdentityStore((s) => s.playerId)
   const lastUsedName = usePlayerIdentityStore((s) => s.lastUsedName)
   const setLastUsedName = usePlayerIdentityStore((s) => s.setLastUsedName)
   const storedAccessCode = useAccessStore((s) => s.code)
   const clearAccessCode = useAccessStore((s) => s.clear)
+  const rememberRoom = useRecentRoomsStore((s) => s.remember)
 
   const [name, setName] = useState(lastUsedName ?? '')
   const [error, setError] = useState<string | null>(null)
@@ -59,6 +62,16 @@ export function CreateRoomSheet({ open, onOpenChange }: Props) {
       }
 
       const roomId = await createRoom(args)
+      const room = await convex.query(api.rooms.getRoom, { roomId })
+
+      if (room) {
+        rememberRoom({
+          roomId,
+          code: room.code,
+          hostName: room.hostName,
+          lastJoinedAt: Date.now(),
+        })
+      }
 
       setLastUsedName(name)
       onOpenChange(false)

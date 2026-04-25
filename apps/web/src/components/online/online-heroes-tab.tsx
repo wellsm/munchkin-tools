@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Share2 } from "lucide-react";
 import type { Doc } from "@munchkin-tools/convex/convex/_generated/dataModel";
 import { Header } from "@/components/app/header";
@@ -17,6 +18,7 @@ type Props = {
 
 export function OnlineHeroesTab({ room }: Props) {
   const t = useT();
+  const navigate = useNavigate();
   const viewerId = usePlayerIdentityStore((s) => s.playerId);
   const [shareOpen, setShareOpen] = useState(false);
   const players = room.players;
@@ -32,7 +34,11 @@ export function OnlineHeroesTab({ room }: Props) {
 
   return (
     <div className="relative h-full w-full flex flex-col">
-      <Header title={t.heroes.title} right={<NotificationButton room={room} />} />
+      <Header
+        title={t.heroes.title}
+        onHome={() => navigate("/")}
+        right={<NotificationButton room={room} />}
+      />
       <div className="flex-1 min-h-0 overflow-auto p-4 pb-24">
         <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {players.map((p) => (

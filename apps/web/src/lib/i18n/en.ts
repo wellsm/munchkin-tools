@@ -5,6 +5,7 @@ export const en = {
     remove: 'Remove',
     back: 'Back',
     add: 'Add',
+    home: 'Home',
   },
   landing: {
     title: 'Munchkin Tools',
@@ -14,6 +15,9 @@ export const en = {
     localSection: 'Local',
     onlineSection: 'Online',
     createMatch: 'Create match',
+    continueMatch: 'Continue match',
+    recentRooms: 'Recent rooms',
+    forgetRoomAria: (code: string) => `Forget room ${code}`,
   },
   whoami: {
     trigger: 'Who am I?',

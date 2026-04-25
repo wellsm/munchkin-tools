@@ -7,6 +7,7 @@ export const pt: Dictionary = {
     remove: 'Remover',
     back: 'Voltar',
     add: 'Adicionar',
+    home: 'Início',
   },
   landing: {
     title: 'Munchkin Tools',
@@ -16,6 +17,9 @@ export const pt: Dictionary = {
     localSection: 'Local',
     onlineSection: 'Online',
     createMatch: 'Criar partida',
+    continueMatch: 'Continuar partida',
+    recentRooms: 'Salas recentes',
+    forgetRoomAria: (code: string) => `Esquecer sala ${code}`,
   },
   whoami: {
     trigger: 'Quem sou eu?',

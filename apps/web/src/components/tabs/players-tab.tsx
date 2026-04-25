@@ -31,7 +31,7 @@ export function PlayersTab() {
 
   return (
     <div className="relative h-full w-full flex flex-col">
-      <Header title={t.heroes.title} />
+      <Header title={t.heroes.title} onHome={() => navigate("/")} />
       <div className="flex-1 min-h-0 overflow-auto p-4 pb-24">
         <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {players.map((p) => (

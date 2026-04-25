@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Coffee, Globe, Loader2, LogIn, MessageSquare, Plus, QrCode } from 'lucide-react'
+import { Coffee, DoorOpen, Globe, History, Loader2, LogIn, MessageSquare, Plus, QrCode, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CreateRoomSheet } from '@/components/app/create-room-sheet'
 import { JoinRoomSheet } from '@/components/app/join-room-sheet'
@@ -11,6 +11,8 @@ import { WhoAmISheet } from '@/components/app/whoami-sheet'
 import { avatarColor, avatarInitial } from '@/lib/avatar-color'
 import { useI18nStore, useT, type Locale } from '@/lib/i18n/store'
 import { usePlayerIdentityStore } from '@/lib/player-identity'
+import { useRecentRoomsStore } from '@/lib/recent-rooms-store'
+import { useMunchkinStore } from '@/lib/store'
 import { useOnlineAccess } from '@/lib/use-online-access'
 import { useSuggestionsVisible } from '@/lib/use-suggestions-visible'
 import { useSupportVisible } from '@/lib/use-support-visible'
@@ -32,6 +34,9 @@ export function Landing() {
   const suggestionsVisible = useSuggestionsVisible()
   const locale = useI18nStore((s) => s.locale)
   const setLocale = useI18nStore((s) => s.setLocale)
+  const offlinePlayerCount = useMunchkinStore((s) => s.players.length)
+  const recentRooms = useRecentRoomsStore((s) => s.rooms)
+  const forgetRoom = useRecentRoomsStore((s) => s.forget)
 
   const [gateOpen, setGateOpen] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
@@ -100,8 +105,17 @@ export function Landing() {
             className="h-14 text-base"
             onClick={() => navigate('/offline')}
           >
-            <Plus className="size-5" />
-            {t.landing.createMatch}
+            {offlinePlayerCount > 0 ? (
+              <>
+                <DoorOpen className="size-5" />
+                {t.landing.continueMatch}
+              </>
+            ) : (
+              <>
+                <Plus className="size-5" />
+                {t.landing.createMatch}
+              </>
+            )}
           </Button>
         </fieldset>
 
@@ -138,6 +152,44 @@ export function Landing() {
                 <QrCode className="size-5" />
                 {t.landing.scanQr}
               </Button>
+
+              {recentRooms.length > 0 && (
+                <div className="flex flex-col gap-1.5 pt-2">
+                  <span className="flex items-center gap-2 text-xs tracking-wider uppercase text-muted-foreground px-1">
+                    <History className="size-3.5" />
+                    {t.landing.recentRooms}
+                  </span>
+                  <ul className="flex flex-col gap-1">
+                    {recentRooms.map((r) => (
+                      <li
+                        key={r.roomId}
+                        className="flex items-center gap-1 rounded-lg border border-border/60 bg-card/50 hover:bg-accent transition-colors"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/online/${r.roomId}`)}
+                          className="flex-1 min-w-0 flex items-center justify-between gap-2 px-3 py-2 text-left"
+                        >
+                          <span className="font-munchkin text-base tabular-nums tracking-widest truncate">
+                            {r.code}
+                          </span>
+                          <span className="text-xs text-muted-foreground truncate">
+                            {r.hostName}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => forgetRoom(r.roomId)}
+                          aria-label={t.landing.forgetRoomAria(r.code)}
+                          className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <X className="size-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </>
           ) : (
             <Button

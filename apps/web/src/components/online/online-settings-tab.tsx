@@ -35,6 +35,7 @@ import { useI18nStore, useT, type Locale } from '@/lib/i18n/store'
 import { applyTheme, getStoredTheme, type Theme } from '@/lib/theme'
 import { isWakeLockSupported, useWakeLockStore } from '@/lib/wake-lock'
 import { usePlayerIdentityStore } from '@/lib/player-identity'
+import { useRecentRoomsStore } from '@/lib/recent-rooms-store'
 
 type Room = Doc<'rooms'>
 
@@ -51,6 +52,7 @@ export function OnlineSettingsTab({ room }: Props) {
   const t = useT()
   const navigate = useNavigate()
   const playerId = usePlayerIdentityStore((s) => s.playerId)
+  const forgetRoom = useRecentRoomsStore((s) => s.forget)
   const setMaxPlayers = useMutation(api.rooms.setMaxPlayers)
   const setMaxLevel = useMutation(api.rooms.setMaxLevel)
   const leaveRoom = useMutation(api.rooms.leaveRoom)
@@ -81,12 +83,17 @@ export function OnlineSettingsTab({ room }: Props) {
 
   async function handleLeave() {
     await leaveRoom({ roomId, playerId })
+    forgetRoom(roomId)
     navigate('/')
   }
 
   return (
     <div className="h-full flex flex-col">
-      <Header title={t.settings.title} right={<NotificationButton room={room} />} />
+      <Header
+        title={t.settings.title}
+        onHome={() => navigate('/')}
+        right={<NotificationButton room={room} />}
+      />
       <div className="flex-1 min-h-0 overflow-auto p-4 pb-8 max-w-md mx-auto w-full flex flex-col gap-4">
         {isHost && (
           <div>

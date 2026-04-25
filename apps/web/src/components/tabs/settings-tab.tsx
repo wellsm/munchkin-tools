@@ -1,5 +1,6 @@
 import { Coffee, MessageSquare, Moon, Sun, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/app/header";
 import { SectionLabel } from "@/components/app/section-label";
 import { StepperCard } from "@/components/app/stepper-card";
@@ -34,6 +35,7 @@ import { isWakeLockSupported, useWakeLockStore } from "@/lib/wake-lock";
 
 export function SettingsTab() {
   const t = useT();
+  const navigate = useNavigate();
   const players = useMunchkinStore((s) => s.players);
   const settings = useMunchkinStore((s) => s.settings);
   const setMaxPlayers = useMunchkinStore((s) => s.setMaxPlayers);
@@ -61,7 +63,7 @@ export function SettingsTab() {
 
   return (
     <div className="h-full flex flex-col">
-      <Header title={t.settings.title} />
+      <Header title={t.settings.title} onHome={() => navigate("/")} />
       <div className="flex-1 min-h-0 overflow-auto p-4 pb-8 max-w-md mx-auto w-full flex flex-col gap-4">
         <div>
           <SectionLabel>{t.settings.party}</SectionLabel>
