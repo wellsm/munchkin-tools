@@ -123,6 +123,8 @@ export const pt: Dictionary = {
     lvlShort: 'NV',
     gearShort: 'ITENS',
     strShort: 'FOR',
+    sortByLevel: 'Por nível',
+    sortByStrength: 'Por força',
   },
   heroEdit: {
     newHero: 'Novo Heroi',

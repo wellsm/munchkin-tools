@@ -6,6 +6,7 @@ import { Header } from "@/components/app/header";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n/store";
 import { usePlayerIdentityStore } from "@/lib/player-identity";
+import { sortPlayers, type SortBy } from "@/lib/sort-players";
 import { NotificationButton } from "./notification-button";
 import { OnlineHeroRow } from "./online-hero-row";
 import { ShareSheet } from "./share-sheet";
@@ -21,8 +22,14 @@ export function OnlineHeroesTab({ room }: Props) {
   const navigate = useNavigate();
   const viewerId = usePlayerIdentityStore((s) => s.playerId);
   const [shareOpen, setShareOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<SortBy>(null);
   const players = room.players;
+  const sorted = sortPlayers(players, sortBy);
   const inviteUrl = `${window.location.origin}/online/${room._id}`;
+
+  function toggleSort(next: 'level' | 'strength') {
+    setSortBy((prev) => (prev === next ? null : next));
+  }
 
   if (players.length === 0) {
     return (
@@ -40,8 +47,24 @@ export function OnlineHeroesTab({ room }: Props) {
         right={<NotificationButton room={room} />}
       />
       <div className="flex-1 min-h-0 overflow-auto p-4 pb-24">
+        <div className="flex gap-2 mb-3">
+          <Button
+            size="sm"
+            variant={sortBy === 'level' ? 'default' : 'outline'}
+            onClick={() => toggleSort('level')}
+          >
+            {t.heroes.sortByLevel}
+          </Button>
+          <Button
+            size="sm"
+            variant={sortBy === 'strength' ? 'default' : 'outline'}
+            onClick={() => toggleSort('strength')}
+          >
+            {t.heroes.sortByStrength}
+          </Button>
+        </div>
         <ul className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {players.map((p) => (
+          {sorted.map((p) => (
             <li key={p.playerId}>
               <OnlineHeroRow
                 player={p}

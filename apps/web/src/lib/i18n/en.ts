@@ -121,6 +121,8 @@ export const en = {
     lvlShort: 'LVL',
     gearShort: 'GEAR',
     strShort: 'STR',
+    sortByLevel: 'By level',
+    sortByStrength: 'By strength',
   },
   heroEdit: {
     newHero: 'New Hero',
