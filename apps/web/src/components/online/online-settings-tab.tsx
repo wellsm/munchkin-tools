@@ -55,6 +55,7 @@ export function OnlineSettingsTab({ room }: Props) {
   const forgetRoom = useRecentRoomsStore((s) => s.forget)
   const setMaxPlayers = useMutation(api.rooms.setMaxPlayers)
   const setMaxLevel = useMutation(api.rooms.setMaxLevel)
+  const setSpectator = useMutation(api.rooms.setSpectator)
   const leaveRoom = useMutation(api.rooms.leaveRoom)
   const locale = useI18nStore((s) => s.locale)
   const setLocale = useI18nStore((s) => s.setLocale)
@@ -119,6 +120,45 @@ export function OnlineSettingsTab({ room }: Props) {
                 increaseDisabled={room.maxLevel >= MAX_LEVEL_CEILING}
                 hint={t.settings.maxLevelHint}
               />
+            </div>
+          </div>
+        )}
+
+        {isHost && (
+          <div>
+            <SectionLabel>{t.spectators.section}</SectionLabel>
+            <div className="flex flex-col gap-2 mb-2">
+              <p className="text-xs text-muted-foreground px-1">
+                {t.spectators.description}
+              </p>
+              <ul className="flex flex-col gap-2">
+                {room.players.map((p) => {
+                  const isSpec = p.isSpectator ?? false
+
+                  return (
+                    <li
+                      key={p.playerId}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/50 px-4 py-3"
+                    >
+                      <span className="font-munchkin text-lg truncate">
+                        {p.name}
+                      </span>
+                      <Switch
+                        checked={isSpec}
+                        onCheckedChange={(value) =>
+                          setSpectator({
+                            roomId,
+                            requesterId: playerId,
+                            targetId: p.playerId,
+                            value,
+                          })
+                        }
+                        aria-label={t.spectators.toggleAria(p.name)}
+                      />
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           </div>
         )}

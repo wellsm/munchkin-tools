@@ -610,6 +610,52 @@ export const updatePlayer = mutation({
   },
 })
 
+export const setSpectator = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    requesterId: v.string(),
+    targetId: v.string(),
+    value: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    const requester = requireMember(room, args.requesterId)
+
+    if (!requester.isHost) {
+      throw new Error('Only the host can change spectator status')
+    }
+
+    const targetIndex = room.players.findIndex((p) => p.playerId === args.targetId)
+
+    if (targetIndex < 0) {
+      throw new Error('Target player not found')
+    }
+
+    const next = [...room.players]
+    next[targetIndex] = { ...next[targetIndex], isSpectator: args.value }
+
+    // Removing a spectator from combat: if they were main or helper, drop them.
+    let combat = room.combat
+
+    if (args.value) {
+      const isMain = combat.mainCombatantId === args.targetId
+
+      if (isMain) {
+        combat = { ...combat, mainCombatantId: null, helperIds: [] }
+      } else if (combat.helperIds.includes(args.targetId)) {
+        combat = { ...combat, helperIds: combat.helperIds.filter((id) => id !== args.targetId) }
+      }
+    }
+
+    await ctx.db.patch(args.roomId, { players: next, combat })
+  },
+})
+
 export const setMainCombatant = mutation({
   args: {
     roomId: v.id('rooms'),
@@ -630,10 +676,14 @@ export const setMainCombatant = mutation({
     }
 
     if (args.targetId !== null) {
-      const exists = room.players.some((p) => p.playerId === args.targetId)
+      const target = room.players.find((p) => p.playerId === args.targetId)
 
-      if (!exists) {
+      if (!target) {
         throw new Error('Target player not found')
+      }
+
+      if (target.isSpectator) {
+        throw new Error('Spectators cannot fight')
       }
     }
 
@@ -671,10 +721,14 @@ export const addHelper = mutation({
       throw new Error('Only the host can add a helper')
     }
 
-    const helperExists = room.players.some((p) => p.playerId === args.helperId)
+    const helperPlayer = room.players.find((p) => p.playerId === args.helperId)
 
-    if (!helperExists) {
+    if (!helperPlayer) {
       throw new Error('Helper not found in this room')
+    }
+
+    if (helperPlayer.isSpectator) {
+      throw new Error('Spectators cannot fight')
     }
 
     if (room.combat.mainCombatantId === args.helperId) {

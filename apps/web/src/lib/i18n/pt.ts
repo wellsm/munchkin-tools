@@ -66,6 +66,11 @@ export const pt: Dictionary = {
     errorRoomNotFound: 'Nenhuma sala encontrada com esse código.',
     errorInvalidAccessCode: 'Código de acesso inválido.',
   },
+  spectators: {
+    section: 'Espectadores',
+    description: 'Espectadores ficam na sala e (se host) podem controlar a partida, mas não aparecem nas listas de heróis e combate.',
+    toggleAria: (name: string) => `Alternar espectador de ${name}`,
+  },
   waitingRoom: {
     title: 'Sala de Espera',
     players: 'Jogadores',

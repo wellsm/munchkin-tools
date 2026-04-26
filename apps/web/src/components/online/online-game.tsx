@@ -24,7 +24,7 @@ type TabValue = (typeof VALID_TABS)[number];
 export function OnlineGame({ room }: Props) {
   const t = useT();
   const [searchParams, setSearchParams] = useSearchParams();
-  const playerCount = room.players.length;
+  const playerCount = room.players.filter((p) => !p.isSpectator).length;
   const canFight = playerCount >= MIN_HEROES_FOR_COMBAT;
 
   const rawTab = searchParams.get("tab");

@@ -70,7 +70,7 @@ export function OnlineMainCombatantPickerSheet({ room, open, onOpenChange }: Pro
           )}
 
           <ul className="flex flex-col gap-2">
-            {room.players.map((p) => {
+            {room.players.filter((p) => !p.isSpectator).map((p) => {
               const avatarBg = playerAvatarColor({
                 id: p.playerId,
                 color: p.color ?? undefined,

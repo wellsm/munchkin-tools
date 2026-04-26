@@ -1,25 +1,26 @@
 import { Plus } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/app/header";
 import { HeroRow } from "@/components/app/hero-row";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/lib/i18n/store";
 import { useMunchkinStore } from "@/lib/store";
-import { sortPlayers, type SortBy } from "@/lib/sort-players";
+import { sortPlayers } from "@/lib/sort-players";
+import { useSortPreferenceStore } from "@/lib/sort-preference-store";
 
 export function PlayersTab() {
   const t = useT();
   const navigate = useNavigate();
   const players = useMunchkinStore((s) => s.players);
   const maxPlayers = useMunchkinStore((s) => s.settings.maxPlayers);
-  const [sortBy, setSortBy] = useState<SortBy>(null);
+  const sortBy = useSortPreferenceStore((s) => s.sortBy);
+  const setSortBy = useSortPreferenceStore((s) => s.setSortBy);
 
   const canAdd = players.length < maxPlayers;
   const sorted = sortPlayers(players, sortBy);
 
   function toggleSort(next: 'level' | 'strength') {
-    setSortBy((prev) => (prev === next ? null : next));
+    setSortBy(sortBy === next ? null : next);
   }
 
   function goToAdd() {

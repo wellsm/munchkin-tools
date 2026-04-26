@@ -52,6 +52,7 @@ export default defineSchema({
         joinedAt: v.number(),
         isHost: v.boolean(),
         ready: v.boolean(),
+        isSpectator: v.optional(v.boolean()),
       }),
     ),
     combat: v.object({

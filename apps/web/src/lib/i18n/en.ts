@@ -64,6 +64,11 @@ export const en = {
     errorRoomNotFound: 'Room not found with that code.',
     errorInvalidAccessCode: 'Invalid access code.',
   },
+  spectators: {
+    section: 'Spectators',
+    description: 'Spectators stay in the room and (if host) can control the game, but do not appear in heroes or combat lists.',
+    toggleAria: (name: string) => `Toggle spectator for ${name}`,
+  },
   waitingRoom: {
     title: 'Waiting Room',
     players: 'Players',

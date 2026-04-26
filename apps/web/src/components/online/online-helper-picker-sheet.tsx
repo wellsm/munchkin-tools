@@ -45,6 +45,7 @@ export function OnlineHelperPickerSheet({ room, open, onOpenChange }: Props) {
   const { players, combat } = room;
   const available = players.filter(
     (p) =>
+      !p.isSpectator &&
       p.playerId !== combat.mainCombatantId &&
       !combat.helperIds.includes(p.playerId),
   );
