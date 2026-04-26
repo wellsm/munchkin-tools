@@ -121,7 +121,7 @@ export function OnlineFightingView({ room }: Props) {
   const isHost = me?.isHost ?? false;
   const isMain = main.playerId === requesterId;
   const isHelper = combat.helperIds.includes(requesterId);
-  const canControl = isMain || isHelper;
+  const canControl = isMain || isHelper || isHost;
   const canAddHelper = isHost && helpers.length < 1;
 
   function runMutation<T>(fn: () => Promise<T>) {
