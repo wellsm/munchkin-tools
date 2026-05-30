@@ -96,13 +96,15 @@ function clampInt(value: number, min: number, max: number): number {
 
 // Combat controls (Monster Level, Modifiers, Remove Helper, Fled, Finish) can
 // be operated by active participants (main combatant, current helper) OR by
-// the host — hosts often referee from outside the fight.
+// the host — hosts often referee from outside the fight. When the room has
+// open combat enabled, the player who started the combat can also control it.
 function requireCombatControl(room: Room, requesterId: string): void {
   const requester = requireMember(room, requesterId)
   const isMain = room.combat.mainCombatantId === requesterId
   const isHelper = room.combat.helperIds.includes(requesterId)
+  const isStarter = room.openCombat === true && room.combat.startedById === requesterId
 
-  if (!isMain && !isHelper && !requester.isHost) {
+  if (!isMain && !isHelper && !requester.isHost && !isStarter) {
     throw new Error('Only the fighter, their helper, or the host can control this combat')
   }
 }
