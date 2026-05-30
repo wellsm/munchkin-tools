@@ -111,6 +111,8 @@ export function OnlineSettingsTab({ room }: Props) {
                 }
                 decreaseDisabled={decreaseMaxPlayersDisabled}
                 increaseDisabled={increaseMaxPlayersDisabled}
+                min={Math.max(MIN_MAX_PLAYERS, playerCount)}
+                max={PRODUCT_MAX_PLAYERS}
                 hint={t.settings.maxHeroesHint(playerCount)}
               />
               <StepperCard
@@ -121,6 +123,8 @@ export function OnlineSettingsTab({ room }: Props) {
                 }
                 decreaseDisabled={room.maxLevel <= MIN_LEVEL}
                 increaseDisabled={room.maxLevel >= MAX_LEVEL_CEILING}
+                min={MIN_LEVEL}
+                max={MAX_LEVEL_CEILING}
                 hint={t.settings.maxLevelHint}
               />
               <section className="rounded-xl border border-border/60 bg-card/50 p-4 flex flex-col gap-2">

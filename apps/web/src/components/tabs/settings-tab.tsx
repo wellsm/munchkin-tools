@@ -74,6 +74,8 @@ export function SettingsTab() {
               onChange={setMaxPlayers}
               decreaseDisabled={decreaseMaxPlayersDisabled}
               increaseDisabled={increaseMaxPlayersDisabled}
+              min={Math.max(MIN_MAX_PLAYERS, players.length)}
+              max={PRODUCT_MAX_PLAYERS}
               hint={t.settings.maxHeroesHint(players.length)}
             />
             <StepperCard
@@ -82,6 +84,8 @@ export function SettingsTab() {
               onChange={setMaxLevel}
               decreaseDisabled={settings.maxLevel <= 1}
               increaseDisabled={settings.maxLevel >= 99}
+              min={1}
+              max={99}
               hint={t.settings.maxLevelHint}
             />
           </div>

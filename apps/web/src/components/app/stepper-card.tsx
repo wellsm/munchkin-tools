@@ -1,4 +1,5 @@
 import { Minus, Plus } from 'lucide-react'
+import { EditableNumber } from '@/components/app/editable-number'
 
 type Props = {
   label: string
@@ -6,6 +7,9 @@ type Props = {
   onChange: (n: number) => void
   decreaseDisabled?: boolean
   increaseDisabled?: boolean
+  editDisabled?: boolean
+  min?: number
+  max?: number
   hint?: string
 }
 
@@ -15,6 +19,9 @@ export function StepperCard({
   onChange,
   decreaseDisabled,
   increaseDisabled,
+  editDisabled,
+  min,
+  max,
   hint,
 }: Props) {
   return (
@@ -33,9 +40,15 @@ export function StepperCard({
           >
             <Minus className="size-4" />
           </button>
-          <span className="px-2 py-2 font-munchkin text-primary text-xl tabular-nums min-w-8 text-center">
-            {value}
-          </span>
+          <EditableNumber
+            value={value}
+            onChange={onChange}
+            min={min}
+            max={max}
+            disabled={editDisabled}
+            ariaLabel={label}
+            className="px-2 py-2 font-munchkin text-primary text-xl tabular-nums min-w-8 text-center hover:text-primary/80 transition-colors"
+          />
           <button
             type="button"
             aria-label={`Increase ${label}`}

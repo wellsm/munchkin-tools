@@ -240,6 +240,8 @@ export function OnlineFightingView({ room }: Props) {
           onChange={setLocalMonsterLevel}
           decreaseDisabled={!canControl || localMonsterLevel <= 0}
           increaseDisabled={!canControl}
+          editDisabled={!canControl}
+          min={0}
         />
         <StepperCard
           label={t.combat.partyModifiers}
@@ -247,6 +249,7 @@ export function OnlineFightingView({ room }: Props) {
           onChange={setLocalPartyMod}
           decreaseDisabled={!canControl}
           increaseDisabled={!canControl}
+          editDisabled={!canControl}
         />
         <StepperCard
           label={t.combat.monsterModifiers}
@@ -254,6 +257,7 @@ export function OnlineFightingView({ room }: Props) {
           onChange={setLocalMonsterMod}
           decreaseDisabled={!canControl}
           increaseDisabled={!canControl}
+          editDisabled={!canControl}
         />
 
         {hasHelper && (
