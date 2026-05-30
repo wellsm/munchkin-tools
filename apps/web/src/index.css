@@ -148,4 +148,13 @@ body {
   html {
     @apply font-sans;
   }
+
+  /* Bigger base font on TV-class viewports so heroes/combat/settings scale
+     up everywhere without per-component xl: prefixes. Tailwind's text/spacing
+     scale is rem-based — bumping the root font-size multiplies all of it. */
+  @media (min-width: 1280px) {
+    html {
+      font-size: 22px;
+    }
+  }
 }

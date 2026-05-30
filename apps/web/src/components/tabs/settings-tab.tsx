@@ -64,7 +64,7 @@ export function SettingsTab() {
   return (
     <div className="h-full flex flex-col">
       <Header title={t.settings.title} onHome={() => navigate("/")} />
-      <div className="flex-1 min-h-0 overflow-auto p-4 pb-8 max-w-md mx-auto w-full flex flex-col gap-4">
+      <div className="flex-1 min-h-0 overflow-auto p-4 pb-8 max-w-md lg:max-w-3xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-4 content-start">
         <div>
           <SectionLabel>{t.settings.party}</SectionLabel>
           <div className="flex flex-col gap-3 mb-6">

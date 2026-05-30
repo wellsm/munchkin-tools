@@ -44,7 +44,10 @@ export function OnlineWhoFightsView({ room }: Props) {
     }
   }
 
-  if (!isHost) {
+  const canStart =
+    isHost || (room.openCombat === true && viewer != null && !viewer.isSpectator);
+
+  if (!canStart) {
     return (
       <div className="h-full flex flex-col">
         <Header

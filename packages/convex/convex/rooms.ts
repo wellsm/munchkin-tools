@@ -72,6 +72,7 @@ function defaultCombat(): Room['combat'] {
     partyModifier: 0,
     monsterLevel: 0,
     monsterModifier: 0,
+    startedById: null,
   }
 }
 
@@ -95,13 +96,15 @@ function clampInt(value: number, min: number, max: number): number {
 
 // Combat controls (Monster Level, Modifiers, Remove Helper, Fled, Finish) can
 // be operated by active participants (main combatant, current helper) OR by
-// the host — hosts often referee from outside the fight.
+// the host — hosts often referee from outside the fight. When the room has
+// open combat enabled, the player who started the combat can also control it.
 function requireCombatControl(room: Room, requesterId: string): void {
   const requester = requireMember(room, requesterId)
   const isMain = room.combat.mainCombatantId === requesterId
   const isHelper = room.combat.helperIds.includes(requesterId)
+  const isStarter = room.openCombat === true && room.combat.startedById === requesterId && !requester.isSpectator
 
-  if (!isMain && !isHelper && !requester.isHost) {
+  if (!isMain && !isHelper && !requester.isHost && !isStarter) {
     throw new Error('Only the fighter, their helper, or the host can control this combat')
   }
 }
@@ -460,6 +463,7 @@ export const leaveRoom = mutation({
       mainCombatantId:
         room.combat.mainCombatantId === args.playerId ? null : room.combat.mainCombatantId,
       helperIds: room.combat.helperIds.filter((id) => id !== args.playerId),
+      startedById: room.combat.startedById === args.playerId ? null : room.combat.startedById,
     }
     const nextRequests = room.joinRequests.filter((r) => r.playerId !== args.playerId)
 
@@ -525,6 +529,29 @@ export const setMaxLevel = mutation({
       return { ...p, level: nextMax }
     })
     await ctx.db.patch(args.roomId, { maxLevel: nextMax, players: demotedPlayers })
+  },
+})
+
+export const setOpenCombat = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    requesterId: v.string(),
+    value: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    const requester = requireMember(room, args.requesterId)
+
+    if (!requester.isHost) {
+      throw new Error('Only the host can change open combat')
+    }
+
+    await ctx.db.patch(args.roomId, { openCombat: args.value })
   },
 })
 
@@ -650,6 +677,10 @@ export const setSpectator = mutation({
       } else if (combat.helperIds.includes(args.targetId)) {
         combat = { ...combat, helperIds: combat.helperIds.filter((id) => id !== args.targetId) }
       }
+
+      if (combat.startedById === args.targetId) {
+        combat = { ...combat, startedById: null }
+      }
     }
 
     await ctx.db.patch(args.roomId, { players: next, combat })
@@ -671,7 +702,7 @@ export const setMainCombatant = mutation({
 
     const requester = requireMember(room, args.requesterId)
 
-    if (!requester.isHost) {
+    if (!requester.isHost && !(room.openCombat === true && !requester.isSpectator)) {
       throw new Error('Only the host can set the main combatant')
     }
 
@@ -689,7 +720,7 @@ export const setMainCombatant = mutation({
 
     if (args.targetId === null) {
       await ctx.db.patch(args.roomId, {
-        combat: { ...room.combat, mainCombatantId: null, helperIds: [] },
+        combat: { ...room.combat, mainCombatantId: null, helperIds: [], startedById: null },
       })
 
       return
@@ -697,7 +728,12 @@ export const setMainCombatant = mutation({
 
     const nextHelpers = room.combat.helperIds.filter((id) => id !== args.targetId)
     await ctx.db.patch(args.roomId, {
-      combat: { ...room.combat, mainCombatantId: args.targetId, helperIds: nextHelpers },
+      combat: {
+        ...room.combat,
+        mainCombatantId: args.targetId,
+        helperIds: nextHelpers,
+        startedById: args.requesterId,
+      },
     })
   },
 })
@@ -716,8 +752,9 @@ export const addHelper = mutation({
     }
 
     const requester = requireMember(room, args.requesterId)
+    const isStarter = room.openCombat === true && room.combat.startedById === args.requesterId && !requester.isSpectator
 
-    if (!requester.isHost) {
+    if (!requester.isHost && !isStarter) {
       throw new Error('Only the host can add a helper')
     }
 

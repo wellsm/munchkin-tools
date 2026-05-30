@@ -61,6 +61,7 @@ export default defineSchema({
       partyModifier: v.number(),
       monsterLevel: v.number(),
       monsterModifier: v.number(),
+      startedById: v.optional(v.union(v.string(), v.null())),
     }),
     joinRequests: v.array(
       v.object({
@@ -72,6 +73,7 @@ export default defineSchema({
     maxPlayers: v.number(),
     maxLevel: v.number(),
     started: v.boolean(),
+    openCombat: v.optional(v.boolean()),
     createdAt: v.number(),
   }).index('by_code', ['code']),
 })

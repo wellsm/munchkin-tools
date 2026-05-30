@@ -10,7 +10,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 export function useDebouncedServerValue<T>(
   value: T,
   onCommit: (next: T) => void,
-  delay = 500,
+  delay = 1000,
 ) {
   const [local, setLocal] = useState<T>(value)
 
