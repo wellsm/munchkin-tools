@@ -706,6 +706,19 @@ export const setMainCombatant = mutation({
       throw new Error('Only the host can set the main combatant')
     }
 
+    // Prevent a non-host from hijacking or aborting a combat that another
+    // player already started. Only the host or the current starter may change
+    // an in-progress combat; anyone eligible can start a fresh one.
+    const existingStarter = room.combat.startedById
+
+    if (
+      !requester.isHost &&
+      existingStarter != null &&
+      existingStarter !== args.requesterId
+    ) {
+      throw new Error('A combat is already in progress; only the host or the current starter can change it')
+    }
+
     if (args.targetId !== null) {
       const target = room.players.find((p) => p.playerId === args.targetId)
 
