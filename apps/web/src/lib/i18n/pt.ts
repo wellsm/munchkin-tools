@@ -227,6 +227,8 @@ export const pt: Dictionary = {
     maxHeroesHint: (count: number) =>
       `Não pode ser menor que a contagem atual de heróis (${count}).`,
     maxLevelHint: 'Heróis acima desse nível serão rebaixados.',
+    openCombat: 'Combate aberto',
+    openCombatHint: 'Permite que qualquer jogador inicie e conduza o próprio combate',
     theme: 'Tema',
     themeDark: 'Escuro',
     themeLight: 'Claro',

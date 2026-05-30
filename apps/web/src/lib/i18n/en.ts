@@ -224,6 +224,8 @@ export const en = {
     maxLevel: 'Max Level',
     maxHeroesHint: (count: number) => `Cannot be lower than current hero count (${count}).`,
     maxLevelHint: 'Heroes above this level will be demoted.',
+    openCombat: 'Open combat',
+    openCombatHint: 'Let any player start and run their own combat',
     theme: 'Theme',
     themeDark: 'Dark',
     themeLight: 'Light',
