@@ -531,6 +531,29 @@ export const setMaxLevel = mutation({
   },
 })
 
+export const setOpenCombat = mutation({
+  args: {
+    roomId: v.id('rooms'),
+    requesterId: v.string(),
+    value: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const room = await ctx.db.get(args.roomId)
+
+    if (!room) {
+      throw new Error('Room not found')
+    }
+
+    const requester = requireMember(room, args.requesterId)
+
+    if (!requester.isHost) {
+      throw new Error('Only the host can change open combat')
+    }
+
+    await ctx.db.patch(args.roomId, { openCombat: args.value })
+  },
+})
+
 export const updatePlayer = mutation({
   args: {
     roomId: v.id('rooms'),
