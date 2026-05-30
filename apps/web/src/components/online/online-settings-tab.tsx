@@ -56,6 +56,7 @@ export function OnlineSettingsTab({ room }: Props) {
   const forgetRoom = useRecentRoomsStore((s) => s.forget)
   const setMaxPlayers = useMutation(api.rooms.setMaxPlayers)
   const setMaxLevel = useMutation(api.rooms.setMaxLevel)
+  const setOpenCombat = useMutation(api.rooms.setOpenCombat)
   const leaveRoom = useMutation(api.rooms.leaveRoom)
   const locale = useI18nStore((s) => s.locale)
   const setLocale = useI18nStore((s) => s.setLocale)
@@ -122,6 +123,23 @@ export function OnlineSettingsTab({ room }: Props) {
                 increaseDisabled={room.maxLevel >= MAX_LEVEL_CEILING}
                 hint={t.settings.maxLevelHint}
               />
+              <section className="rounded-xl border border-border/60 bg-card/50 p-4 flex flex-col gap-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-base tracking-widest uppercase text-muted-foreground font-munchkin">
+                    {t.settings.openCombat}
+                  </span>
+                  <Switch
+                    checked={room.openCombat ?? false}
+                    onCheckedChange={(v) =>
+                      setOpenCombat({ roomId, requesterId: playerId, value: v })
+                    }
+                    aria-label={t.settings.openCombat}
+                  />
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {t.settings.openCombatHint}
+                </span>
+              </section>
             </div>
           </div>
         )}
