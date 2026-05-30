@@ -674,7 +674,7 @@ export const setMainCombatant = mutation({
 
     const requester = requireMember(room, args.requesterId)
 
-    if (!requester.isHost) {
+    if (!requester.isHost && !(room.openCombat === true && !requester.isSpectator)) {
       throw new Error('Only the host can set the main combatant')
     }
 
@@ -692,7 +692,7 @@ export const setMainCombatant = mutation({
 
     if (args.targetId === null) {
       await ctx.db.patch(args.roomId, {
-        combat: { ...room.combat, mainCombatantId: null, helperIds: [] },
+        combat: { ...room.combat, mainCombatantId: null, helperIds: [], startedById: null },
       })
 
       return
@@ -700,7 +700,12 @@ export const setMainCombatant = mutation({
 
     const nextHelpers = room.combat.helperIds.filter((id) => id !== args.targetId)
     await ctx.db.patch(args.roomId, {
-      combat: { ...room.combat, mainCombatantId: args.targetId, helperIds: nextHelpers },
+      combat: {
+        ...room.combat,
+        mainCombatantId: args.targetId,
+        helperIds: nextHelpers,
+        startedById: args.requesterId,
+      },
     })
   },
 })
