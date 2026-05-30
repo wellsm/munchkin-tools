@@ -21,8 +21,11 @@ non-interactive `<span>`:
   in `online-fighting-view.tsx`. In the fighting view the buttons are disabled
   when the user lacks combat control (`!canControl`).
 - **`StatCard`** (`apps/web/src/components/app/stat-card.tsx`) — value with
-  chevron-down / chevron-up below it. Used in `player-edit.tsx` for hero level
-  (1–maxLevel) and gear (unbounded).
+  chevron-down / chevron-up below it. Used for hero level (1–maxLevel) and gear
+  (unbounded) in **two** screens: `apps/web/src/app/player-edit.tsx` (offline,
+  via `commitField`) and `apps/web/src/app/online-player-edit.tsx` (online, via
+  the debounced `setLocalLevel`/`setLocalGear`). Online additionally gates edits
+  behind `canEdit`.
 
 Both currently take only `decreaseDisabled`/`increaseDisabled` (or
 `downDisabled`/`upDisabled`) booleans — no numeric min/max.
@@ -97,9 +100,15 @@ value, only the in-progress draft string and an `editing` boolean.
 - `settings-tab.tsx`: same bounds (3–8, 1–99).
 - `online-fighting-view.tsx`: monster level `min={0}` + `editDisabled={!canControl}`;
   party/monster modifiers no min/max + `editDisabled={!canControl}`.
-- `player-edit.tsx`: hero level `min={1} max={settings.maxLevel}` with an
-  `onChange`; gear `onChange` with no bounds. (Wire `onChange` to the same
-  setter the chevrons use.)
+- `app/player-edit.tsx` (offline): hero level `min={1}
+  max={settings.maxLevel}` with `onChange={(n) => commitField('level', n)}`;
+  gear `onChange={(n) => commitField('gear', n)}` no bounds.
+- `app/online-player-edit.tsx` (online): hero level `min={1}
+  max={room.maxLevel}` with `onChange={setLocalLevel}` +
+  `editDisabled={!canEdit}`; gear `onChange={setLocalGear}` no bounds +
+  `editDisabled={!canEdit}`. (`setLocalLevel`/`setLocalGear` take an absolute
+  value and feed the debounced mutation — EditableNumber already clamps, so the
+  existing `Math.max/min` in the chevron handlers is not needed on this path.)
 
 Numbers without bounds (modifiers, gear) get no `min`/`max`, so any integer
 (including negative) is accepted.
@@ -121,6 +130,18 @@ This repo only has vitest tests for pure functions (`apps/web/src/lib/*.test.ts`
 - Manual smoke test: click each number type, type a value, confirm with Enter
   and with blur, cancel with Esc, try out-of-range (clamps) and empty (reverts),
   try a negative modifier, and confirm a disabled combat stepper is not editable.
+
+## Also: restore debounce default to 500ms
+
+The `useDebouncedServerValue` hook
+(`apps/web/src/lib/use-debounced-server-value.ts`) had its default `delay`
+parameter changed from `500` to `1000` in a recent WIP commit. Revert it to
+`delay = 500`. None of the call sites pass an override, so this single default
+change restores the prior 500ms cadence everywhere it's used (combat monster
+level / party modifier / monster modifier in `online-fighting-view.tsx`, and
+hero level / gear in `online-player-edit.tsx`). Typed-value commits land
+immediately on Enter/blur via the new EditableNumber `onChange`; the debounce
+only affects the +/- button auto-commit.
 
 ## Out of scope
 
