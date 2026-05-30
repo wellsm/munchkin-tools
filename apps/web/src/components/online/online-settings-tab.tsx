@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Coffee, DoorOpen, MessageSquare, Moon, Sun } from 'lucide-react'
+import { ChevronDown, Coffee, DoorOpen, MessageSquare, Moon, Sun } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from 'convex/react'
 import { api } from '@munchkin-tools/convex/convex/_generated/api'
@@ -8,6 +8,7 @@ import { Header } from '@/components/app/header'
 import { SectionLabel } from '@/components/app/section-label'
 import { StepperCard } from '@/components/app/stepper-card'
 import { SuggestionSheet } from '@/components/app/suggestion-sheet'
+import { SpectatorPickerSheet } from '@/components/online/spectator-picker-sheet'
 import { SUPPORT_URL } from '@/lib/support'
 import { useSuggestionsVisible } from '@/lib/use-suggestions-visible'
 import { useSupportVisible } from '@/lib/use-support-visible'
@@ -55,7 +56,6 @@ export function OnlineSettingsTab({ room }: Props) {
   const forgetRoom = useRecentRoomsStore((s) => s.forget)
   const setMaxPlayers = useMutation(api.rooms.setMaxPlayers)
   const setMaxLevel = useMutation(api.rooms.setMaxLevel)
-  const setSpectator = useMutation(api.rooms.setSpectator)
   const leaveRoom = useMutation(api.rooms.leaveRoom)
   const locale = useI18nStore((s) => s.locale)
   const setLocale = useI18nStore((s) => s.setLocale)
@@ -66,10 +66,12 @@ export function OnlineSettingsTab({ room }: Props) {
   const supportVisible = useSupportVisible()
   const suggestionsVisible = useSuggestionsVisible()
   const [suggestionOpen, setSuggestionOpen] = useState(false)
+  const [spectatorOpen, setSpectatorOpen] = useState(false)
 
   const myPlayer = room.players.find((p) => p.playerId === playerId)
   const isHost = myPlayer?.isHost ?? false
   const playerCount = room.players.length
+  const spectators = room.players.filter((p) => p.isSpectator)
   const roomId = room._id as Id<'rooms'>
 
   const decreaseMaxPlayersDisabled =
@@ -95,7 +97,7 @@ export function OnlineSettingsTab({ room }: Props) {
         onHome={() => navigate('/')}
         right={<NotificationButton room={room} />}
       />
-      <div className="flex-1 min-h-0 overflow-auto p-4 pb-8 max-w-md mx-auto w-full flex flex-col gap-4">
+      <div className="flex-1 min-h-0 overflow-auto p-4 pb-8 max-w-md lg:max-w-3xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-4 content-start">
         {isHost && (
           <div>
             <SectionLabel>{t.settings.party}</SectionLabel>
@@ -127,39 +129,23 @@ export function OnlineSettingsTab({ room }: Props) {
         {isHost && (
           <div>
             <SectionLabel>{t.spectators.section}</SectionLabel>
-            <div className="flex flex-col gap-2 mb-2">
-              <p className="text-xs text-muted-foreground px-1">
-                {t.spectators.description}
-              </p>
-              <ul className="flex flex-col gap-2">
-                {room.players.map((p) => {
-                  const isSpec = p.isSpectator ?? false
-
-                  return (
-                    <li
-                      key={p.playerId}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-card/50 px-4 py-3"
-                    >
-                      <span className="font-munchkin text-lg truncate">
-                        {p.name}
-                      </span>
-                      <Switch
-                        checked={isSpec}
-                        onCheckedChange={(value) =>
-                          setSpectator({
-                            roomId,
-                            requesterId: playerId,
-                            targetId: p.playerId,
-                            value,
-                          })
-                        }
-                        aria-label={t.spectators.toggleAria(p.name)}
-                      />
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
+            <button
+              type="button"
+              onClick={() => setSpectatorOpen(true)}
+              aria-label={t.spectators.triggerAria}
+              className="w-full flex items-center justify-between gap-2 rounded-xl border border-border/60 bg-card/50 px-4 py-3 hover:bg-accent transition-colors"
+            >
+              <span className="text-base font-munchkin tracking-wide truncate text-left">
+                {spectators.length === 0 ? (
+                  <span className="text-muted-foreground">
+                    {t.spectators.empty}
+                  </span>
+                ) : (
+                  spectators.map((p) => p.name).join(', ')
+                )}
+              </span>
+              <ChevronDown className="size-4 shrink-0 opacity-60" />
+            </button>
           </div>
         )}
 
@@ -304,6 +290,11 @@ export function OnlineSettingsTab({ room }: Props) {
       <SuggestionSheet
         open={suggestionOpen}
         onOpenChange={setSuggestionOpen}
+      />
+      <SpectatorPickerSheet
+        room={room}
+        open={spectatorOpen}
+        onOpenChange={setSpectatorOpen}
       />
     </div>
   )

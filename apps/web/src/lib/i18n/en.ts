@@ -68,6 +68,10 @@ export const en = {
     section: 'Spectators',
     description: 'Spectators stay in the room and (if host) can control the game, but do not appear in heroes or combat lists.',
     toggleAria: (name: string) => `Toggle spectator for ${name}`,
+    empty: 'None',
+    pickTitle: 'Pick spectators',
+    triggerAria: 'Select spectators',
+    countLabel: (n: number) => `${n} spectator${n === 1 ? '' : 's'}`,
   },
   waitingRoom: {
     title: 'Waiting Room',

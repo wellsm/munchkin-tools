@@ -70,6 +70,10 @@ export const pt: Dictionary = {
     section: 'Espectadores',
     description: 'Espectadores ficam na sala e (se host) podem controlar a partida, mas não aparecem nas listas de heróis e combate.',
     toggleAria: (name: string) => `Alternar espectador de ${name}`,
+    empty: 'Nenhum',
+    pickTitle: 'Escolher espectadores',
+    triggerAria: 'Selecionar espectadores',
+    countLabel: (n: number) => `${n} espectador${n === 1 ? '' : 'es'}`,
   },
   waitingRoom: {
     title: 'Sala de Espera',

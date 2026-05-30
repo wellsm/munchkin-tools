@@ -24,7 +24,7 @@ export function Chip({ active, size = 'default', children, color, variant = 'def
         borderColor: color, color
       } : undefined}
       className={cn(
-        'inline-flex items-center gap-2 border transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+        'inline-flex items-center gap-1 border transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
         active
           ? useCustomColor
             ? 'border-transparent'
