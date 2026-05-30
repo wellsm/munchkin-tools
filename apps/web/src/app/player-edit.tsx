@@ -328,6 +328,9 @@ export function PlayerEdit() {
             onUp={() => handleLevelChange(1)}
             downDisabled={source.level <= MIN_LEVEL}
             upDisabled={source.level >= settings.maxLevel}
+            onChange={(n) => commitField('level', n)}
+            min={MIN_LEVEL}
+            max={settings.maxLevel}
           />
           <div className="flex flex-col items-center justify-center">
             <span className="text-xs tracking-widest uppercase text-muted-foreground mt-4">
@@ -342,6 +345,7 @@ export function PlayerEdit() {
             value={source.gear}
             onDown={() => handleGearChange(-1)}
             onUp={() => handleGearChange(1)}
+            onChange={(n) => commitField('gear', n)}
           />
         </div>
 

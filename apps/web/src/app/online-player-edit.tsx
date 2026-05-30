@@ -395,6 +395,10 @@ export function OnlinePlayerEdit() {
             onUp={() => handleLevelChange(1)}
             downDisabled={!canEdit || localLevel <= MIN_LEVEL}
             upDisabled={!canEdit || localLevel >= room.maxLevel}
+            onChange={setLocalLevel}
+            min={MIN_LEVEL}
+            max={room.maxLevel}
+            editDisabled={!canEdit}
           />
           <div className="flex flex-col items-center justify-center">
             <span className="text-xs tracking-widest uppercase text-muted-foreground mt-4">
@@ -411,6 +415,8 @@ export function OnlinePlayerEdit() {
             onUp={() => handleGearChange(1)}
             downDisabled={!canEdit}
             upDisabled={!canEdit}
+            onChange={setLocalGear}
+            editDisabled={!canEdit}
           />
         </div>
 
