@@ -102,7 +102,7 @@ function requireCombatControl(room: Room, requesterId: string): void {
   const requester = requireMember(room, requesterId)
   const isMain = room.combat.mainCombatantId === requesterId
   const isHelper = room.combat.helperIds.includes(requesterId)
-  const isStarter = room.openCombat === true && room.combat.startedById === requesterId
+  const isStarter = room.openCombat === true && room.combat.startedById === requesterId && !requester.isSpectator
 
   if (!isMain && !isHelper && !requester.isHost && !isStarter) {
     throw new Error('Only the fighter, their helper, or the host can control this combat')
@@ -463,6 +463,7 @@ export const leaveRoom = mutation({
       mainCombatantId:
         room.combat.mainCombatantId === args.playerId ? null : room.combat.mainCombatantId,
       helperIds: room.combat.helperIds.filter((id) => id !== args.playerId),
+      startedById: room.combat.startedById === args.playerId ? null : room.combat.startedById,
     }
     const nextRequests = room.joinRequests.filter((r) => r.playerId !== args.playerId)
 
@@ -676,6 +677,10 @@ export const setSpectator = mutation({
       } else if (combat.helperIds.includes(args.targetId)) {
         combat = { ...combat, helperIds: combat.helperIds.filter((id) => id !== args.targetId) }
       }
+
+      if (combat.startedById === args.targetId) {
+        combat = { ...combat, startedById: null }
+      }
     }
 
     await ctx.db.patch(args.roomId, { players: next, combat })
@@ -747,7 +752,7 @@ export const addHelper = mutation({
     }
 
     const requester = requireMember(room, args.requesterId)
-    const isStarter = room.openCombat === true && room.combat.startedById === args.requesterId
+    const isStarter = room.openCombat === true && room.combat.startedById === args.requesterId && !requester.isSpectator
 
     if (!requester.isHost && !isStarter) {
       throw new Error('Only the host can add a helper')
