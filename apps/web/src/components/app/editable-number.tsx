@@ -68,11 +68,13 @@ export function EditableNumber({
         type="text"
         inputMode="numeric"
         value={draft}
-        onChange={(e) => setDraft(e.target.value.replace(/[^0-9-]/g, ''))}
+        onChange={(e) =>
+          setDraft(e.target.value.replace(/[^0-9-]/g, '').replace(/(?!^)-/g, ''))
+        }
         onBlur={commit}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
-            commit()
+            inputRef.current?.blur()
           } else if (e.key === 'Escape') {
             setEditing(false)
           }
