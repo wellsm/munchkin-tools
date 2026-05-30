@@ -724,8 +724,9 @@ export const addHelper = mutation({
     }
 
     const requester = requireMember(room, args.requesterId)
+    const isStarter = room.openCombat === true && room.combat.startedById === args.requesterId
 
-    if (!requester.isHost) {
+    if (!requester.isHost && !isStarter) {
       throw new Error('Only the host can add a helper')
     }
 
