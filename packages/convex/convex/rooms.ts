@@ -72,6 +72,7 @@ function defaultCombat(): Room['combat'] {
     partyModifier: 0,
     monsterLevel: 0,
     monsterModifier: 0,
+    startedById: null,
   }
 }
 
